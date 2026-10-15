@@ -25,11 +25,11 @@ Compare against a previously saved JSON report:
 python -m reversium project.zip --compare reports/previous/report.json --output reports/current
 ```
 
-Comparison lists added/removed files and findings, and changed readable files with hashes in both reports. Moving a finding to a different line alone does not count as a new finding. Comparison is currently CLI-only; reports and exports display the results.
+Comparison lists added/removed files and findings, and changed inspected files with hashes in both reports (including binaries). Moving a finding to a different line or byte offset alone does not count as a new finding. Comparison is currently CLI-only; reports and exports display the results.
 
 ## Current coverage
 
-- ZIP member inventory, source language counts, source hashes, binary candidates.
+- ZIP member inventory, source language counts and hashes for inspected content.
 - Python AST imports, classes, functions and main guards.
 - JavaScript/TypeScript import and require heuristics, package.json dependency inventory.
 - requirements.txt and go.mod dependency names (common declarations only).
@@ -37,9 +37,14 @@ Comparison lists added/removed files and findings, and changed readable files wi
 - Heuristic non-Python route and endpoint-host candidates, with file and line references.
 - Conservative Python and JavaScript/TypeScript local module links, including relative imports, index files and emitted .js to TypeScript path candidates. Ambiguous matches are retained without selecting a target.
 - Internal/external/unresolved/ambiguous labels and per-file analysis coverage.
+- Static binary identification and metadata: PE/ELF library references, Java class references, DEX/Mach-O header identification and APK/JAR-like container directories. Binary evidence uses byte offsets; partial/unsupported readers remain explicit.
+- Evidence-backed platform/framework/runtime candidates and supporting service references from known libraries and simple Docker/Compose image declarations.
+- Setup/readiness assessment with unconfirmed requirements; no automatic installation or execution.
 - Embedded SVG diagram of file-to-import/package mentions, evidence table and explicit limitations.
 
-Diagrams show import/package references and local path candidates, not call graphs. An external import label requires a matching declared package name; unknown references remain unresolved (including Python standard-library imports). Aliases, custom module paths and dynamic imports are not resolved. JavaScript is still scanned heuristically; Python is the only AST parser. Other supported extensions receive language inventory only. No claim of complete architecture recovery, vulnerability detection, cost estimation or binary decompilation is made in this release. Files are not extracted, built, imported or executed. Nested archives are inventoried without recursion.
+Diagrams show import/package references and local path candidates, not call graphs. An external import label requires a matching declared package name; unknown references remain unresolved (including Python standard-library imports). Aliases, custom module paths and dynamic imports are not resolved. JavaScript is still scanned heuristically; Python is the only AST parser. Other source languages receive language inventory only. No claim of complete architecture recovery, vulnerability detection, cost estimation or binary decompilation is made in this release. Files are not extracted, built, imported or executed. Nested ZIP containers receive bounded directory-only inspection, without recursive content analysis. See [binary coverage and limits](docs/BINARY_ANALYSIS.md).
+
+The platform profile identifies likely components and supporting services, not an exact business specification or a verified deployment. Client references can be optional or development-only. The application does not install, start or health-check submitted software; stable operation, resource sizing and required service versions remain unverified. Reversium is free to run, while the analyzed software may require paid or private external services.
 
 Browser uploads are capped at 64 MiB. Both entry points reject archives over 10,000 entries or 256 MiB declared uncompressed size, unsafe paths, symlinks and duplicate member names. Individual content reads are capped at 4 MiB; compression ratios above 200:1 are skipped. Encrypted members are skipped. Reports can contain private paths and symbol names; review them before sharing. Run locally on trusted hardware; static parsing still consumes resources.
 
@@ -50,4 +55,4 @@ Browser uploads are capped at 64 MiB. Both entry points reject archives over 10,
 - [Plain-language explanation](docs/PLAIN_LANGUAGE.md)
 - [Contributing](CONTRIBUTING.md)
 
-Licensed under MIT. Binary analyzers will be optional adapters with their own license notices. The core will continue to work without AI or paid services.
+Licensed under MIT. The built-in static binary reader has no third-party dependencies. External decompiler adapters remain planned and will have their own license notices. The core continues to work without AI or paid services.

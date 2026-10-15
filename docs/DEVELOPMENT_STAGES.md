@@ -40,13 +40,25 @@ Verification on 2026-10-15:
 
 Remaining Stage 2 work: additional language parsers, broader framework/manifest coverage, browser baseline selection, improved alias/re-export handling, and richer graph layouts. Python remains the sole AST parser; JavaScript/TypeScript remains heuristic. Cross-language calls and actual runtime behavior are not inferred. Binary analysis remains Stage 3.
 
-## Stage 3 — Binary inspection (planned)
+## Stage 3 — Binary inspection (first increment delivered, v0.3.0)
 
-- Detect binary formats by signatures, not extensions alone.
-- Add imports, metadata and strings with offsets as evidence.
-- Optional ILSpy, JADX/Java and Ghidra headless adapters.
-- Bound analyzer runtime/output and show tool versions and failure status.
-- Keep original artifacts unchanged and report decompilation uncertainty.
+Implemented:
+- Local dependency-free static reader `reversium-static/1`, with explicit complete/partial/unsupported inspection status. No submitted code is executed or extracted.
+- Signature recognition for PE candidates, ELF, Java class, DEX, Mach-O and ZIP containers; APK/JAR-like directory markers. Renamed and extensionless binaries can be detected within content limits.
+- PE architecture/bitness, CLR-directory marker and ordinary imported DLL names; ELF architecture/bitness/endian and section-based DT_NEEDED references; Java version/class references.
+- DEX/Mach-O header identification; bounded nested-container directory inspection, without nested member extraction.
+- Bounded ASCII string samples, limited credential-assignment omission and URL host-only samples. Source evidence keeps line numbers; binary evidence uses byte offsets.
+- Binary metadata table and byte-offset evidence in HTML/JSON reports. Hash comparisons include inspected binaries via `changed_files`.
+- Evidence-linked platform profile: framework/runtime candidates, supporting database/cache/broker/integration references and simple Docker/Compose image candidates.
+- Setup/readiness section lists unknowns explicitly: the tool does not install, build, start or health-check the software, or certify stability.
+- Reproducible synthetic fixtures and [binary coverage/limits](BINARY_ANALYSIS.md).
+
+Verification on 2026-10-15:
+- All 30 tests pass, including PE/ELF imports, Java references, ELF 32-bit big-endian header, DEX/Mach-O identification, malformed offsets/truncation, output limits, signature detection, binary comparisons, service evidence and source URL credential omission. The loopback HTTP test ran outside sandbox socket restrictions.
+- CLI mixed binary fixture generation and HTML/JSON export completed. Browser upload on local port 8768 showed 8 files, 5 binary candidates, 27 findings and the expected partial status for broken.exe. Filtering `binary_import` showed 2 findings with offsets. Downloaded JSON contains schema version 3 and full results.
+- Visually checked report profile, service references and binary table. Screenshot is saved locally under ignored `reports/browser-binary.jpg`. Tests use synthetic metadata fixtures, not reconstructed production applications. Broader real-world binary coverage remains to be validated.
+
+Remaining: external decompiler adapters (ILSpy/JADX/Ghidra), richer native imports/symbols, UTF-16 strings, program-header-only ELF imports, and deeper Mach-O/DEX/managed metadata. No optional tool is installed or invoked in this increment. Reader status describes supported field inspection, not whole-file validity. Platform purpose and service needs are candidates; business behavior and deployment stability are unverified.
 
 Exit criterion: supported binary fixtures yield reproducible evidence without executing their programs. Tool installation and redistribution notices must be documented.
 
@@ -61,7 +73,10 @@ Exit criterion: supported binary fixtures yield reproducible evidence without ex
 
 Separate disposable-VM workflow with explicit user control, network capture and behavior evidence. Never execute submitted programs in the main application process. This stage is outside the initial static-analysis release.
 
+Future setup workflow: produce a reviewable run plan (OS/architecture, pinned dependencies, services, environment-variable names, migrations and startup commands), then validate in a disposable VM. Only successful installation, startup, health checks and service checks may establish that a package runs. Stability additionally needs load, restart/recovery, backup and monitoring validation. None of those steps are performed by v0.3.0.
+
 ## Change log
 
+- 2026-10-15: Delivered v0.3.0 static binary inspection and evidence-backed platform/service candidates; 30 tests pass. Automatic setup/execution and decompiler adapters remain future work. No new runtime dependencies, network services or paid features.
 - 2026-10-15: Delivered v0.2.0 source-resolution/reporting increment, verified browser workflow and responsive layout, and expanded tests from 8 to 16. No paid service or new runtime dependency added.
 - 2026-10-15: Created initial workbench and living documents. Configured project identity for TheFamousJC/reversium. Remote reachability and publishing depend on available network access.

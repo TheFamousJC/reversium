@@ -94,7 +94,7 @@ def resolve_imports(report):
 
 def compare_reports(current, previous):
     """Compare stable evidence identities; line movement alone is not a new finding."""
-    if not isinstance(previous, dict) or previous.get('schema_version') not in (1, 2):
+    if not isinstance(previous, dict) or previous.get('schema_version') not in (1, 2, 3):
         raise ValueError('Unsupported baseline report schema.')
     if not isinstance(previous.get('files'), list) or not isinstance(previous.get('findings'), list):
         raise ValueError('Baseline must contain files and findings lists.')
@@ -103,7 +103,9 @@ def compare_reports(current, previous):
     identity = lambda f: (f['kind'], f['value'], f['evidence']['file'])
     old_findings = {identity(f) for f in previous['findings']}
     new_findings = {identity(f) for f in current['findings']}
+    changed = sorted(p for p in new.keys() & old.keys() if new[p].get('sha256') and old[p].get('sha256') and new[p]['sha256'] != old[p]['sha256'])
     return {'added_files': sorted(new.keys() - old.keys()), 'removed_files': sorted(old.keys() - new.keys()),
-            'changed_source_files': sorted(p for p in new.keys() & old.keys() if new[p].get('sha256') and old[p].get('sha256') and new[p]['sha256'] != old[p]['sha256']),
+            'changed_files': changed,
+            'changed_source_files': [p for p in changed if new[p].get('category') == 'source'],
             'added_findings': [dict(kind=k, value=v, file=p) for k, v, p in sorted(new_findings - old_findings)],
             'removed_findings': [dict(kind=k, value=v, file=p) for k, v, p in sorted(old_findings - new_findings)]}
