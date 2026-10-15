@@ -34,7 +34,7 @@ python tests/make_binary_fixture.py
 python -m reversium reports/binary-fixture.zip --output reports/binary
 ```
 
-The generated fixture contains synthetic metadata only, plus a tiny source/config example. It is not a working software platform. The browser upload should report 8 files, 5 binary candidates and 27 findings. Filtering evidence to `binary_import` shows KERNEL32.dll and libc.so.6. Fixture artifacts are ignored by Git.
+The generated fixture contains synthetic metadata only, plus a tiny source/config example. It is not a working software platform. With the v0.5.0 route tracer, analysis reports 8 files, 5 binary candidates and 29 findings (including the source handler/response evidence). Filtering evidence to `binary_import` shows KERNEL32.dll and libc.so.6. Fixture artifacts are ignored by Git.
 
 ## Format references
 

@@ -12,6 +12,7 @@ from http.server import ThreadingHTTPServer
 from reversium.analyze import inspect_zip, MAX_FILE
 from reversium.report import render
 from reversium.__main__ import Handler
+from reversium import __version__
 
 
 def archive(files):
@@ -72,6 +73,12 @@ class AnalysisTests(unittest.TestCase):
             connection = http.client.HTTPConnection('127.0.0.1', server.server_port)
             connection.request('GET', '/')
             self.assertIn(b'Reversium', connection.getresponse().read())
+            connection.request('GET', '/example')
+            sample = connection.getresponse().read()
+            self.assertIn(b'Feature traced through code', sample)
+            self.assertIn(b'role="tablist" aria-label="Report sections">', sample)
+            connection.request('GET', '/version')
+            self.assertEqual(json.loads(connection.getresponse().read())['version'], __version__)
             data = archive([('a.py', 'import os')]).getvalue()
             connection.request('POST', '/analyze', body=data, headers={'Content-Type': 'application/zip'})
             self.assertIn(b'a.py:1', connection.getresponse().read())

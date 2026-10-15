@@ -32,9 +32,20 @@ def explain_software(report):
     def component_key(item):
         return item['value'].lower().replace('_', '-').split('.')[0]
 
+    traced_routes = set()
+    for trace in report.get('route_traces', []):
+        if not trace['operations']:
+            continue
+        traced_routes.add(trace['route'])
+        descriptions = list(dict.fromkeys(item['description'] for item in trace['operations']))
+        add('Feature traced through code', f'The handler “{trace["handler"]}” for {trace["method"]} {trace["route"]} contains code that: ' + ' '.join(descriptions[:8]),
+            ' '.join(trace['unknowns']) + (' Additional operations are available in Evidence.' if len(descriptions) > 8 else ''), trace['evidence_indices'])
+
     for index, item in enumerate(findings):
         kind, value = item['kind'], item['value']
         if kind == 'route_candidate':
+            if value in traced_routes:
+                continue
             add('Possible web entry point', f'The code contains a possible web entry point named “{value}”. Other software or a browser may be able to send requests to it.',
                 'The name does not establish what it returns, who can access it, whether it is enabled, or what business task it performs.', [index])
         elif kind == 'model_candidate':

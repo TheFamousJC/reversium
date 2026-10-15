@@ -1,5 +1,6 @@
 import argparse
 import json
+import socket
 import tempfile
 import threading
 import webbrowser
@@ -8,8 +9,10 @@ from pathlib import Path
 from .analyze import inspect_zip
 from .report import render, STYLE
 from .source import compare_reports
+from .sample import sample_archive
+from . import __version__
 
-HOME = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium</title><style>''' + STYLE + '''</style><main><p class="brand">REVERSIUM / PRIVATE BY DESIGN</p><h1>From archive to understanding.</h1><p>Inspect a ZIP on your computer. Discover source files, dependencies, route candidates and architecture evidence. No accounts, API keys or uploads to a cloud service.</p><form><input aria-label="Choose ZIP archive" type="file" accept=".zip" required><button>Analyze archive</button></form><p id="status" role="status">Maximum ZIP size: 64 MiB. Input code is never executed.</p><p>Python AST analysis · JavaScript/TypeScript import scanning · Platform profile · Supporting services · Static binary inspection</p><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=document.querySelector('input').files[0],s=document.querySelector('#status'),b=document.querySelector('button');if(f.size>67108864){s.textContent='ZIP exceeds 64 MiB.';return}b.disabled=true;s.textContent='Analyzing locally…';try{const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/zip'},body:f});if(!r.ok)throw new Error(await r.text());document.open();document.write(await r.text());document.close()}catch(e){s.textContent=e.message;b.disabled=false}};</script></main></html>'''
+HOME = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium</title><style>''' + STYLE + '''</style><main><p class="brand">REVERSIUM 0.5.0 / PRIVATE BY DESIGN</p><h1>From archive to understanding.</h1><p>Inspect a ZIP on your computer. Discover source files, dependencies, route candidates and architecture evidence. No accounts, API keys or uploads to a cloud service.</p><p>Understand an unfamiliar software package, trace supported features, and prepare maintenance or migration work. Report sections: What this software does, Architecture, Evidence, and Coverage.</p><p><a href="/example">Open a local sample report</a> to see all four tabs, or analyze your ZIP below.</p><nav aria-label="Preview report sections"><a class="preview-tab" href="/example#panel-behavior">What this software does</a><a class="preview-tab" href="/example#panel-architecture">Architecture</a><a class="preview-tab" href="/example#panel-evidence">Evidence</a><a class="preview-tab" href="/example#panel-coverage">Coverage</a></nav><form><input aria-label="Choose ZIP archive" type="file" accept=".zip" required><button>Analyze archive</button></form><p id="status" role="status">Maximum ZIP size: 64 MiB. Input code is never executed.</p><p>Python AST analysis · JavaScript/TypeScript import scanning · Platform profile · Supporting services · Static binary inspection</p><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=document.querySelector('input').files[0],s=document.querySelector('#status'),b=document.querySelector('button');if(f.size>67108864){s.textContent='ZIP exceeds 64 MiB.';return}b.disabled=true;s.textContent='Analyzing locally…';try{const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/zip'},body:f});if(!r.ok)throw new Error(await r.text());document.open();document.write(await r.text());document.close()}catch(e){s.textContent=e.message;b.disabled=false}};</script></main></html>'''
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -30,6 +33,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.valid_host():
             return self.send(403, 'Invalid host.')
+        if self.path == '/example':
+            return self.send(200, render(inspect_zip(sample_archive())))
+        if self.path == '/version':
+            return self.send(200, json.dumps({'version': __version__}), 'application/json')
         self.send(200, HOME) if self.path == '/' else self.send(404, 'Not found.')
 
     def do_POST(self):
@@ -70,6 +77,17 @@ class Handler(BaseHTTPRequestHandler):
             self.send(400, 'Unable to analyze ZIP. Check archive integrity, safe paths, encryption and documented size limits.', 'text/plain; charset=utf-8')
 
 
+class LocalHTTPServer(ThreadingHTTPServer):
+    # Windows can let multiple SO_REUSEADDR listeners bind the same port,
+    # causing a newly launched browser to reach an older process.
+    allow_reuse_address = False
+
+    def server_bind(self):
+        if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
+
+
 def main():
     parser = argparse.ArgumentParser(description='Reversium local archive analysis')
     parser.add_argument('archive', nargs='?', help='ZIP to inspect; omit to start browser UI')
@@ -94,10 +112,16 @@ def main():
         (output / 'report.html').write_text(render(result), encoding='utf-8')
         print(f'Reports saved to {output.resolve()}')
         return
-    server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
+    try:
+        server = LocalHTTPServer(('127.0.0.1', args.port), Handler)
+    except OSError:
+        if args.port != 8765:
+            raise
+        print('Default port is busy. Starting this version on a free port instead of using an older server.', flush=True)
+        server = LocalHTTPServer(('127.0.0.1', 0), Handler)
     server.daemon_threads = True
     url = f'http://127.0.0.1:{server.server_port}'
-    print(f'Reversium: {url} (Ctrl+C to stop)')
+    print(f'Reversium {__version__}: {url} (Ctrl+C to stop)', flush=True)
     if not args.no_browser:
         threading.Timer(0.5, webbrowser.open, args=(url,)).start()
     try:

@@ -12,6 +12,8 @@ Choose a ZIP in the browser at http://127.0.0.1:8765. Analysis stays on your com
 
 On Windows, `./Start-Reversium.ps1` also starts the application and can use the bundled Codex Python runtime when available.
 
+The Windows launcher now selects a free local port. Use the address it opens and check the displayed version (0.5.0); an already-running server continues serving its older code until restarted. The CLI uses 8765 by default and selects a free port if that default is busy. `--port 0` explicitly requests a free port.
+
 ```sh
 python -m reversium project.zip --output reports/project
 python -m unittest discover -s tests -v
@@ -22,6 +24,14 @@ The CLI writes standalone `report.html` and structured `report.json`. It overwri
 Reports open on **What this software does**, a plain-language overview with evidence links and explicit unknowns. **Architecture** holds the platform profile, supporting services and diagram; **Evidence** holds filterable findings and baseline comparison; **Coverage** holds binary inspection, inventory, readiness and limitations. Tabs support arrow/Home/End keyboard navigation. Saved HTML retains all sections; printing or disabling JavaScript exposes all sections. Analysis does not establish an exact behavioral specification of arbitrary uploaded programs.
 
 Explanations use local rules only, with no AI or added dependencies. Each explanation links to matching findings and includes what remains unverified. Links clear any evidence filter and focus the referenced row. Up to 16 explanation groups appear in the overview, with an explicit omitted count; full findings stay available. Packages without supported clues get an insufficient-evidence result. Structured explanations are included in the report JSON's additive `behavior` field (schema version 3).
+
+Python feature tracing follows module-level decorated route handlers into uniquely resolved local/imported helpers and recognizes supported SQLite reads/writes/commits and response shapes. Trace evidence and limits are recorded in `route_traces` and findings. Dynamic SQL, unresolved calls, class-based handlers, ORM calls and other languages remain unknown. This is bounded syntax tracing, not execution or control-flow verification.
+
+Tabs are visible before scripting initializes and remain near the top while scrolling; without JavaScript, their anchors navigate the visible sections. The home page links to a built-in local sample report showing the four sections. Sample source is analyzed, never executed.
+
+## Practical use
+
+Reversium helps with initial software due diligence, legacy-system handover and maintenance/migration discovery. Use it to locate likely features, follow supported routes to data operations, and inventory dependencies before deeper review. It provides evidence and open questions rather than a certified functional specification, runtime validation or automatic rebuild.
 
 Compare against a previously saved JSON report:
 

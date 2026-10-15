@@ -20,6 +20,18 @@ On Windows you can also run `./Start-Reversium.ps1`. Reports now open on “What
 
 Each explanation includes “Still unknown” and a link to its supporting finding. Click that link to open the exact evidence, even if a search filter previously hid it. The overview shows up to 16 groups; additional findings remain available in Evidence. If the tool lacks enough evidence, it says so instead of inventing a purpose.
 
+The latest version follows some Python web handlers into helper functions, including helpers in other files. When it recognizes SQLite operations, it can explain that code reads, adds, updates or deletes records, asks to save pending changes, or returns rows or named response fields. For example, the local sample links a request for contacts to the helper that reads the contacts table. The evidence includes both the handler and the data operation.
+
+This is still a code trace, not a successful test run. The code might run only in certain conditions, be unused or fail. Unsupported calls and dynamically built database queries stay unknown. Other languages, class-based handlers and database frameworks are not traced in this version.
+
+If tabs were missing, start the current version with `./Start-Reversium.ps1` and use the new browser address it opens. The launcher now chooses a free local port, so an older server on port 8765 does not keep serving the old interface. Look for version 0.5.0 at the top. The home page offers sample links for all four sections; after analyzing a ZIP, report navigation stays visible near the top and while scrolling. Without JavaScript, the links still move between visible sections.
+
+## What is the practical application?
+
+Use Reversium when you receive unfamiliar software and need an evidence-backed starting point. A maintainer can locate a route and the database operation behind it. Someone taking over a legacy system can inventory files, dependencies and possible features. A team planning a migration can find components and supporting services that need investigation before estimating a rebuild.
+
+The useful output is a map of what was found, where it was found, and what must still be checked. It saves initial discovery work. It does not yet run the submitted system, prove all business rules, certify security or produce a stable rebuilt application.
+
 In Evidence, type in Filter evidence to find a file, name or reference type. Download JSON saves structured results for later comparison; Download HTML saves a report you can open in a browser. Both downloads include all sections and findings, even when another tab or filter is active. Printed reports show every section. On a narrow screen, slide the diagram or table sideways to see the remaining columns.
 
 To compare two versions, save the first JSON report, then run `python -m reversium new-package.zip --compare reports/old/report.json --output reports/new`. The new report lists added and removed files and findings. It can identify changed readable files when both versions were inspected. It does not yet compare how programs behave, and comparison currently starts from the terminal.
@@ -27,6 +39,8 @@ To compare two versions, save the first JSON report, then run `python -m reversi
 ## What we checked
 
 We tested the source example, both report formats, and desktop-size and narrow phone-size layouts. For binary analysis, we uploaded a second example containing source, settings and synthetic program headers. The browser showed 8 files, 5 binary candidates and 27 findings. It correctly showed one broken file as partial, identified likely supporting services, and filtered the two imported-library findings. The new explanation tab shows 11 groups for that example. We checked its evidence links, the honest unknown state for a package without useful program evidence, and the saved HTML export. Thirty-six automated checks passed. These tests use examples; they do not promise every software package is fully understood.
+
+For version 0.5.0, the checks expanded to 45 passing tests. We also checked real browser ZIP upload, visible report tabs, the local sample, and navigation with report scripts removed. The sample’s two files produce 19 findings and explain a read operation and an insert/save operation with source links. Those statements describe supported code paths, not confirmed runtime outcomes.
 
 ## Privacy and cost
 

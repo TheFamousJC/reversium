@@ -1,4 +1,4 @@
-param([int]$Port = 8765)
+param([int]$Port = 0)
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
 $taskPython = Get-Command python -ErrorAction SilentlyContinue

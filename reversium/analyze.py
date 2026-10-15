@@ -11,6 +11,7 @@ from .source import python_details, manifest_details, resolve_imports
 from .binary import identify, inspect_binary
 from .platform import CONFIG_NAMES, config_details, platform_profile
 from .explain import explain_software
+from .tracing import trace_routes
 
 LANGUAGES = {'.py': 'Python', '.js': 'JavaScript', '.jsx': 'JavaScript', '.ts': 'TypeScript', '.tsx': 'TypeScript', '.java': 'Java', '.cs': 'C#', '.php': 'PHP', '.go': 'Go', '.rs': 'Rust', '.c': 'C', '.cpp': 'C++', '.h': 'C/C++'}
 BINARY = {'.exe', '.dll', '.apk', '.so', '.class', '.jar', '.dylib'}
@@ -23,6 +24,8 @@ MAX_FILE = 4 * 1024 * 1024
 def inspect_zip(path):
     """Read bounded archive members in memory. Never extract or execute inputs."""
     report = {'schema_version': 3, 'files': [], 'findings': [], 'warnings': [], 'scope': 'Static ZIP inspection; no input code is executed.'}
+    python_trees = {}
+    trace_source_bytes = 0
     def finding(kind, value, file, line, confidence='observed'):
         report['findings'].append({'kind': kind, 'value': str(value)[:300], 'confidence': confidence, 'evidence': {'file': file, 'line': line}})
     with zipfile.ZipFile(path) as archive:
@@ -97,6 +100,13 @@ def inspect_zip(path):
             if suffix == '.py':
                 try:
                     tree = ast.parse(source)
+                    if len(python_trees) < 128 and trace_source_bytes + len(data) <= 16 * 1024 * 1024:
+                        python_trees[name] = tree
+                        trace_source_bytes += len(data)
+                    else:
+                        message = 'Python helper tracing input capped at 128 files / 16 MiB source; other AST findings remain available.'
+                        if message not in report['warnings']:
+                            report['warnings'].append(message)
                     item['analysis'] = 'python_ast'
                     python_details(tree, name, finding)
                     for node in ast.walk(tree):
@@ -128,10 +138,12 @@ def inspect_zip(path):
                     except ValueError:
                         continue
     resolve_imports(report)
+    trace_routes(report, python_trees)
     report['summary'] = {'files': len(report['files']), 'bytes': sum(f['bytes'] for f in report['files']), 'languages': dict(Counter(f['language'] for f in report['files'] if f['language'])), 'binary_candidates': sum(f['category'] == 'binary' for f in report['files']), 'findings': len(report['findings'])}
     report['coverage'] = dict(Counter(f['analysis'] for f in report['files']))
     report['platform'] = platform_profile(report)
     report['behavior'] = explain_software(report)
     report['limitations'] = ['Python symbols/imports use AST parsing; JavaScript/TypeScript imports and endpoint-host candidates use heuristics.', 'Other source languages are inventoried only. No complete call graph, runtime behavior, vulnerability audit, or business requirements recovery is claimed.', 'Binary inspection is bounded static metadata analysis, not decompilation or behavioral verification. Mach-O and DEX receive header identification only. Malformed binaries retain partial findings.', 'Nested containers receive directory inspection only. Files over 4 MiB or compression limits are inventoried without content inspection. Binary string samples may contain private content; URL hosts omit credentials, paths and queries.']
     report['limitations'] += ['Local module links are path candidates, not runtime resolution. Aliases, custom search paths, re-exports and dynamic imports may remain unresolved. Ambiguous matches are not selected.', 'Python decorator routes and ORM base-class names are syntax candidates, not verified framework behavior. Non-Python route and import scans can match comments.', 'Only package.json, requirements.txt and go.mod dependencies are extracted. Other known manifests are identified only. File changes are compared only when both reports contain inspected-content hashes.']
+    report['limitations'].append('Handler tracing covers Python module-level routes/helpers and simple literal SQLite statements only. It is bounded to 128 files / 16 MiB source, 100 routes, 3 helper levels / 12 functions, 24 call references, 40 operations and 10,000 syntax nodes per function. ORM, class-based and dynamic behavior are not resolved; branch outcomes and successful execution are unverified.')
     return report

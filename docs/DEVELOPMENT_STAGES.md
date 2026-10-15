@@ -84,6 +84,24 @@ Remaining Stage 4 work:
 - Editable modernization options and work breakdown estimates.
 - Versioned infrastructure price assumptions and low/base/high cost scenarios.
 
+### v0.5.0 — Route/helper tracing and visible navigation
+
+Implemented:
+- Retain a bounded set of Python ASTs, associate module-level decorated routes with their handler, and follow uniquely resolved same-file/imported helpers (including aliases) across source files.
+- Propagate recognized SQLite connection/cursor bindings through helper parameters. Identify simple literal SELECT/INSERT/UPDATE/DELETE statements, commit requests and supported return shapes (dictionary field names, lists and database rows). String response values, database paths and SQL values are not copied into trace explanations.
+- Add `route_traces`, `route_handler`, `handler_call` and `handler_operation` evidence, preserving source locations and report indices. The explanation tab prioritizes traced features over route-name-only clues.
+- Explicit unknowns cover unresolved calls, dynamic/unsupported SQL, repeated/recursive helpers, decorators and tracing limits. Statements may be conditional, unreachable or fail; the analyzer does not verify control flow, permissions, transaction success or side effects beyond the supported syntax.
+- Bounds: 128 files / 16 MiB of retained Python source, 100 routes, helper depth 3 / 12 functions per route, 24 helper-call references, 40 operations and 10,000 scanned syntax nodes per function. Tracing covers module-level Python and SQLite only; ORM, class-based and other-language tracing remains future work.
+- Report navigation is now visible before JavaScript initializes, higher on the page and sticky while scrolling. Anchor links provide usable section navigation without scripting. The home page has labeled sample-report section links; reports show version 0.5.0.
+- Built-in local `/example` sample report and `/version` endpoint. The Windows launcher selects a free port by default; the CLI falls back to a free port when default 8765 is busy, helping avoid accidentally reopening an older server. Already-running processes do not automatically update.
+
+Verification:
+- All 45 tests pass, including cross-file reads/inserts/commits/returns, update/delete cursor operations, unsupported clients/dynamic SQL, recursive helpers, shadowed names, nested uncalled functions, literal SQL values and omitted response values. Live HTTP tests cover sample report, version and ZIP upload.
+- Browser verified the live home page, four visible tabs on both sample and uploaded ZIP reports, traced feature evidence, and JavaScript-free anchor navigation using a generated report with scripts removed. The final sample has 2 source files and 19 findings.
+- Browser checked the final home section links, tab switching, evidence navigation and report layout. Screenshot saved locally under ignored `reports/browser-handler-tracing.jpg`.
+
+Practical application: an initial review of unfamiliar software, a source-backed feature inventory for maintainers, and a starting point for handover, dependency review and modernization planning. It reduces discovery effort; it does not certify the application or establish a complete specification.
+
 ## Stage 5 — Optional runtime investigation (future)
 
 Separate disposable-VM workflow with explicit user control, network capture and behavior evidence. Never execute submitted programs in the main application process. This stage is outside the initial static-analysis release.
@@ -92,6 +110,7 @@ Future setup workflow: produce a reviewable run plan (OS/architecture, pinned de
 
 ## Change log
 
+- 2026-10-15: Delivered v0.5.0 Python/SQLite handler tracing, stronger visible-tab fallback, live sample/version UI and free-port startup. Added practical-use guidance and expanded verification to 45 tests. No runtime dependencies or paid services added.
 - 2026-10-15: Delivered v0.4.0 “What this software does” tab with local evidence-linked explanations, per-claim and global unknowns, and 36 passing tests. The summaries describe clues, not a complete or verified functional specification.
 - 2026-10-15: Delivered v0.3.1 report navigation: Architecture (profile/services/diagram), Evidence (filterable findings/comparison), and Coverage (binary inspection/inventory/readiness/limits). Added accessible tab relationships, arrow/Home/End keyboard navigation, no-JavaScript fallback and print styles exposing every section. HTML exports retain every section and reset the filter. Browser checks confirmed tab isolation, keyboard switching, two matching binary-import findings and full HTML export; existing 30-test regression suite passes. The Coverage tab explicitly distinguishes evidence from an exact behavioral specification.
 - 2026-10-15: Delivered v0.3.0 static binary inspection and evidence-backed platform/service candidates; 30 tests pass. Automatic setup/execution and decompiler adapters remain future work. No new runtime dependencies, network services or paid features.
