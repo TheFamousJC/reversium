@@ -19,6 +19,8 @@ python -m unittest discover -s tests -v
 
 The CLI writes standalone `report.html` and structured `report.json`. It overwrites those two names in the selected output directory. Browser reports offer Download JSON and Download HTML, plus a live evidence filter. Exports always contain the full report, even when the view is filtered.
 
+Reports have three tabs: **Architecture** (platform profile, supporting services and diagram), **Evidence** (filterable findings and baseline comparison), and **Coverage** (binary inspection, inventory, readiness and limitations). Tabs support arrow/Home/End keyboard navigation. Saved HTML retains all sections; printing or disabling JavaScript exposes all sections. Analysis does not establish an exact behavioral specification of arbitrary uploaded programs.
+
 Compare against a previously saved JSON report:
 
 ```sh

@@ -16,7 +16,9 @@ For Python, it recognizes some possible web routes and data-model classes. It al
 
 Install Python 3.10 or newer, open a terminal in the Reversium folder and run `python -m reversium`. A browser page opens. Choose your ZIP and click Analyze archive. To create saved reports directly, run `python -m reversium your-package.zip --output reports/my-project`.
 
-On Windows you can also run `./Start-Reversium.ps1`. In a report, type in Filter evidence to find a file, name or reference type. Download JSON saves structured results for later comparison; Download HTML saves a report you can open in a browser. Both downloads include all findings, even when a filter is active. On a narrow screen, slide the diagram or table sideways to see the remaining columns.
+On Windows you can also run `./Start-Reversium.ps1`. Reports now have three tabs: Architecture shows the likely platform, supporting services and diagram; Evidence shows the findings and search box; Coverage shows the inventory, binary inspection status, readiness and limitations. Use the arrow keys while a tab is focused to switch tabs.
+
+In Evidence, type in Filter evidence to find a file, name or reference type. Download JSON saves structured results for later comparison; Download HTML saves a report you can open in a browser. Both downloads include all sections and findings, even when another tab or filter is active. Printed reports show every section. On a narrow screen, slide the diagram or table sideways to see the remaining columns.
 
 To compare two versions, save the first JSON report, then run `python -m reversium new-package.zip --compare reports/old/report.json --output reports/new`. The new report lists added and removed files and findings. It can identify changed readable files when both versions were inspected. It does not yet compare how programs behave, and comparison currently starts from the terminal.
 
@@ -41,6 +43,12 @@ For Android and Java packages, it can list the inner package directory without o
 It can identify likely ingredients and broad types. For example, references to FastAPI and Python can suggest a Python web API, while a Windows binary header can identify a Windows target and processor type. It shows the supporting file or byte position for those clues.
 
 It cannot reliably conclude that an unknown package is a complete CRM, accounting system or other specific business product from these clues alone. Understanding the exact purpose, features and completeness still requires reviewing behavior and requirements. When it lacks evidence, it says the purpose is unknown.
+
+## Can it tell me exactly what the program does?
+
+Not for an arbitrary ZIP. Today it identifies ingredients, code references, route/model candidates and some binary metadata. Those clues support an explanation of likely behavior, but they are not a complete description of every feature or business rule. Missing services or files, configuration, dynamically loaded code and obfuscation can hide important behavior.
+
+For a small, complete source program, careful code review may explain its behavior precisely. For a larger platform, a dependable functional description needs deeper source tracing, requirements review and isolated tests. Even running it only demonstrates the scenarios actually exercised. Reversium does not yet generate a comprehensive functional specification or run those tests; the Coverage tab makes this limit explicit.
 
 ## Can it set up and run the ZIP?
 

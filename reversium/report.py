@@ -21,6 +21,9 @@ def render(report):
     notes = ''.join(f'<li>{esc(x)}</li>' for x in report['warnings'] + report['limitations'])
     payload = json.dumps(report).replace('&', '\\u0026').replace('<', '\\u003c').replace('>', '\\u003e')
     comparison = ''
+    platform_section = ''
+    readiness = ''
+    binary_section = ''
     if 'comparison' in report:
         comparison = '<h2>Changes from baseline</h2><p>Line movement alone is ignored. Hash comparison covers content-inspected files only.</p><pre>' + esc(json.dumps(report['comparison'], indent=2)) + '</pre>'
     profile = report.get('platform', {})
@@ -28,21 +31,50 @@ def render(report):
         stack = ''.join('<li>' + esc(item['name']) + ' — candidate; ' + location(item['evidence']) + '</li>' for item in profile['stack_candidates'] + profile.get('runtime_candidates', []))
         services = ''.join('<tr><td>' + esc(item['name']) + '</td><td>' + esc(item['role']) + '</td><td>' + esc(item['status']) + '</td><td>' + location(item['evidence']) + '</td></tr>' for item in profile['supporting_services'])
         binary_rows = ''.join('<tr><td>' + esc(item['file']) + '</td><td>' + esc(item['format']) + '</td><td>' + esc(item['target']) + '</td><td>' + esc(item['architecture']) + '</td><td>' + esc(item['status']) + '</td></tr>' for item in profile['binary_targets'])
-        comparison = ('<h2>Platform profile</h2><p>' + esc(profile['purpose']) + '</p><ul>' + (stack or '<li>No supported framework evidence found.</li>') + '</ul>'
+        platform_section = ('<h2>Platform profile</h2><p>' + esc(profile['purpose']) + '</p><ul>' + (stack or '<li>No supported framework evidence found.</li>') + '</ul>'
                       + '<h2>Supporting services</h2><p>References can be optional or development-only. A stable deployment is not verified.</p>'
-                      + ('<div class="scroll"><table><tr><th>Service</th><th>Role</th><th>Assessment</th><th>Evidence</th></tr>' + services + '</table></div>' if services else '<p>No supported service references found; requirements remain unknown.</p>')
-                      + '<h2>Setup and readiness</h2><p>' + esc(profile['readiness']) + '</p><details><summary>What still needs confirmation</summary><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in profile['unknowns'] + profile['next_steps']) + '</ul></details>'
-                      + '<h2>Binary inspection</h2><p>Metadata and references only. Programs are never executed. Reader status describes supported inspection, not binary validity or readiness to run. Byte offsets appear in the evidence table.</p>'
-                      + ('<div class="scroll"><table><tr><th>File</th><th>Format</th><th>Runtime / target</th><th>Architecture</th><th>Reader status</th></tr>' + binary_rows + '</table></div>' if binary_rows else '<p>No inspected binary candidates.</p>') + comparison)
-    return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium report</title><style>{STYLE}</style><main><p class="brand">REVERSIUM / LOCAL ANALYSIS</p><nav><a href="/">Analyze another ZIP</a><button id="json-export">Download JSON</button><button id="html-export">Download HTML</button></nav><h1>Understand what’s inside.</h1><p>{esc(report['scope'])}</p><div class="cards">{''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k.replace("_", " "))}</span></article>' for k,v in report['summary'].items() if k != 'languages')}</div>{comparison}<h2>Architecture: import and dependency mentions</h2><p>File → local file candidate or referenced package. Labels distinguish internal, external, unresolved and ambiguous references. First 100 unique edges; full evidence is below.</p><div class="scroll">{''.join(diagram) if pairs else '<p>No supported dependency references found.</p>'}</div><h2>Evidence</h2><label for="evidence-filter">Filter evidence</label><input id="evidence-filter" type="search" placeholder="File, symbol, kind or resolution"><p id="filter-count" role="status">{len(findings)} findings</p><div class="scroll"><table id="evidence-table"><thead><tr><th>Finding</th><th>Value</th><th>Location</th><th>Confidence</th><th>Resolution</th></tr></thead><tbody>{rows}</tbody></table></div><h2>Inventory</h2><div class="scroll"><table><tr><th>File</th><th>Type</th><th>Bytes</th><th>Analysis coverage</th></tr>{files}</table></div><h2>Coverage and limitations</h2><ul>{notes}</ul><p>Generated locally by Reversium 0.3.0. No paid services or remote assets.</p></main><script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}</script></html>'''
+                      + ('<div class="scroll"><table><tr><th>Service</th><th>Role</th><th>Assessment</th><th>Evidence</th></tr>' + services + '</table></div>' if services else '<p>No supported service references found; requirements remain unknown.</p>'))
+        readiness = '<h2>Setup and readiness</h2><p>' + esc(profile['readiness']) + '</p><details><summary>What still needs confirmation</summary><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in profile['unknowns'] + profile['next_steps']) + '</ul></details>'
+        binary_section = ('<h2>Binary inspection</h2><p>Metadata and references only. Programs are never executed. Reader status describes supported inspection, not binary validity or readiness to run. Byte offsets appear in the evidence table.</p>'
+                          + ('<div class="scroll"><table><tr><th>File</th><th>Format</th><th>Runtime / target</th><th>Architecture</th><th>Reader status</th></tr>' + binary_rows + '</table></div>' if binary_rows else '<p>No inspected binary candidates.</p>'))
+    return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Reversium report</title><style>{STYLE}</style><main>
+<p class="brand">REVERSIUM / LOCAL ANALYSIS</p>
+<nav><a href="/">Analyze another ZIP</a><button id="json-export">Download JSON</button><button id="html-export">Download HTML</button></nav>
+<h1>Understand what’s inside.</h1><p>{esc(report['scope'])}</p>
+<div class="cards">{''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k.replace("_", " "))}</span></article>' for k,v in report['summary'].items() if k != 'languages')}</div>
+<div role="tablist" aria-label="Report sections" hidden>
+<button role="tab" id="tab-architecture" aria-controls="panel-architecture" aria-selected="true">Architecture</button>
+<button role="tab" id="tab-evidence" aria-controls="panel-evidence" aria-selected="false" tabindex="-1">Evidence</button>
+<button role="tab" id="tab-coverage" aria-controls="panel-coverage" aria-selected="false" tabindex="-1">Coverage</button>
+</div>
+<section role="tabpanel" id="panel-architecture" aria-labelledby="tab-architecture" tabindex="0">
+{platform_section}<h2>Architecture: import and dependency mentions</h2>
+<p>File → local file candidate or referenced package. Labels distinguish internal, external, unresolved and ambiguous references. First 100 unique edges; full references are in the Evidence tab.</p>
+<div class="scroll">{''.join(diagram) if pairs else '<p>No supported dependency references found.</p>'}</div></section>
+<section role="tabpanel" id="panel-evidence" aria-labelledby="tab-evidence" tabindex="0">
+<h2>Evidence</h2><label for="evidence-filter">Filter evidence</label><input id="evidence-filter" type="search" placeholder="File, symbol, kind or resolution">
+<p id="filter-count" role="status">{len(findings)} findings</p><div class="scroll"><table id="evidence-table"><thead><tr><th>Finding</th><th>Value</th><th>Location</th><th>Confidence</th><th>Resolution</th></tr></thead><tbody>{rows}</tbody></table></div>{comparison}</section>
+<section role="tabpanel" id="panel-coverage" aria-labelledby="tab-coverage" tabindex="0">
+<h2>What this report can explain</h2><p>Reversium identifies code and metadata clues. It cannot tell you exactly everything the program does. Missing files, runtime configuration, external services, dynamic behavior and obfuscation can hide functionality. Findings are evidence for review, not a complete behavioral specification.</p>
+{binary_section}<h2>Inventory</h2><div class="scroll"><table><tr><th>File</th><th>Type</th><th>Bytes</th><th>Analysis coverage</th></tr>{files}</table></div>{readiness}
+<h2>Coverage and limitations</h2><ul>{notes}</ul></section>
+<p>Generated locally by Reversium 0.3.1. No paid services or remote assets.</p></main>
+<script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}</script></html>'''
 
 
 STYLE = 'body{margin:0;background:#101823;color:#e8edf5;font:16px system-ui}main{max-width:1180px;margin:60px auto;padding:0 28px}.brand{color:#66d9c2;letter-spacing:3px;font-size:12px}h1{font-size:48px;letter-spacing:-2px}h2{margin-top:45px}p,li{color:#afbdce;line-height:1.7}.cards{display:flex;gap:14px;flex-wrap:wrap}article{padding:24px;background:#1c2838;border-radius:12px;min-width:130px}strong{display:block;font-size:30px}span{color:#afbdce}table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;padding:12px;border-bottom:1px solid #304056;overflow-wrap:anywhere}.scroll{overflow:auto}svg{width:100%;min-width:650px;background:#162130;border-radius:12px}button{background:#66d9c2;color:#101823;border:0;border-radius:8px;padding:14px 24px;font-weight:700;cursor:pointer}input{padding:20px}a{color:#66d9c2}'
 STYLE += 'nav{display:flex;align-items:center;gap:12px;flex-wrap:wrap}input[type=search]{display:block;box-sizing:border-box;width:100%;max-width:600px;background:#1c2838;color:#e8edf5;border:1px solid #657890;border-radius:8px;margin-top:10px}button:disabled{opacity:.5;cursor:wait}pre{white-space:pre-wrap;overflow-wrap:anywhere}form{display:flex;flex-wrap:wrap;align-items:center;gap:12px}input[type=file]{max-width:100%;box-sizing:border-box}svg text{font:13px monospace}@media(max-width:600px){main{margin:28px auto;padding:0 16px}h1{font-size:34px}.cards article{flex:1;min-width:100px;padding:16px}nav button{padding:12px}td,th{padding:8px}}'
 STYLE += 'table{min-width:760px}svg{min-width:1000px}'
+STYLE += '[role=tablist]{display:flex;gap:8px;flex-wrap:wrap;margin-top:32px;padding-bottom:12px;border-bottom:1px solid #304056}[hidden]{display:none!important}[role=tab]{background:#1c2838;color:#afbdce;border:1px solid #657890}[role=tab][aria-selected=true]{background:#66d9c2;color:#101823;border-color:#66d9c2}:focus-visible{outline:3px solid #c7b6ff;outline-offset:4px}[role=tabpanel]{padding-bottom:20px}@media print{[role=tablist],nav,#evidence-filter,label[for=evidence-filter]{display:none!important}[role=tabpanel][hidden],#evidence-table tr[hidden]{display:block!important}[role=tabpanel]{break-before:page}#evidence-table tr[hidden]{display:table-row!important}.scroll{overflow:visible}table,svg{min-width:0}body{background:white;color:black}p,li,span{color:#333}}'
 
-SCRIPT = '''const filter=document.querySelector('#evidence-filter');
+SCRIPT = '''const tabs=Array.from(document.querySelectorAll('[role=tab]'));
+function activateTab(tab,focus=false){for(const item of tabs){const selected=item===tab;item.setAttribute('aria-selected',String(selected));item.tabIndex=selected?0:-1;document.getElementById(item.getAttribute('aria-controls')).hidden=!selected}if(focus)tab.focus()}
+document.querySelector('[role=tablist]').hidden=false;
+for(const tab of tabs){tab.addEventListener('click',()=>activateTab(tab));tab.addEventListener('keydown',event=>{let index=tabs.indexOf(tab);if(event.key==='ArrowRight')index=(index+1)%tabs.length;else if(event.key==='ArrowLeft')index=(index+tabs.length-1)%tabs.length;else if(event.key==='Home')index=0;else if(event.key==='End')index=tabs.length-1;else return;event.preventDefault();activateTab(tabs[index],true)})}
+activateTab(tabs[0]);
+const filter=document.querySelector('#evidence-filter');
 filter.addEventListener('input',()=>{let count=0;for(const row of document.querySelectorAll('#evidence-table tbody tr')){row.hidden=!row.textContent.toLowerCase().includes(filter.value.toLowerCase());if(!row.hidden)count++}document.querySelector('#filter-count').textContent=count+' findings'});
 function download(text,type,name){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 document.querySelector('#json-export').onclick=()=>download(document.querySelector('#report-data').textContent,'application/json','reversium-report.json');
-document.querySelector('#html-export').onclick=()=>{const copy=document.documentElement.cloneNode(true);copy.querySelector('#evidence-filter').value='';for(const row of copy.querySelectorAll('tr'))row.removeAttribute('hidden');copy.querySelector('#filter-count').textContent=copy.querySelectorAll('#evidence-table tbody tr').length+' findings';download('<!doctype html>'+copy.outerHTML,'text/html','reversium-report.html')};'''
+document.querySelector('#html-export').onclick=()=>{const copy=document.documentElement.cloneNode(true);copy.querySelector('#evidence-filter').value='';for(const row of copy.querySelectorAll('tr'))row.removeAttribute('hidden');for(const panel of copy.querySelectorAll('[role=tabpanel]'))panel.removeAttribute('hidden');copy.querySelector('[role=tablist]').hidden=true;copy.querySelector('#filter-count').textContent=copy.querySelectorAll('#evidence-table tbody tr').length+' findings';download('<!doctype html>'+copy.outerHTML,'text/html','reversium-report.html')};'''
