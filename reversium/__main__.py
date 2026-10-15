@@ -7,6 +7,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from .analyze import inspect_zip
 from .report import render, STYLE
+from .source import compare_reports
 
 HOME = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium</title><style>''' + STYLE + '''</style><main><p class="brand">REVERSIUM / PRIVATE BY DESIGN</p><h1>From archive to understanding.</h1><p>Inspect a ZIP on your computer. Discover source files, dependencies, route candidates and architecture evidence. No accounts, API keys or uploads to a cloud service.</p><form><input aria-label="Choose ZIP archive" type="file" accept=".zip" required><button>Analyze archive</button></form><p id="status" role="status">Maximum ZIP size: 64 MiB. Input code is never executed.</p><p>Python AST analysis · JavaScript/TypeScript import scanning · Other language inventory · Binary inventory</p><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=document.querySelector('input').files[0],s=document.querySelector('#status'),b=document.querySelector('button');if(f.size>67108864){s.textContent='ZIP exceeds 64 MiB.';return}b.disabled=true;s.textContent='Analyzing locally…';try{const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/zip'},body:f});if(!r.ok)throw new Error(await r.text());document.open();document.write(await r.text());document.close()}catch(e){s.textContent=e.message;b.disabled=false}};</script></main></html>'''
 
@@ -34,6 +35,18 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         expected_origin = f'http://127.0.0.1:{self.server.server_port}'
         if not self.valid_host() or self.headers.get('Origin') not in (None, expected_origin):
+            # Drain a bounded upload before closing. Windows can otherwise reset
+            # the socket and discard the 403 response when unread data remains.
+            self.connection.settimeout(2)
+            try:
+                remaining = min(max(int(self.headers.get('Content-Length', '0')), 0), 64 * 1024 * 1024)
+                while remaining:
+                    chunk = self.rfile.read(min(remaining, 65536))
+                    if not chunk:
+                        break
+                    remaining -= len(chunk)
+            except (ValueError, OSError):
+                pass
             return self.send(403, 'Local requests only.')
         if self.path != '/analyze':
             return self.send(404, 'Not found.')
@@ -63,9 +76,18 @@ def main():
     parser.add_argument('--output', default='reports', help='CLI report directory')
     parser.add_argument('--port', type=int, default=8765)
     parser.add_argument('--no-browser', action='store_true')
+    parser.add_argument('--compare', help='Prior report.json to compare with CLI analysis')
     args = parser.parse_args()
     if args.archive:
         result = inspect_zip(args.archive)
+        if args.compare:
+            baseline = Path(args.compare)
+            if baseline.stat().st_size > 32 * 1024 * 1024:
+                parser.error('Baseline report exceeds 32 MiB.')
+            try:
+                result['comparison'] = compare_reports(result, json.loads(baseline.read_text(encoding='utf-8')))
+            except (ValueError, KeyError, TypeError) as error:
+                parser.error(f'Invalid baseline report: {error}')
         output = Path(args.output)
         output.mkdir(parents=True, exist_ok=True)
         (output / 'report.json').write_text(json.dumps(result, indent=2), encoding='utf-8')

@@ -17,17 +17,29 @@ python -m reversium project.zip --output reports/project
 python -m unittest discover -s tests -v
 ```
 
-The CLI writes standalone `report.html` and structured `report.json`. It overwrites those two names in the selected output directory. The browser displays a report; use browser Save/Print to retain it, or the CLI for JSON export.
+The CLI writes standalone `report.html` and structured `report.json`. It overwrites those two names in the selected output directory. Browser reports offer Download JSON and Download HTML, plus a live evidence filter. Exports always contain the full report, even when the view is filtered.
+
+Compare against a previously saved JSON report:
+
+```sh
+python -m reversium project.zip --compare reports/previous/report.json --output reports/current
+```
+
+Comparison lists added/removed files and findings, and changed readable files with hashes in both reports. Moving a finding to a different line alone does not count as a new finding. Comparison is currently CLI-only; reports and exports display the results.
 
 ## Current coverage
 
 - ZIP member inventory, source language counts, source hashes, binary candidates.
 - Python AST imports, classes, functions and main guards.
 - JavaScript/TypeScript import and require heuristics, package.json dependency inventory.
-- Heuristic route and endpoint-host candidates, with file and line references.
+- requirements.txt and go.mod dependency names (common declarations only).
+- Python AST decorator route candidates (including multiline decorators) and Django/SQLAlchemy base-name model candidates.
+- Heuristic non-Python route and endpoint-host candidates, with file and line references.
+- Conservative Python and JavaScript/TypeScript local module links, including relative imports, index files and emitted .js to TypeScript path candidates. Ambiguous matches are retained without selecting a target.
+- Internal/external/unresolved/ambiguous labels and per-file analysis coverage.
 - Embedded SVG diagram of file-to-import/package mentions, evidence table and explicit limitations.
 
-Diagrams show mentions, not resolved call graphs. Other supported extensions receive language inventory only. No claim of complete architecture recovery, vulnerability detection, cost estimation or binary decompilation is made in this release. Files are not extracted, built, imported or executed. Nested archives are inventoried without recursion.
+Diagrams show import/package references and local path candidates, not call graphs. An external import label requires a matching declared package name; unknown references remain unresolved (including Python standard-library imports). Aliases, custom module paths and dynamic imports are not resolved. JavaScript is still scanned heuristically; Python is the only AST parser. Other supported extensions receive language inventory only. No claim of complete architecture recovery, vulnerability detection, cost estimation or binary decompilation is made in this release. Files are not extracted, built, imported or executed. Nested archives are inventoried without recursion.
 
 Browser uploads are capped at 64 MiB. Both entry points reject archives over 10,000 entries or 256 MiB declared uncompressed size, unsafe paths, symlinks and duplicate member names. Individual content reads are capped at 4 MiB; compression ratios above 200:1 are skipped. Encrypted members are skipped. Reports can contain private paths and symbol names; review them before sharing. Run locally on trusted hardware; static parsing still consumes resources.
 
