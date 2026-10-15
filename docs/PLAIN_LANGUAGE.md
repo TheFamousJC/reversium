@@ -16,7 +16,9 @@ For Python, it recognizes some possible web routes and data-model classes. It al
 
 Install Python 3.10 or newer, open a terminal in the Reversium folder and run `python -m reversium`. A browser page opens. Choose your ZIP and click Analyze archive. To create saved reports directly, run `python -m reversium your-package.zip --output reports/my-project`.
 
-On Windows you can also run `./Start-Reversium.ps1`. Reports now have three tabs: Architecture shows the likely platform, supporting services and diagram; Evidence shows the findings and search box; Coverage shows the inventory, binary inspection status, readiness and limitations. Use the arrow keys while a tab is focused to switch tabs.
+On Windows you can also run `./Start-Reversium.ps1`. Reports now open on “What this software does,” a plain-language overview of what the findings suggest. Architecture shows the likely platform, supporting services and diagram; Evidence shows the findings and search box; Coverage shows the inventory, binary inspection status, readiness and limitations. Use the arrow keys while a tab is focused to switch tabs.
+
+Each explanation includes “Still unknown” and a link to its supporting finding. Click that link to open the exact evidence, even if a search filter previously hid it. The overview shows up to 16 groups; additional findings remain available in Evidence. If the tool lacks enough evidence, it says so instead of inventing a purpose.
 
 In Evidence, type in Filter evidence to find a file, name or reference type. Download JSON saves structured results for later comparison; Download HTML saves a report you can open in a browser. Both downloads include all sections and findings, even when another tab or filter is active. Printed reports show every section. On a narrow screen, slide the diagram or table sideways to see the remaining columns.
 
@@ -24,7 +26,7 @@ To compare two versions, save the first JSON report, then run `python -m reversi
 
 ## What we checked
 
-We tested the source example, both report formats, and desktop-size and narrow phone-size layouts. For binary analysis, we uploaded a second example containing source, settings and synthetic program headers. The browser showed 8 files, 5 binary candidates and 27 findings. It correctly showed one broken file as partial, identified likely supporting services, and filtered the two imported-library findings. Thirty automated checks passed. These tests use examples; they do not promise every software package is fully understood.
+We tested the source example, both report formats, and desktop-size and narrow phone-size layouts. For binary analysis, we uploaded a second example containing source, settings and synthetic program headers. The browser showed 8 files, 5 binary candidates and 27 findings. It correctly showed one broken file as partial, identified likely supporting services, and filtered the two imported-library findings. The new explanation tab shows 11 groups for that example. We checked its evidence links, the honest unknown state for a package without useful program evidence, and the saved HTML export. Thirty-six automated checks passed. These tests use examples; they do not promise every software package is fully understood.
 
 ## Privacy and cost
 
@@ -46,7 +48,9 @@ It cannot reliably conclude that an unknown package is a complete CRM, accountin
 
 ## Can it tell me exactly what the program does?
 
-Not for an arbitrary ZIP. Today it identifies ingredients, code references, route/model candidates and some binary metadata. Those clues support an explanation of likely behavior, but they are not a complete description of every feature or business rule. Missing services or files, configuration, dynamically loaded code and obfuscation can hide important behavior.
+Not for an arbitrary ZIP. The “What this software does” tab now turns supported clues into short explanations of possible behavior. For example, a database reference suggests the application may keep records, but does not prove it actually stores anything. A web entry-point name does not prove what it returns or who can use it. Binary strings are not treated as proof of a feature. All explanations use rules on your own computer, with no paid AI service.
+
+These are not a complete description of every feature or business rule. Missing services or files, configuration, dynamically loaded code and obfuscation can hide important behavior. Every explanation includes what remains unknown, and the tab lists further questions and ways to check the interpretation.
 
 For a small, complete source program, careful code review may explain its behavior precisely. For a larger platform, a dependable functional description needs deeper source tracing, requirements review and isolated tests. Even running it only demonstrates the scenarios actually exercised. Reversium does not yet generate a comprehensive functional specification or run those tests; the Coverage tab makes this limit explicit.
 

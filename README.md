@@ -19,7 +19,9 @@ python -m unittest discover -s tests -v
 
 The CLI writes standalone `report.html` and structured `report.json`. It overwrites those two names in the selected output directory. Browser reports offer Download JSON and Download HTML, plus a live evidence filter. Exports always contain the full report, even when the view is filtered.
 
-Reports have three tabs: **Architecture** (platform profile, supporting services and diagram), **Evidence** (filterable findings and baseline comparison), and **Coverage** (binary inspection, inventory, readiness and limitations). Tabs support arrow/Home/End keyboard navigation. Saved HTML retains all sections; printing or disabling JavaScript exposes all sections. Analysis does not establish an exact behavioral specification of arbitrary uploaded programs.
+Reports open on **What this software does**, a plain-language overview with evidence links and explicit unknowns. **Architecture** holds the platform profile, supporting services and diagram; **Evidence** holds filterable findings and baseline comparison; **Coverage** holds binary inspection, inventory, readiness and limitations. Tabs support arrow/Home/End keyboard navigation. Saved HTML retains all sections; printing or disabling JavaScript exposes all sections. Analysis does not establish an exact behavioral specification of arbitrary uploaded programs.
+
+Explanations use local rules only, with no AI or added dependencies. Each explanation links to matching findings and includes what remains unverified. Links clear any evidence filter and focus the referenced row. Up to 16 explanation groups appear in the overview, with an explicit omitted count; full findings stay available. Packages without supported clues get an insufficient-evidence result. Structured explanations are included in the report JSON's additive `behavior` field (schema version 3).
 
 Compare against a previously saved JSON report:
 

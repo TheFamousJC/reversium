@@ -62,7 +62,22 @@ Remaining: external decompiler adapters (ILSpy/JADX/Ghidra), richer native impor
 
 Exit criterion: supported binary fixtures yield reproducible evidence without executing their programs. Tool installation and redistribution notices must be documented.
 
-## Stage 4 — Requirements and planning (planned)
+## Stage 4 — Requirements and planning (first explanation increment delivered, v0.4.0)
+
+Implemented:
+- Default “What this software does” report tab, alongside Architecture, Evidence and Coverage.
+- Dependency-free local rules convert route/model/host findings, recognized framework/service references and binary-format clues into cautious plain-language explanations. No model, API key, network request or program execution is involved.
+- Every explanation has matching finding indices, a statement that it is not verified by running, and a specific unknown. Names, dependencies and binary strings are not promoted into confirmed business features.
+- Evidence links switch to Evidence, clear filters, focus/highlight the exact finding and preserve line/byte provenance. Finding hashes support direct navigation and reopening.
+- Explicit global unknowns cover business purpose, workflow completeness, side effects, configuration, external services, uninspected code and runtime stability. An archive without supported clues receives an honest insufficient-evidence state.
+- Overview capped at 16 explanation groups, with an explicit omitted count and all findings retained. The additive `behavior` JSON field includes explanations, unknowns, method and confirmation steps within schema version 3; HTML exports retain all four tabs.
+
+Verification on 2026-10-15:
+- All 36 regression tests pass, including six explanation tests covering evidence integrity, unsupported-input unknowns, inference limits, service uncertainty, escaped names/export data and output caps. The local HTTP test ran outside sandbox socket restrictions.
+- Browser verified the default explanation tab, 11 explanation groups for the mixed fixture, the insufficient-evidence state for a text-only ZIP, and navigation from app.py:3 to finding-22 after a filter deliberately hid all findings.
+- Standalone HTML download completed; exported content retains all four panels and the structured explanations. Screenshot saved locally under ignored `reports/browser-explanations.jpg`.
+
+Remaining Stage 4 work:
 
 - Evidence-linked functional specification drafts and unresolved questions.
 - Optional local model adapter; deterministic reports remain available without AI.
@@ -77,6 +92,7 @@ Future setup workflow: produce a reviewable run plan (OS/architecture, pinned de
 
 ## Change log
 
+- 2026-10-15: Delivered v0.4.0 “What this software does” tab with local evidence-linked explanations, per-claim and global unknowns, and 36 passing tests. The summaries describe clues, not a complete or verified functional specification.
 - 2026-10-15: Delivered v0.3.1 report navigation: Architecture (profile/services/diagram), Evidence (filterable findings/comparison), and Coverage (binary inspection/inventory/readiness/limits). Added accessible tab relationships, arrow/Home/End keyboard navigation, no-JavaScript fallback and print styles exposing every section. HTML exports retain every section and reset the filter. Browser checks confirmed tab isolation, keyboard switching, two matching binary-import findings and full HTML export; existing 30-test regression suite passes. The Coverage tab explicitly distinguishes evidence from an exact behavioral specification.
 - 2026-10-15: Delivered v0.3.0 static binary inspection and evidence-backed platform/service candidates; 30 tests pass. Automatic setup/execution and decompiler adapters remain future work. No new runtime dependencies, network services or paid features.
 - 2026-10-15: Delivered v0.2.0 source-resolution/reporting increment, verified browser workflow and responsive layout, and expanded tests from 8 to 16. No paid service or new runtime dependency added.
