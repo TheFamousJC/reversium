@@ -12,6 +12,8 @@ from .binary import identify, inspect_binary
 from .platform import CONFIG_NAMES, config_details, platform_profile
 from .explain import explain_software
 from .tracing import trace_routes
+from .feature_map import build_feature_map
+from .js_tracing import trace_javascript
 
 LANGUAGES = {'.py': 'Python', '.js': 'JavaScript', '.jsx': 'JavaScript', '.ts': 'TypeScript', '.tsx': 'TypeScript', '.java': 'Java', '.cs': 'C#', '.php': 'PHP', '.go': 'Go', '.rs': 'Rust', '.c': 'C', '.cpp': 'C++', '.h': 'C/C++'}
 BINARY = {'.exe', '.dll', '.apk', '.so', '.class', '.jar', '.dylib'}
@@ -25,6 +27,8 @@ def inspect_zip(path):
     """Read bounded archive members in memory. Never extract or execute inputs."""
     report = {'schema_version': 3, 'files': [], 'findings': [], 'warnings': [], 'scope': 'Static ZIP inspection; no input code is executed.'}
     python_trees = {}
+    js_sources = {}
+    js_source_bytes = 0
     trace_source_bytes = 0
     def finding(kind, value, file, line, confidence='observed'):
         report['findings'].append({'kind': kind, 'value': str(value)[:300], 'confidence': confidence, 'evidence': {'file': file, 'line': line}})
@@ -83,6 +87,12 @@ def inspect_zip(path):
                 config_details(source, name, finding)
                 continue
             item['analysis'] = 'heuristic' if suffix in {'.js', '.jsx', '.ts', '.tsx'} else 'manifest' if p.name in MANIFESTS else 'inventory_only'
+            if suffix in {'.js', '.ts'}:
+                if len(js_sources) < 128 and js_source_bytes + len(data) <= 16 * 1024 * 1024:
+                    js_sources[name] = source
+                    js_source_bytes += len(data)
+                else:
+                    report['warnings'].append(f'{name}: JS/TS helper tracing input cap reached (128 files / 16 MiB).')
             if p.name in MANIFESTS:
                 finding('manifest', p.name, name, 1)
                 manifest_details(source, name, finding)
@@ -139,11 +149,13 @@ def inspect_zip(path):
                         continue
     resolve_imports(report)
     trace_routes(report, python_trees)
+    trace_javascript(report, js_sources)
     report['summary'] = {'files': len(report['files']), 'bytes': sum(f['bytes'] for f in report['files']), 'languages': dict(Counter(f['language'] for f in report['files'] if f['language'])), 'binary_candidates': sum(f['category'] == 'binary' for f in report['files']), 'findings': len(report['findings'])}
     report['coverage'] = dict(Counter(f['analysis'] for f in report['files']))
     report['platform'] = platform_profile(report)
     report['behavior'] = explain_software(report)
+    report['feature_map'] = build_feature_map(report)
     report['limitations'] = ['Python symbols/imports use AST parsing; JavaScript/TypeScript imports and endpoint-host candidates use heuristics.', 'Other source languages are inventoried only. No complete call graph, runtime behavior, vulnerability audit, or business requirements recovery is claimed.', 'Binary inspection is bounded static metadata analysis, not decompilation or behavioral verification. Mach-O and DEX receive header identification only. Malformed binaries retain partial findings.', 'Nested containers receive directory inspection only. Files over 4 MiB or compression limits are inventoried without content inspection. Binary string samples may contain private content; URL hosts omit credentials, paths and queries.']
     report['limitations'] += ['Local module links are path candidates, not runtime resolution. Aliases, custom search paths, re-exports and dynamic imports may remain unresolved. Ambiguous matches are not selected.', 'Python decorator routes and ORM base-class names are syntax candidates, not verified framework behavior. Non-Python route and import scans can match comments.', 'Only package.json, requirements.txt and go.mod dependencies are extracted. Other known manifests are identified only. File changes are compared only when both reports contain inspected-content hashes.']
-    report['limitations'].append('Handler tracing covers Python module-level routes/helpers and simple literal SQLite statements only. It is bounded to 128 files / 16 MiB source, 100 routes, 3 helper levels / 12 functions, 24 call references, 40 operations and 10,000 syntax nodes per function. ORM, class-based and dynamic behavior are not resolved; branch outcomes and successful execution are unverified.')
+    report['limitations'].append('Python AST traces cover module-level handlers/helpers, simple SQLite statements and selected requests/httpx host references. JS/TS uses a conservative token recognizer for selected ES-module Express callbacks/helpers and pg/mysql2 literal SQL, not a full parser. CommonJS, JSX/TSX, ORM, class-based, dynamic and complex middleware behavior are untraced. Bounds: 128 files / 16 MiB per source family, 100 combined routes, helper depth 3 / 12 functions and 40 operations per trace; Python scans 10,000 nodes per function and JS/TS 60,000 tokens per file. Branch outcomes and successful execution remain unverified.')
     return report

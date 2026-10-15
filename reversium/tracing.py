@@ -2,6 +2,7 @@
 import ast
 import re
 from itertools import islice
+from urllib.parse import urlsplit
 
 MAX_ROUTES = 100
 MAX_FUNCTIONS = 12
@@ -87,12 +88,12 @@ def trace_routes(report, trees):
                          'operations': [], 'unknowns': [], 'evidence_indices': [emit('route_handler', f'{path} → {function.name}', file, decorator.lineno)]}
                 visited = set()
 
-                def operation(text, current_file, line):
+                def operation(text, current_file, line, owner):
                     if len(trace['operations']) >= MAX_OPERATIONS:
                         trace['unknowns'].append('Operation limit reached (40).')
                         return
                     index = emit('handler_operation', text, current_file, line)
-                    trace['operations'].append({'description': text, 'evidence_index': index})
+                    trace['operations'].append({'description': text, 'evidence_index': index, 'owner': {'file': current_file, 'function': owner}})
 
                 def visit(current_file, current_function, depth, bindings=None):
                     key = (current_file, current_function.name)
@@ -142,13 +143,13 @@ def trace_routes(report, trees):
                             value = node.value
                             if isinstance(value, ast.Dict):
                                 fields = [str(k.value) for k in value.keys if isinstance(k, ast.Constant) and isinstance(k.value, str)]
-                                operation('Returns a structured response with fields: ' + ', '.join(fields[:12]) + '.' if fields else 'Returns a structured response.', current_file, node.lineno)
+                                operation('Returns a structured response with fields: ' + ', '.join(fields[:12]) + '.' if fields else 'Returns a structured response.', current_file, node.lineno, current_function.name)
                             elif isinstance(value, (ast.List, ast.ListComp)):
-                                operation('Returns a list of results.', current_file, node.lineno)
+                                operation('Returns a list of results.', current_file, node.lineno, current_function.name)
                             elif symbol(value, context) == 'sqlite-rows' or (isinstance(value, ast.Call) and symbol(value.func, context) == 'sqlite-cursor.fetchall'):
-                                operation('Returns rows read from the database.', current_file, node.lineno)
+                                operation('Returns rows read from the database.', current_file, node.lineno, current_function.name)
                             elif isinstance(value, ast.Constant):
-                                operation('Returns a fixed value (content omitted).', current_file, node.lineno)
+                                operation('Returns a fixed value (content omitted).', current_file, node.lineno, current_function.name)
                         if not isinstance(node, ast.Call):
                             continue
                         target = symbol(node.func, context)
@@ -160,7 +161,9 @@ def trace_routes(report, trees):
                                 if len(trace['evidence_indices']) >= MAX_FUNCTIONS * 2:
                                     trace['unknowns'].append('Helper-call evidence limit reached (24).')
                                     continue
-                                trace['evidence_indices'].append(emit('handler_call', f'{current_function.name} → {helper_name}', current_file, node.lineno))
+                                call_index = emit('handler_call', f'{current_function.name} → {helper_name}', current_file, node.lineno)
+                                findings[call_index]['target'] = {'file': helper_file, 'function': helper_name}
+                                trace['evidence_indices'].append(call_index)
                                 args = helper.args.posonlyargs + helper.args.args
                                 passed = {param.arg: symbol(arg, context) for param, arg in zip(args, node.args)}
                                 passed.update({kw.arg: symbol(kw.value, context) for kw in node.keywords if kw.arg})
@@ -177,15 +180,25 @@ def trace_routes(report, trees):
                                     table = re.search(r'\b(?:FROM|INTO|UPDATE)\s+([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)?)', clean, re.I)
                                     verb = {'SELECT': 'Reads', 'INSERT': 'Adds', 'UPDATE': 'Updates', 'DELETE': 'Deletes'}[action]
                                     description = verb + ' records in “' + table.group(1) + '” via SQLite.' if table else 'Contains a SQLite ' + action + ' statement; no table was identified.'
-                                    operation(description, current_file, node.lineno)
+                                    operation(description, current_file, node.lineno, current_function.name)
                                 else:
                                     trace['unknowns'].append('A SQL statement is present but its operation is unsupported.')
                             else:
                                 trace['unknowns'].append('Dynamic SQL could not be interpreted.')
                         elif target in ('sqlite-connection.commit', 'sqlite-cursor.commit'):
-                            operation('Requests that pending database changes be committed.', current_file, node.lineno)
+                            operation('Requests that pending database changes be committed.', current_file, node.lineno, current_function.name)
                         elif target == 'sqlite3.connect':
-                            operation('Opens a SQLite database connection.', current_file, node.lineno)
+                            operation('Opens a SQLite database connection.', current_file, node.lineno, current_function.name)
+                        elif target in ('requests.get', 'requests.post', 'requests.put', 'requests.delete', 'httpx.get', 'httpx.post'):
+                            if node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
+                                try:
+                                    parsed = urlsplit(node.args[0].value)
+                                    if parsed.scheme in ('http', 'https') and parsed.hostname:
+                                        operation('References web host “' + parsed.scheme + '://' + parsed.hostname + '” in an HTTP request.', current_file, node.lineno, current_function.name)
+                                except ValueError:
+                                    trace['unknowns'].append('HTTP request URL could not be interpreted.')
+                            else:
+                                trace['unknowns'].append('Dynamic HTTP request URL was not interpreted.')
                         elif target in ('sqlite-connection.cursor',):
                             pass
                         elif not (isinstance(target, str) and target.startswith('sqlite-') and getattr(node.func, 'attr', '') in {'fetchall', 'fetchone', 'close'}):
@@ -195,7 +208,7 @@ def trace_routes(report, trees):
 
                 visit(file, function, 0)
                 trace['unknowns'] += ['Statements may be conditional or unreachable; branch outcomes, call order, authorization and successful execution are not verified.',
-                                      'Only supported Python module-level handlers/helpers and SQLite operations are traced. ORM operations and other languages remain untraced.']
+                                      'This Python trace covers module-level handlers/helpers, selected SQLite operations and literal requests/httpx host references. ORM and class-based behavior are not resolved.']
                 trace['unknowns'] = list(dict.fromkeys(trace['unknowns']))
                 trace['evidence_indices'] += [item['evidence_index'] for item in trace['operations']]
                 traces.append(trace)

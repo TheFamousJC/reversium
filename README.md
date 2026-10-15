@@ -12,20 +12,24 @@ Choose a ZIP in the browser at http://127.0.0.1:8765. Analysis stays on your com
 
 On Windows, `./Start-Reversium.ps1` also starts the application and can use the bundled Codex Python runtime when available.
 
-The Windows launcher now selects a free local port. Use the address it opens and check the displayed version (0.5.0); an already-running server continues serving its older code until restarted. The CLI uses 8765 by default and selects a free port if that default is busy. `--port 0` explicitly requests a free port.
+The Windows launcher now selects a free local port. Use the address it opens and check the displayed version (0.6.0); an already-running server continues serving its older code until restarted. The CLI uses 8765 by default and selects a free port if that default is busy. `--port 0` explicitly requests a free port.
 
 ```sh
 python -m reversium project.zip --output reports/project
 python -m unittest discover -s tests -v
 ```
 
-The CLI writes standalone `report.html` and structured `report.json`. It overwrites those two names in the selected output directory. Browser reports offer Download JSON and Download HTML, plus a live evidence filter. Exports always contain the full report, even when the view is filtered.
+The CLI writes standalone `report.html`, structured `report.json`, and `feature-map.svg`. It overwrites those names in the selected output directory. Browser reports offer Download JSON, Download HTML and map SVG, plus live evidence/feature filters. Exports always contain the full generated report/map view, even when the screen is filtered.
 
 Reports open on **What this software does**, a plain-language overview with evidence links and explicit unknowns. **Architecture** holds the platform profile, supporting services and diagram; **Evidence** holds filterable findings and baseline comparison; **Coverage** holds binary inspection, inventory, readiness and limitations. Tabs support arrow/Home/End keyboard navigation. Saved HTML retains all sections; printing or disabling JavaScript exposes all sections. Analysis does not establish an exact behavioral specification of arbitrary uploaded programs.
 
+In **Architecture**, the feature interaction map connects supported routes, handlers, helpers and data-name candidates. Select a node/line to inspect evidence or filter by feature. Solid edges are traced references; dashed data edges are inferred name matches, not proof of the same database or a business workflow. A catalogue supplies supported-operation titles and unknowns. Browser SVG export and CLI `feature-map.svg` retain the complete drawn view; JSON includes the full generated graph. The view discloses omissions beyond 120 nodes/240 edges.
+
+`--compare previous-report.json` now compares stable feature/node/edge identities as well as files/findings. Added items are green, changed items amber; removals are listed. Baselines without a map are reported as unavailable. Structural differences do not establish behavioral changes.
+
 Explanations use local rules only, with no AI or added dependencies. Each explanation links to matching findings and includes what remains unverified. Links clear any evidence filter and focus the referenced row. Up to 16 explanation groups appear in the overview, with an explicit omitted count; full findings stay available. Packages without supported clues get an insufficient-evidence result. Structured explanations are included in the report JSON's additive `behavior` field (schema version 3).
 
-Python feature tracing follows module-level decorated route handlers into uniquely resolved local/imported helpers and recognizes supported SQLite reads/writes/commits and response shapes. Trace evidence and limits are recorded in `route_traces` and findings. Dynamic SQL, unresolved calls, class-based handlers, ORM calls and other languages remain unknown. This is bounded syntax tracing, not execution or control-flow verification.
+Python feature tracing follows module-level decorated route handlers into uniquely resolved local/imported helpers and recognizes supported SQLite reads/writes/commits, response shapes and selected literal requests/httpx host references. JavaScript/TypeScript tracing recognizes selected ES-module Express registrations, block-bodied callbacks and helpers, pg Pool/Client and mysql2 literal SQL calls, plus response field names. It uses a bounded local tokenizer, not a full parser, and requires no Node installation. CommonJS, JSX/TSX, regex-literal files, dynamic SQL/query objects, complex middleware/router prefixes, class handlers and ORM calls remain unsupported. Trace evidence and limits are recorded in `route_traces`, coverage and findings. No input is evaluated.
 
 Tabs are visible before scripting initializes and remain near the top while scrolling; without JavaScript, their anchors navigate the visible sections. The home page links to a built-in local sample report showing the four sections. Sample source is analyzed, never executed.
 

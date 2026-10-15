@@ -2,6 +2,38 @@
 
 Living document. Update completed work, verification and remaining limitations with each stage. Last updated: 2026-10-15.
 
+## Focused roadmap — current scope
+
+Product purpose: upload unfamiliar software, see its features and connections, and inspect the evidence behind the map. The brief development pause is over at the user's request. Resume with the **feature interaction map as the next milestone**; do not expand into unrelated reconstruction/deployment work.
+
+1. Feature interaction map: connect supported routes/features to handlers, helpers, data and external references; distinguish traced links from inferred shared dependencies. A shared table name is not proof of the same database or a business workflow.
+2. Feature catalogue: understandable names and descriptions, linked evidence and unknowns; retain a stable identity for comparisons.
+3. Broader tracing: selected JavaScript/TypeScript routes/database calls in addition to Python/SQLite; explicitly mark unsupported syntax and behavior.
+4. Clickable evidence: inspect nodes and connections, open matching findings and show file/line provenance.
+5. Confidence and coverage: expose traced/inferred links, unsupported files, omitted nodes and unresolved calls.
+6. Export and comparison: standalone diagram/report export and added/removed/changed feature connections between reports.
+
+Done means these work locally without paid services, with regression/browser verification and documented coverage. It does not mean every language, framework or possible application is understood. Automatic installation/execution, deeper decompilers, AI integration, cloud/labor cost estimation and automatic reconstruction are **deferred**. Historical stages below are a record, not a commitment to implement those deferred ideas now.
+
+### Focused MVP status — v0.6.0
+
+The feature interaction map was implemented first on resumption. All six focused capabilities now have a working, bounded implementation:
+
+| Capability | Delivered scope |
+| --- | --- |
+| Feature interaction map | Routes → handlers → resolvable helpers → data-name candidates; selected Python requests/httpx host references. Data-name edges are inferred and explicitly do not establish database identity. |
+| Feature catalogue | Stable feature identities, route labels, supported-operation titles/descriptions, evidence and unknowns. No business features are guessed from names alone. |
+| Broader tracing | Python AST/SQLite plus conservative JS/TS token recognition for ES-module Express registrations, block-bodied callbacks/named helpers, pg Pool/Client and mysql2 pool/connection literal SQL. |
+| Clickable evidence | Inspect nodes or connections with mouse/keyboard, then open the corresponding source finding; filter the map by feature. |
+| Confidence/coverage | Solid traced calls, dashed inferred data-name links, explicit trace limitations, route-candidate/trace counts without claiming a completeness percentage, and omission counts. |
+| Export/comparison | HTML/JSON and standalone SVG, including browser SVG download. CLI baselines compare stable features/nodes/edges; added/changed items are highlighted and removals listed. Old baselines without maps are reported as unavailable. |
+
+Verification: 59 tests pass. Browser checked Python and TypeScript samples, feature filtering, data-node inspection/unknowns, exact evidence navigation, SVG download and complete HTML export after filtering, and an added delete route in the comparison view. CLI comparison detected one added feature, two nodes and two connections in that example. Exported SVG is valid XML and retains the full diagram. Screenshot: ignored `reports/browser-feature-map.jpg`.
+
+Scope boundaries: JS/TS is a **bounded token recognizer**, not a full parser or type checker. CommonJS, namespace/default re-export resolution, JSX/TSX tracing, regex-literal files, class handlers, dynamic SQL/query objects, callback bodies, middleware/router-prefix effects, ORM and complex data flow remain unsupported/unknown. Input is never evaluated. No Node runtime or third-party parser is required. JS input retention is capped at 128 files / 16 MiB with 60,000 tokens per file; combined routes cap at 100, helpers at depth 3 / 12 functions and operations at 40. Graph views cap at 120 nodes / 240 edges and disclose omissions; JSON retains the generated graph. Static baselines compare code structure, not runtime behavior.
+
+Next work should be validation on representative user-supplied packages and fixes within this scope, rather than expanding into the deferred features. No claim of universal language coverage or production certification is made.
+
 ## Stage 1 — Local source archive workbench
 
 Implemented:
@@ -110,6 +142,7 @@ Future setup workflow: produce a reviewable run plan (OS/architecture, pinned de
 
 ## Change log
 
+- 2026-10-15: Resumed with the focused roadmap and delivered v0.6.0 interaction map/catalogue, selected JS/TS tracing, map inspection/filtering and SVG/baseline exports. The scoped MVP's six capabilities are implemented; unsupported syntax and runtime behavior remain explicit unknowns. 59 tests pass and browser workflows were verified.
 - 2026-10-15: Delivered v0.5.0 Python/SQLite handler tracing, stronger visible-tab fallback, live sample/version UI and free-port startup. Added practical-use guidance and expanded verification to 45 tests. No runtime dependencies or paid services added.
 - 2026-10-15: Delivered v0.4.0 “What this software does” tab with local evidence-linked explanations, per-claim and global unknowns, and 36 passing tests. The summaries describe clues, not a complete or verified functional specification.
 - 2026-10-15: Delivered v0.3.1 report navigation: Architecture (profile/services/diagram), Evidence (filterable findings/comparison), and Coverage (binary inspection/inventory/readiness/limits). Added accessible tab relationships, arrow/Home/End keyboard navigation, no-JavaScript fallback and print styles exposing every section. HTML exports retain every section and reset the filter. Browser checks confirmed tab isolation, keyboard switching, two matching binary-import findings and full HTML export; existing 30-test regression suite passes. The Coverage tab explicitly distinguishes evidence from an exact behavioral specification.

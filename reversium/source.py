@@ -2,6 +2,7 @@
 import ast
 import posixpath
 import re
+from .feature_map import compare_maps
 
 
 def python_details(tree, name, finding):
@@ -104,7 +105,7 @@ def compare_reports(current, previous):
     old_findings = {identity(f) for f in previous['findings']}
     new_findings = {identity(f) for f in current['findings']}
     changed = sorted(p for p in new.keys() & old.keys() if new[p].get('sha256') and old[p].get('sha256') and new[p]['sha256'] != old[p]['sha256'])
-    return {'added_files': sorted(new.keys() - old.keys()), 'removed_files': sorted(old.keys() - new.keys()),
+    return {'feature_map': compare_maps(current, previous), 'added_files': sorted(new.keys() - old.keys()), 'removed_files': sorted(old.keys() - new.keys()),
             'changed_files': changed,
             'changed_source_files': [p for p in changed if new[p].get('category') == 'source'],
             'added_findings': [dict(kind=k, value=v, file=p) for k, v, p in sorted(new_findings - old_findings)],

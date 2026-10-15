@@ -2,6 +2,34 @@
 
 Living explanation. Last updated: 2026-10-15.
 
+## Our focused plan
+
+Reversium's job is to help you upload unfamiliar software, see its features and connections, and check the evidence. Development has resumed. **The feature interaction map is the next milestone.**
+
+The focused feature list is: an interaction diagram, a plain-language feature catalogue, selected JavaScript/TypeScript tracing alongside Python, clickable evidence, visible confidence/coverage, and map export/comparison. The diagram should show a route leading to its handler and helpers, then to data or an outside service. Features that may share data can appear connected through that data, with uncertainty clearly labeled. Matching names alone do not prove a shared database or a complete workflow.
+
+We are deferring automatic installation/running, deeper decompilation, AI, cost estimates and automatic rebuilding. Keeping that boundary makes the product useful without growing into an unlimited reconstruction project.
+
+The next milestone has now been delivered in version 0.6.0. The focused workflow is available: feature catalogue, interaction map, selected Python and JavaScript/TypeScript tracing, clickable evidence, uncertainty/coverage, and map export/comparison. This means the supported patterns work; it does not mean every application or framework is understood.
+
+## How the feature interaction map works
+
+Open Architecture after analyzing a ZIP, or try either local sample on the home page. The map connects a feature's route to its handler, its helper functions, and recognizable data operations. For example, a contacts listing and a contacts insert can point to the same table-name candidate. Solid lines show references traced in supported code. Dashed lines show inferred data-name connections: matching table names might belong to different databases, so this does not prove the features share real data.
+
+Choose a feature to dim unrelated parts. Select a box or line to see the evidence and unknowns, then follow a source link into Evidence. The catalogue below the map gives short descriptions such as “Read contacts records,” grounded in recognized SQL operations. It does not invent a CRM or other business purpose from a route name.
+
+Download map SVG saves a standalone diagram. HTML/JSON exports include the full map even when you filtered the screen. CLI exports also write `feature-map.svg`. To compare versions, use `python -m reversium newer.zip --compare older-report.json --output reports/newer`. Added map items are green, changed items amber, and removals are listed. A baseline without a map is marked unavailable rather than interpreted as an empty application.
+
+The Python sample uses SQLite. The JavaScript/TypeScript sample uses selected Express and PostgreSQL patterns; MySQL calls through selected mysql2 patterns are also recognized. The JavaScript reader uses local rules, not a complete compiler, and does not need Node or install packages. Unsupported syntax, dynamic queries, middleware effects and many frameworks remain unknown. The program being inspected is never run.
+
+## Who is this for, and what do I need?
+
+This is for a developer taking over unfamiliar code, a consultant assessing a legacy package, a technical lead planning a migration, or a software owner preparing a handover. You need a ZIP you are allowed to inspect, Python 3.10 or newer (or the bundled runtime through the Windows launcher), and questions you want answered. No cloud account or API key is needed.
+
+A non-programmer can use the overview to ask better questions. A developer should review the evidence before using it to change or deploy software. A useful first question is: “Which routes read or change this data, and where is that code?”
+
+We verified both sample maps in the browser, map filtering and evidence inspection, SVG/HTML export and a comparison with an added delete feature. Fifty-nine automated tests pass. The focused MVP is ready for trying representative packages; gaps in coverage must still be reviewed.
+
 ## What it does today
 
 Reversium helps you understand a software package. You give it a ZIP file, and it makes a list of what is inside. For selected kinds of readable code, it identifies named building blocks, references to other software and possible web addresses or application routes.
@@ -24,7 +52,7 @@ The latest version follows some Python web handlers into helper functions, inclu
 
 This is still a code trace, not a successful test run. The code might run only in certain conditions, be unused or fail. Unsupported calls and dynamically built database queries stay unknown. Other languages, class-based handlers and database frameworks are not traced in this version.
 
-If tabs were missing, start the current version with `./Start-Reversium.ps1` and use the new browser address it opens. The launcher now chooses a free local port, so an older server on port 8765 does not keep serving the old interface. Look for version 0.5.0 at the top. The home page offers sample links for all four sections; after analyzing a ZIP, report navigation stays visible near the top and while scrolling. Without JavaScript, the links still move between visible sections.
+If tabs were missing, start the current version with `./Start-Reversium.ps1` and use the new browser address it opens. The launcher now chooses a free local port, so an older server on port 8765 does not keep serving the old interface. Look for version 0.6.0 at the top. The home page offers sample links for all four sections; after analyzing a ZIP, report navigation stays visible near the top and while scrolling. Without JavaScript, the links still move between visible sections.
 
 ## What is the practical application?
 

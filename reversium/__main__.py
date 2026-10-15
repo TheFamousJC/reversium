@@ -9,10 +9,11 @@ from pathlib import Path
 from .analyze import inspect_zip
 from .report import render, STYLE
 from .source import compare_reports
-from .sample import sample_archive
+from .sample import sample_archive, javascript_sample_archive
 from . import __version__
+from .feature_map import render_svg
 
-HOME = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium</title><style>''' + STYLE + '''</style><main><p class="brand">REVERSIUM 0.5.0 / PRIVATE BY DESIGN</p><h1>From archive to understanding.</h1><p>Inspect a ZIP on your computer. Discover source files, dependencies, route candidates and architecture evidence. No accounts, API keys or uploads to a cloud service.</p><p>Understand an unfamiliar software package, trace supported features, and prepare maintenance or migration work. Report sections: What this software does, Architecture, Evidence, and Coverage.</p><p><a href="/example">Open a local sample report</a> to see all four tabs, or analyze your ZIP below.</p><nav aria-label="Preview report sections"><a class="preview-tab" href="/example#panel-behavior">What this software does</a><a class="preview-tab" href="/example#panel-architecture">Architecture</a><a class="preview-tab" href="/example#panel-evidence">Evidence</a><a class="preview-tab" href="/example#panel-coverage">Coverage</a></nav><form><input aria-label="Choose ZIP archive" type="file" accept=".zip" required><button>Analyze archive</button></form><p id="status" role="status">Maximum ZIP size: 64 MiB. Input code is never executed.</p><p>Python AST analysis · JavaScript/TypeScript import scanning · Platform profile · Supporting services · Static binary inspection</p><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=document.querySelector('input').files[0],s=document.querySelector('#status'),b=document.querySelector('button');if(f.size>67108864){s.textContent='ZIP exceeds 64 MiB.';return}b.disabled=true;s.textContent='Analyzing locally…';try{const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/zip'},body:f});if(!r.ok)throw new Error(await r.text());document.open();document.write(await r.text());document.close()}catch(e){s.textContent=e.message;b.disabled=false}};</script></main></html>'''
+HOME = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium</title><style>''' + STYLE + '''</style><main><p class="brand">REVERSIUM 0.6.0 / PRIVATE BY DESIGN</p><h1>From archive to understanding.</h1><p>Inspect a ZIP on your computer. Discover source files, dependencies, route candidates and architecture evidence. No accounts, API keys or uploads to a cloud service.</p><p>Understand an unfamiliar software package, trace supported features, and prepare maintenance or migration work. Report sections: What this software does, Architecture, Evidence, and Coverage.</p><p><a href="/example">Open a local sample report</a> to see all four tabs, try the <a href="/example-js">JavaScript/TypeScript sample</a>, or analyze your ZIP below.</p><nav aria-label="Preview report sections"><a class="preview-tab" href="/example#panel-behavior">What this software does</a><a class="preview-tab" href="/example#panel-architecture">Architecture</a><a class="preview-tab" href="/example#panel-evidence">Evidence</a><a class="preview-tab" href="/example#panel-coverage">Coverage</a></nav><form><input aria-label="Choose ZIP archive" type="file" accept=".zip" required><button>Analyze archive</button></form><p id="status" role="status">Maximum ZIP size: 64 MiB. Input code is never executed.</p><p>Python AST analysis · JavaScript/TypeScript import scanning · Platform profile · Supporting services · Static binary inspection</p><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=document.querySelector('input').files[0],s=document.querySelector('#status'),b=document.querySelector('button');if(f.size>67108864){s.textContent='ZIP exceeds 64 MiB.';return}b.disabled=true;s.textContent='Analyzing locally…';try{const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/zip'},body:f});if(!r.ok)throw new Error(await r.text());document.open();document.write(await r.text());document.close()}catch(e){s.textContent=e.message;b.disabled=false}};</script></main></html>'''
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -35,6 +36,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(403, 'Invalid host.')
         if self.path == '/example':
             return self.send(200, render(inspect_zip(sample_archive())))
+        if self.path == '/example-js':
+            return self.send(200, render(inspect_zip(javascript_sample_archive())))
         if self.path == '/version':
             return self.send(200, json.dumps({'version': __version__}), 'application/json')
         self.send(200, HOME) if self.path == '/' else self.send(404, 'Not found.')
@@ -110,6 +113,7 @@ def main():
         output.mkdir(parents=True, exist_ok=True)
         (output / 'report.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
         (output / 'report.html').write_text(render(result), encoding='utf-8')
+        (output / 'feature-map.svg').write_text(render_svg(result['feature_map'], result.get('comparison', {}).get('feature_map'))[0], encoding='utf-8')
         print(f'Reports saved to {output.resolve()}')
         return
     try:
