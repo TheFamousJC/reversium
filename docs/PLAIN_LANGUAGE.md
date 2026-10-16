@@ -2,6 +2,18 @@
 
 Living explanation. Last updated: 2026-10-16.
 
+## Following more Tudela workflows in version 0.8.0
+
+The map can now follow selected actions passed between React screens. For example, the chat screen's send action connects to the callback supplied by the main app, then to the `/api/chat` request and supported backend/data references. A CMS save action can connect to a callback returned by its content-management helper and then to the database code. Click a box or line to inspect the source evidence.
+
+It also follows some addresses built from local constants or passed into request helpers. The staff screen's helper calls fetch with a variable URL; the report can now show which caller supplied the staff endpoint and which HTTP method it requested. Evidence includes both the caller and the helper. Different callers are kept separate so a read action is not accidentally described as a write action.
+
+On your original ZIP, the report shows 172 possible prop bindings and 52 resolved API-target contexts. A context is one caller/path/method combination; it is not a unique service or a verified working feature. The number of source files and starting points is unchanged: 115 JS/TS files, 25 route references and 32 React/JSX modules. We checked the chat and staff maps in the browser, followed the chat prop link to its exact source line, inspected both staff caller/helper locations, and passed 96 automated checks.
+
+A passed action can still have several possible providers, and the program might choose among them while running. Reversium displays those possibilities rather than choosing one. State-setting callbacks, more complex property forwarding and addresses controlled by environment settings can remain unknown. A recognized API path also does not prove the same server will handle it after deployment. None of Tudela's code or requests are run by the analysis.
+
+Large maps can exceed display or tracing limits. The App and CMS views disclose these; a smaller selected workflow is easier to inspect. JSON keeps the generated reference data. Reversium remains local and free, without an AI service, account, Node installation or API key. Your ZIP and private report are not published with Reversium's code.
+
 ## What changed after testing your Tudela ZIP
 
 Version 0.7.0 maps much more of Tudela than the first report. It reads all 115 JavaScript/TypeScript files in that ZIP, including 32 files containing React screen/component code. It recognizes 25 web-route references, rather than drawing only the narration endpoint. The map offers 57 starting points: those routes and React modules. These are starting points for investigation, not 57 proven business features.
@@ -10,7 +22,7 @@ For example, selecting TourCommunityPanel shows references from the community sc
 
 Select a feature to rebuild its focused map. This brings in connections that were outside the overview's display limit. The view reports any omitted boxes/lines. Solid lines mean source references were recognized; dashed lines mean a possible connection based on a data name or route path. Neither means that the action succeeded or is available to a visitor.
 
-This is still not the entire working story. Some Tudela actions are passed between screens through properties and callbacks, and some addresses and table names are built while the program runs. Those connections remain unknown. Reading every code file is different from proving every workflow. The next focused improvement is following those selected screen-to-screen callbacks and constructed local API addresses.
+At the v0.7.0 stage, screen-to-screen callbacks and constructed addresses were major gaps. Version 0.8.0 adds the selected patterns described above. More complex forwarding, state changes and dynamic table names remain unknown; reading every code file is still different from proving every workflow.
 
 Everything stays local and free. Reversium does not start Tudela, contact Supabase or Google, install Tudela's dependencies, or send your archive to an AI service. Your analyzed software may still need paid services when you run it independently. We tested the real ZIP in the browser, checked a focused community map and its database evidence links, and passed 72 automated checks.
 
@@ -68,7 +80,7 @@ The latest version follows some Python web handlers into helper functions, inclu
 
 This is still a code trace, not a successful test run. The code might run only in certain conditions, be unused or fail. Unsupported calls and dynamically built database queries stay unknown. Class-based handlers and database frameworks beyond the supported patterns remain unknown; the newer TS/React/Supabase reference reader is described above.
 
-If tabs were missing, start the current version with `./Start-Reversium.ps1` and use the new browser address it opens. The launcher now chooses a free local port, so an older server on port 8765 does not keep serving the old interface. Look for version 0.7.0 at the top. The home page offers sample links for all four sections; after analyzing a ZIP, report navigation stays visible near the top and while scrolling. Without JavaScript, the links still move between visible sections.
+If tabs were missing, start the current version with `./Start-Reversium.ps1` and use the new browser address it opens. The launcher now chooses a free local port, so an older server on port 8765 does not keep serving the old interface. Look for version 0.8.0 at the top. The home page offers sample links for all four sections; after analyzing a ZIP, report navigation stays visible near the top and while scrolling. Without JavaScript, the links still move between visible sections.
 
 ## What is the practical application?
 

@@ -7,6 +7,7 @@ import re
 from urllib.parse import urlsplit
 from .js_tracing import parse_module, arguments
 from .feature_map import stable_id
+from .workflows import Workflows
 
 MAX_NODES = 4000
 MAX_EDGES = 12000
@@ -34,10 +35,19 @@ def trace_workspace(report, sources, sql_sources=None):
         if source not in nodes or target not in nodes or len(edges) >= MAX_EDGES:
             return
         identity = stable_id('edge', source, target, label)
+        idx = None
         if identity not in edges:
             idx = emit('source_reference', nodes[source]['label'] + ' → ' + label + ' → ' + nodes[target]['label'], file, line)
             edges[identity] = {'id': identity, 'source': source, 'target': target, 'label': label,
                                'confidence': confidence, 'evidence_indices': [idx], 'features': []}
+        elif not any(findings[idx]['evidence'] == {'file': file, 'line': line} for idx in edges[identity]['evidence_indices']):
+            if len(edges[identity]['evidence_indices']) < 16:
+                idx = emit('source_reference', nodes[source]['label'] + ' → ' + label + ' → ' + nodes[target]['label'], file, line)
+                edges[identity]['evidence_indices'].append(idx)
+        if idx is not None:
+            for identity in (source, target):
+                if len(nodes[identity]['evidence_indices']) < 32 and idx not in nodes[identity]['evidence_indices']:
+                    nodes[identity]['evidence_indices'].append(idx)
 
     for file, source in sources.items():
         try:
@@ -46,7 +56,7 @@ def trace_workspace(report, sources, sql_sources=None):
             gaps.append(f'{file}: structural tracing skipped: {error}.')
             continue
         modules[file] = m
-        m.update(file=file, funcs=[], variables=[], imports={})
+        m.update(file=file, funcs=[], variables=[], imports={}, variable_kinds={})
         m['node'] = node('module', file.split('/')[-1], file)
         t, pairs = m['tokens'], m['pairs']
         # Discover named functions at any lexical depth, including typed props,
@@ -119,6 +129,7 @@ def trace_workspace(report, sources, sql_sources=None):
                     j += 1
                 if j < len(t) and t[j].value == '=':
                     m['variables'].append((t[i + 1].value, j + 1, enclosing(m, i)))
+                    m['variable_kinds'][j + 1] = token.value
         for i, token in enumerate(t):
             if token.value != 'import' or m['depth'][i] != 0:
                 continue
@@ -230,6 +241,8 @@ def trace_workspace(report, sources, sql_sources=None):
                 return client(modules[target], original, len(modules[target]['tokens']), seen)
         return None
 
+    flow = Workflows(modules, node, link, enclosing, gaps)
+    flow.prepare()
     routes, requests, mounts = [], [], []
     for file, m in modules.items():
         t, pairs = m['tokens'], m['pairs']
@@ -354,33 +367,6 @@ def trace_workspace(report, sources, sql_sources=None):
                 resource = node('auth', 'Supabase Auth', 'Supabase Auth')
                 link(owner(i), resource, 'auth ' + '.'.join(names[1:]), file, token.line)
 
-        # fetch references: only literal local paths or literal/template hosts.
-        for i, token in enumerate(t[:-2]):
-            if token.value != 'fetch' or t[i + 1].value != '(' or i + 1 not in pairs or (i and t[i - 1].value in ('.', 'function')):
-                continue
-            args = arguments(m, i + 1)
-            if not args:
-                continue
-            a, b = args[0]
-            if b != a + 1 or t[a].kind not in ('string', 'dynamic'):
-                gaps.append(f'{file}:{token.line}: fetch target is computed; endpoint unresolved.')
-                continue
-            value = t[a].value
-            if value.startswith('/') and not value.startswith('//'):
-                path = value.split('?')[0]
-                # Template paths are displayed as candidates, not matched to routes.
-                if t[a].kind == 'string':
-                    requests.append((owner(i), path, file, token.line))
-                else:
-                    gaps.append(f'{file}:{token.line}: templated local API target is unresolved.')
-            elif value.startswith(('https://', 'http://')):
-                try:
-                    host = urlsplit(value).hostname
-                    if host and '${' not in host:
-                        resource = node('external', host, host)
-                        link(owner(i), resource, 'fetch host reference', file, token.line)
-                except ValueError:
-                    pass
     for path, route, file, scope in routes:
         candidates = [mount for mount in mounts if mount[:2] == (file, scope)]
         if len({mount[2] for mount in candidates}) == 1:
@@ -396,13 +382,36 @@ def trace_workspace(report, sources, sql_sources=None):
                     root['evidence_indices'].append(idx)
         elif candidates:
             gaps.append(f'{file}: multiple router mounts; effective paths remain unknown.')
-    for caller, path, file, line in requests:
-        matches = [(route, rf) for rp, route, rf, scope in routes if nodes[route]['label'].split(' ', 1)[1] == path]
-        if len(matches) == 1:
-            link(caller, matches[0][0], 'local API path candidate', file, line, 'inferred')
-        else:
-            resource = node('external', 'Local API: ' + path[:100], ('local-api', path))
-            link(caller, resource, 'local fetch reference', file, line)
+    flow.connect_props()
+    for request in flow.api_requests():
+        value, method = request['target'], request['method']
+        if value.startswith('/') and not value.startswith('//') and '\\' not in value:
+            path = value.split('?')[0].split('#')[0]
+            matches = []
+            for rp, route, rf, scope in routes:
+                registered_method, registered_path = nodes[route]['label'].split(' ', 1)
+                if method is not None and registered_method != method:
+                    continue
+                segments, actual = registered_path.split('/'), path.split('/')
+                if len(segments) == len(actual) and all((expected.startswith(':') and part == '{*}') or expected == part for expected, part in zip(segments, actual)):
+                    matches.append(route)
+            if len(matches) == 1 and method is not None:
+                resource = matches[0]
+                label = 'API target candidate ' + method
+            else:
+                resource = node('external', 'Local API: ' + (method or '?') + ' ' + path[:100], ('local-api', method, path))
+                label = 'API path candidate (route/method unresolved)'
+            for file, line in request['evidence']:
+                link(request['caller'], resource, label, file, line, 'inferred')
+        elif value.startswith(('https://', 'http://')):
+            try:
+                host = urlsplit(value).hostname
+                if host and '${' not in host:
+                    resource = node('external', host, host)
+                    for file, line in request['evidence']:
+                        link(request['caller'], resource, 'fetch host candidate', file, line, 'inferred')
+            except ValueError:
+                pass
     # Include a module's named declarations so imported modules remain navigable.
     for file, m in modules.items():
         for fn in m['funcs']:
@@ -444,6 +453,7 @@ def trace_workspace(report, sources, sql_sources=None):
                 link(resource, target, label, file, clean[:start + match.start()].count('\n') + 1, 'inferred')
     report['workspace_graph'] = {'nodes': list(nodes.values()), 'edges': list(edges.values()), 'roots': roots,
                                  'mount_candidates': mounts,
+                                 'workflow_coverage': {'prop_bindings': flow.bindings, 'callback_references': flow.prop_calls, 'api_targets': len(flow.requests)},
                                  'parsed_files': len(modules), 'gaps': list(dict.fromkeys(gaps))[:200],
                                  'limits': {'nodes': MAX_NODES, 'edges': MAX_EDGES}}
     if len(nodes) >= MAX_NODES or len(edges) >= MAX_EDGES:

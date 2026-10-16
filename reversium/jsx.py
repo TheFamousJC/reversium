@@ -3,6 +3,7 @@
 This is not a JSX/type parser. Tags are source references, never rendered UI proof.
 """
 import re
+import json
 
 
 def jsx_tokens(source, tokenize):
@@ -21,7 +22,7 @@ def jsx_tokens(source, tokenize):
                 i += 1
         raise ValueError('unterminated JSX attribute')
 
-    def expression(i):
+    def expression(i, component=None, prop=None):
         start, depth = i + 1, 1
         i += 1
         while i < len(source):
@@ -40,7 +41,7 @@ def jsx_tokens(source, tokenize):
                 continue
             depth += (source[i] == '{') - (source[i] == '}')
             if depth == 0:
-                expressions.append((start, i))
+                expressions.append((start, i, component, prop))
                 return i + 1
             i += 1
         raise ValueError('unclosed JSX expression')
@@ -60,7 +61,8 @@ def jsx_tokens(source, tokenize):
                 if source[i] in "\"'":
                     i = quoted(i)
                 elif source[i] == '{':
-                    i = expression(i)
+                    attribute = re.search(r'([A-Za-z_$][\w$-]*)\s*=\s*$', source[:i])
+                    i = expression(i, name, attribute.group(1) if attribute else None)
                 else:
                     i += 1
             if i >= len(source):
@@ -76,8 +78,10 @@ def jsx_tokens(source, tokenize):
                 output = []
                 from .js_tracing import Token
                 output.extend(Token(name, 'jsx', offset + 1) for name, offset in tags)
-                for start, end in expressions:
+                for start, end, component, prop in expressions:
                     offset = source[:start].count('\n')
+                    if prop:
+                        output.append(Token(json.dumps([component, prop]), 'jsx-prop', offset + 1))
                     bare = re.fullmatch(r'\s*([A-Za-z_$][\w$]*)\s*', source[start:end])
                     if bare:
                         output.append(Token(bare.group(1), 'jsx-ref', offset + 1))

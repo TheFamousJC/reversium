@@ -2,6 +2,24 @@
 
 Living document. Update completed work, verification and remaining limitations with each stage. Last updated: 2026-10-16.
 
+## v0.8.0 — Selected React callbacks and computed API targets
+
+Delivered 2026-10-16. Extends the Tudela discovery milestone while retaining local, dependency-free static analysis.
+
+- Preserve JSX attribute identity alongside tokenized expressions. Connect explicit callback providers to destructured/aliased component props or object props, forwarded callbacks, inline callbacks, direct immutable component aliases, selected React.lazy literal imports (named/default function exports), useCallback bindings and callbacks in returned hook objects, including the useMemo-returned-object pattern. Prop edges are inferred and combine possible providers across source usages; they are not a component-instance execution trace.
+- Follow the CMS chain `CmsPanel.onSaveCity` → callback returned by `useCmsContent` → `saveCmsCity`, and the chat chain `AskHerzlChat.onSendMessage` → `App.handleSendChatMessage` → `POST /api/chat`. Wider feature traversal now reaches the latter route's backend/data references. Both chains have source links; execution/permissions and branch outcomes remain unverified.
+- Resolve selected fetch targets using immutable local string aliases, concatenation, bounded templates, encoded path-segment candidates and per-call-site arguments through named helper wrappers. Methods are inferred from supported RequestInit object literals/spreads with override order; omitted optional options can retain GET. Different wrapper callers keep separate path/method contexts. Literal local routes are linked only when method/path matching is unambiguous; parameterized path matching accepts encoded segment candidates. Unknown method/route results remain visibly unresolved.
+- Query strings/fragments and external URL credentials are omitted from generated API node labels. No expressions, callbacks, requests or source imports are executed. Mutable/environment-dependent targets, arbitrary function results, shadowed fetch/encoder names and unknown provider expressions stay unknown. Local/parameter shadowing also prevents inherited wrapper arguments from replacing inner bindings.
+- Nodes now expose sampled source evidence as well as edges. Repeated connection locations retain up to 16 provenance entries; nodes sample up to 32. The Architecture tab shows prop-binding and API-context counts, explicitly distinguishing contexts from unique endpoints.
+
+Real ZIP results: same 266 files / 5,167,505 bytes, all 115 JS/TS files scanned, 25 structural routes and 32 React/JSX module roots. New reader identifies 172 callback prop-binding occurrences and 52 resolved API-target contexts, producing 46 unambiguous caller-to-route edges. The workspace graph has 1,183 nodes / 2,160 connections; reachable feature map has 963 nodes / 1,493 connections and 3,882 total findings. Counts are bounded source candidates, not a completeness or success percentage. Large App/CMS traversals disclose their limits; the focused chat and staff maps showed no view omissions.
+
+Verification: 96 automated tests pass (including local HTTP tests). New coverage includes 24 workflow tests: callback forwarding/aliasing, lazy/default components, returned-hook callbacks, React useCallback shorthand, multiple providers, defaults/unknown providers, methods/spread order, separate wrapper caller contexts/provenance, query/credential omission, constant/template paths, mutation/environment/unsupported targets, global fetch/encoder and inner-binding shadowing, scalar useMemo rejection, stable IDs after line moves and the 400-request output bound. Browser verified the real-ZIP report counts, focused chat and staff maps, exact prop evidence at App.tsx:1064 and the computed staff request with caller/helper evidence at CmsStaffAccess.tsx:74 and :44. Generated reports, screenshots and the user's ZIP remain local and excluded from Git.
+
+Limits: prop spreads/default substitution, runtime component instances, state setters, arbitrary re-exports, namespace APIs, complex expressions and general callback argument/state flow are not fully resolved. Multiple bindings remain candidates. Local API paths do not establish deployment origin, proxy behavior, authentication, runtime enablement or successful requests. SQL/database uncertainty from v0.7.0 still applies. Computed API expansion is bounded to helper depth 4, 5,000 contexts, 400 output contexts and 2,000 characters per expression. Feature traversal is depth 10 / 360 visited nodes; SVG views retain their 120-node / 240-edge cap and disclose omissions. Files are not run, installed or sent to external services; no Node, AI or paid API is required.
+
+Next focused milestone: validate additional real workflows and improve per-workflow navigation for large maps. Resolve additional callback/state and origin-dependent URL patterns only with evidence and explicit ambiguity; runtime validation and automatic setup remain deferred.
+
 ## v0.7.0 — Tudela TypeScript, React and Supabase reference map
 
 Delivered 2026-10-16 after the real Tudela ZIP exposed the limits of v0.6.0. This extends the focused roadmap; automatic setup/execution and paid services remain deferred.
@@ -160,6 +178,8 @@ Separate disposable-VM workflow with explicit user control, network capture and 
 Future setup workflow: produce a reviewable run plan (OS/architecture, pinned dependencies, services, environment-variable names, migrations and startup commands), then validate in a disposable VM. Only successful installation, startup, health checks and service checks may establish that a package runs. Stability additionally needs load, restart/recovery, backup and monitoring validation. None of those steps are performed by v0.3.0.
 
 ## Change log
+
+- 2026-10-16: Delivered v0.8.0 selected React prop/callback and computed API target candidates. Verified the original Tudela ZIP in the browser and 96 automated tests; no paid service or runtime dependency added.
 
 - 2026-10-16: Delivered v0.7.0 structural TS/React/Supabase and SQL RPC reference mapping, verified against the original Tudela ZIP; 72 regression tests pass. Whole-platform runtime and prop-flow completeness remain unverified.
 

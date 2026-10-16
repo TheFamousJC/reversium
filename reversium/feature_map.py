@@ -86,7 +86,7 @@ def build_feature_map(report):
     for root in workspace.get('roots', []):
         feature = stable_id('workspace-feature', root['node'])
         pending, visited, indices, descriptions = [(root['node'], 0)], set(), set(root['evidence_indices']), []
-        while pending and len(visited) < 240:
+        while pending and len(visited) < 360:
             identity, depth = pending.pop(0)
             if identity in visited or identity not in workspace_nodes:
                 continue
@@ -97,7 +97,7 @@ def build_feature_map(report):
             for connection in outgoing.get(identity, []):
                 # Imports are inventory references, not proof every imported function
                 # participates in a feature. Follow explicit call/JSX/API references.
-                if connection['label'] == 'imports' or depth >= 6:
+                if connection['label'] == 'imports' or depth >= 10:
                     continue
                 target = workspace_nodes[connection['target']]
                 child = nodes.setdefault(target['id'], dict(target, features=[]))
@@ -105,14 +105,15 @@ def build_feature_map(report):
                 connection_entry = edges.setdefault(connection['id'], dict(connection, features=[]))
                 connection_entry['features'] = sorted(set(connection_entry['features'] + [feature]))
                 indices.update(connection['evidence_indices'])
-                if target['kind'] in ('data', 'rpc', 'storage', 'auth', 'external'):
+                if target['kind'] in ('data', 'rpc', 'storage', 'auth', 'external') or target['kind'] == 'feature' and connection['label'].startswith('API target'):
                     descriptions.append(connection['label'] + ': ' + target['label'])
                 pending.append((target['id'], depth + 1))
         unknowns = ['Lexical references include conditional code and callback bodies; they do not prove execution or a user journey.',
                     'Supabase table/RPC/storage names are candidates; database identity, RPC effects, RLS, permissions and successful operations are unverified.',
-                    'Router mount prefixes, middleware effects, dynamic targets, prop/event data flow, re-exports and runtime configuration remain unknown.']
+                    'Prop bindings combine possible providers across source usages, not runtime component instances. Callback arguments, state, spreads/defaults, branch outcomes and successful invocation remain unverified.',
+                    'Unsupported router mounts, middleware effects, dynamic targets, complex prop/event flow, re-exports and runtime configuration remain unknown.']
         if pending:
-            unknowns.append('Feature traversal capped at 240 nodes; full generated references are in workspace_graph JSON.')
+            unknowns.append('Feature traversal capped at 360 nodes; full generated references are in workspace_graph JSON.')
         catalogue.append({'id': feature, 'node_id': root['node'], 'name': root['name'], 'title': root['name'], 'handler': root['name'], 'file': root['file'],
                           'description': '; '.join(dict.fromkeys(descriptions))[:2400] or 'Source references mapped; no supported data operation established.',
                           'evidence_indices': sorted(indices), 'unknowns': unknowns, 'confidence': 'static source references; not runtime verified', 'type': root['type']})
@@ -121,7 +122,8 @@ def build_feature_map(report):
               'features': catalogue, 'limits': 'Up to 100 traced features; graph view shows up to 120 nodes and 240 edges.',
               'coverage': {'route_candidates': sum(f['kind'] == 'route_candidate' for f in findings), 'traced_features': len(catalogue),
                            'route_references': sum(r['type'] == 'route' for r in workspace.get('roots', [])),
-                           'react_modules': sum(r['type'] == 'react' for r in workspace.get('roots', [])), 'parsed_js_files': workspace.get('parsed_files', 0)},
+                           'react_modules': sum(r['type'] == 'react' for r in workspace.get('roots', [])), 'parsed_js_files': workspace.get('parsed_files', 0),
+                           **workspace.get('workflow_coverage', {})},
               'unknowns': ['Edges show supported static paths, not proven execution or a complete call graph.',
                            'Shared data names indicate possible interaction, not a confirmed shared database or business workflow.',
                            'External dependencies are inventoried separately; unsupported external calls have no invented graph edges.']}

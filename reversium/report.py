@@ -34,6 +34,7 @@ def render(report):
     catalogue = ''.join(f'<tr><td><b>{esc(feature.get("title", feature["name"]))}</b><br>{esc(feature["name"])}</td><td>{esc(feature["description"])}</td><td>{esc(feature["confidence"])}</td><td>' + ' · '.join(f'<a class="evidence-link" href="#finding-{index}">{location(findings[index]["evidence"])}</a>' for index in feature['evidence_indices']) + '</td></tr>' for feature in graph['features'])
     interaction_map = ('<h2>Feature interaction map</h2><p>Solid lines: traced source references. Dashed lines: inferred data-name connections. Shared names do not prove a shared database or business workflow.</p>'
                        + '<p>' + str(graph.get('coverage', {}).get('route_candidates', 0)) + ' heuristic route candidates; ' + str(graph.get('coverage', {}).get('route_references', 0)) + ' structural route references; ' + str(graph.get('coverage', {}).get('react_modules', 0)) + ' React/JSX modules; ' + str(graph.get('coverage', {}).get('parsed_js_files', 0)) + ' JS/TS files scanned. These counts are not a completeness percentage. JSX and call references include callbacks and conditional code; they do not prove a user workflow. Router prefixes are candidates where a single literal mount is resolved.</p>'
+                       + '<p>' + str(graph.get('coverage', {}).get('prop_bindings', 0)) + ' prop binding candidates; ' + str(graph.get('coverage', {}).get('api_targets', 0)) + ' API target contexts resolved. Bindings can have multiple possible providers; target counts include separate callers and are not unique endpoint counts.</p>'
                        + '<label for="map-filter">Show feature</label><select id="map-filter"><option value="">All features</option>' + feature_options + '</select> <button id="svg-export">Download map SVG</button>'
                        + '<div class="scroll map-viewport">' + map_svg + '</div><p id="map-omissions">' + str(map_omissions['omitted_nodes']) + ' nodes and ' + str(map_omissions['omitted_edges']) + ' connections omitted from this view. Select a feature to rebuild its focused map. Full graph data is in JSON.</p>'
                        + '<section id="map-details" aria-live="polite"><h3>Inspect a connection</h3><p>Select a node or line to see evidence, participating features, and unknowns.</p></section>'
@@ -75,7 +76,7 @@ def render(report):
                         + '<h2>How to confirm the explanation</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['next_steps']) + '</ul>')
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Reversium report</title><style>{STYLE}</style><main>
-<p class="brand">REVERSIUM 0.7.0 / LOCAL ANALYSIS</p>
+<p class="brand">REVERSIUM 0.8.0 / LOCAL ANALYSIS</p>
 <nav><a href="/">Analyze another ZIP</a><button id="json-export">Download JSON</button><button id="html-export">Download HTML</button></nav>
 <div role="tablist" aria-label="Report sections">
 <a role="tab" href="#panel-behavior" id="tab-behavior" aria-controls="panel-behavior" aria-selected="true">What this software does</a>
@@ -97,7 +98,7 @@ def render(report):
 <h2>What this report can explain</h2><p>Reversium identifies code and metadata clues. It cannot tell you exactly everything the program does. Missing files, runtime configuration, external services, dynamic behavior and obfuscation can hide functionality. Findings are evidence for review, not a complete behavioral specification.</p>
 {binary_section}<h2>Inventory</h2><div class="scroll"><table><tr><th>File</th><th>Type</th><th>Bytes</th><th>Analysis coverage</th></tr>{files}</table></div>{readiness}
 <h2>Coverage and limitations</h2><ul>{notes}</ul></section>
-<p>Generated locally by Reversium 0.7.0. No paid services or remote assets.</p></main>
+<p>Generated locally by Reversium 0.8.0. No paid services or remote assets.</p></main>
 <script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}</script></html>'''
 
 

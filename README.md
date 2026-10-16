@@ -33,6 +33,12 @@ Python feature tracing follows module-level decorated route handlers into unique
 
 Tabs are visible before scripting initializes and remain near the top while scrolling; without JavaScript, their anchors navigate the visible sections. The home page links to a built-in local sample report showing the four sections. Sample source is analyzed, never executed.
 
+## React workflows and computed targets in v0.8.0
+
+Selected JSX callback bindings, destructured/object props, forwarding, immutable aliases, literal React.lazy components, useCallback and returned hook callbacks now connect UI actions to supported helpers. API target candidates follow local constants/concatenation/templates and per-caller wrapper arguments, with HTTP-method-aware route matching. Binding links are inferred across possible source usages, not verified component instances. Computed origins, complex forwarding/state flow, mutable targets and unknown methods remain explicit gaps.
+
+Verified against the same Tudela ZIP: 172 prop-binding occurrences, 52 resolved API-target contexts and 46 unambiguous caller-to-route connections; 96 tests pass. The chat callback reaches POST /api/chat and the CMS save callback reaches its database helper. Source evidence includes prop-binding locations and API caller/helper locations. Request targets are not contacted. Expression size (2,000 characters), helper depth (4), context/output (5,000/400), feature traversal (10/360) and SVG display (120/240 nodes/edges) are bounded. No Node, AI model, external service or new dependency is required.
+
 ## Tudela tracing in v0.7.0
 
 The real Tudela ZIP now yields 25 structural route references and 32 React/JSX module starting points across all 115 JS/TS files, plus Supabase table, RPC, authentication, storage and SQL migration references. These counts do not establish complete behavior. Select a feature to rebuild a focused map; the 120-node/240-edge view limit is disclosed, and JSON retains generated workspace references. Computed targets, React prop/callback flow, applied migrations, permissions and runtime behavior remain unknown. No Node runtime, parser package, model or paid service is required.
