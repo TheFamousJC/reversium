@@ -26,6 +26,9 @@ def build_feature_map(report):
         entry['features'] = sorted(set(entry['features'] + [feature]))
 
     for trace in report.get('route_traces', [])[:100]:
+        if not any('via PostgreSQL.' in op['description'] or 'via MySQL.' in op['description'] for op in trace['operations']) and any(root['file'] == trace.get('handler_file') and root.get('registered_path') == trace['route']
+               for root in report.get('workspace_graph', {}).get('roots', [])):
+            continue
         indices = trace['evidence_indices']
         if not indices:
             continue
@@ -75,9 +78,50 @@ def build_feature_map(report):
                                 ['Code reference only; successful communication and exchanged data are unverified.'])
                 edge(owner_id, external, 'HTTP reference', 'traced', [index], feature)
         # Unresolved calls belong to this feature; they are gaps, not invented connections.
+    workspace = report.get('workspace_graph', {})
+    workspace_nodes = {n['id']: n for n in workspace.get('nodes', [])}
+    outgoing = {}
+    for item in workspace.get('edges', []):
+        outgoing.setdefault(item['source'], []).append(item)
+    for root in workspace.get('roots', []):
+        feature = stable_id('workspace-feature', root['node'])
+        pending, visited, indices, descriptions = [(root['node'], 0)], set(), set(root['evidence_indices']), []
+        while pending and len(visited) < 240:
+            identity, depth = pending.pop(0)
+            if identity in visited or identity not in workspace_nodes:
+                continue
+            visited.add(identity)
+            item = workspace_nodes[identity]
+            entry = nodes.setdefault(identity, dict(item, features=[]))
+            entry['features'] = sorted(set(entry['features'] + [feature]))
+            for connection in outgoing.get(identity, []):
+                # Imports are inventory references, not proof every imported function
+                # participates in a feature. Follow explicit call/JSX/API references.
+                if connection['label'] == 'imports' or depth >= 6:
+                    continue
+                target = workspace_nodes[connection['target']]
+                child = nodes.setdefault(target['id'], dict(target, features=[]))
+                child['features'] = sorted(set(child['features'] + [feature]))
+                connection_entry = edges.setdefault(connection['id'], dict(connection, features=[]))
+                connection_entry['features'] = sorted(set(connection_entry['features'] + [feature]))
+                indices.update(connection['evidence_indices'])
+                if target['kind'] in ('data', 'rpc', 'storage', 'auth', 'external'):
+                    descriptions.append(connection['label'] + ': ' + target['label'])
+                pending.append((target['id'], depth + 1))
+        unknowns = ['Lexical references include conditional code and callback bodies; they do not prove execution or a user journey.',
+                    'Supabase table/RPC/storage names are candidates; database identity, RPC effects, RLS, permissions and successful operations are unverified.',
+                    'Router mount prefixes, middleware effects, dynamic targets, prop/event data flow, re-exports and runtime configuration remain unknown.']
+        if pending:
+            unknowns.append('Feature traversal capped at 240 nodes; full generated references are in workspace_graph JSON.')
+        catalogue.append({'id': feature, 'node_id': root['node'], 'name': root['name'], 'title': root['name'], 'handler': root['name'], 'file': root['file'],
+                          'description': '; '.join(dict.fromkeys(descriptions))[:2400] or 'Source references mapped; no supported data operation established.',
+                          'evidence_indices': sorted(indices), 'unknowns': unknowns, 'confidence': 'static source references; not runtime verified', 'type': root['type']})
+        nodes[root['node']]['unknowns'] = unknowns
     result = {'nodes': sorted(nodes.values(), key=lambda n: n['id']), 'edges': sorted(edges.values(), key=lambda e: e['id']),
               'features': catalogue, 'limits': 'Up to 100 traced features; graph view shows up to 120 nodes and 240 edges.',
-              'coverage': {'route_candidates': sum(f['kind'] == 'route_candidate' for f in findings), 'traced_features': len(catalogue)},
+              'coverage': {'route_candidates': sum(f['kind'] == 'route_candidate' for f in findings), 'traced_features': len(catalogue),
+                           'route_references': sum(r['type'] == 'route' for r in workspace.get('roots', [])),
+                           'react_modules': sum(r['type'] == 'react' for r in workspace.get('roots', [])), 'parsed_js_files': workspace.get('parsed_files', 0)},
               'unknowns': ['Edges show supported static paths, not proven execution or a complete call graph.',
                            'Shared data names indicate possible interaction, not a confirmed shared database or business workflow.',
                            'External dependencies are inventoried separately; unsupported external calls have no invented graph edges.']}
@@ -109,7 +153,7 @@ def compare_maps(current, previous):
 
 def render_svg(graph, comparison=None):
     esc = lambda value: html.escape(str(value), quote=True)
-    columns = {'feature': 0, 'handler': 1, 'helper': 2, 'data': 3, 'external': 3}
+    columns = {'feature': 0, 'module': 1, 'handler': 1, 'helper': 2, 'data': 3, 'external': 3, 'rpc': 3, 'storage': 3, 'auth': 3}
     feature_rank = {feature['id']: index for index, feature in enumerate(graph['features'])}
     chosen = sorted(graph['nodes'], key=lambda n: (columns[n['kind']], min((feature_rank.get(f, 999) for f in n['features']), default=999), n['label'], n['id']))[:120]
     added = set((comparison or {}).get('added_nodes', []))

@@ -7,7 +7,9 @@ CONFIG_NAMES = {'Dockerfile', 'compose.yml', 'compose.yaml', 'docker-compose.yml
 STACK = {'flask': 'Flask web application', 'django': 'Django web application', 'fastapi': 'FastAPI web API',
          'express': 'Express web application', 'react': 'React user interface', 'next': 'Next.js web application',
          'vue': 'Vue user interface', 'electron': 'Electron desktop application'}
-SERVICES = {'psycopg': ('PostgreSQL', 'database'), 'psycopg2': ('PostgreSQL', 'database'),
+SERVICES = {'@supabase/supabase-js': ('Supabase', 'database, authentication and storage client; enabled services unverified'),
+            'google-auth-library': ('Google APIs', 'authentication client; API use and credentials unverified'),
+            'psycopg': ('PostgreSQL', 'database'), 'psycopg2': ('PostgreSQL', 'database'),
             'psycopg2-binary': ('PostgreSQL', 'database'), 'psycopg-binary': ('PostgreSQL', 'database'),
             'pg': ('PostgreSQL', 'database'), 'mysql': ('MySQL', 'database'), 'mysql2': ('MySQL', 'database'),
             'pymysql': ('MySQL', 'database'), 'redis': ('Redis', 'cache / data store'),

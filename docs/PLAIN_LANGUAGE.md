@@ -1,6 +1,22 @@
 # Reversium, explained without technical background
 
-Living explanation. Last updated: 2026-10-15.
+Living explanation. Last updated: 2026-10-16.
+
+## What changed after testing your Tudela ZIP
+
+Version 0.7.0 maps much more of Tudela than the first report. It reads all 115 JavaScript/TypeScript files in that ZIP, including 32 files containing React screen/component code. It recognizes 25 web-route references, rather than drawing only the narration endpoint. The map offers 57 starting points: those routes and React modules. These are starting points for investigation, not 57 proven business features.
+
+For example, selecting TourCommunityPanel shows references from the community screen to helpers for comments and likes, then to named Supabase database routines. The map can also connect those routine names to table operations written in database migration files. Click a box or line to see its evidence and the source file/line. Old migration definitions can appear alongside newer ones; Reversium does not know which versions were applied to your real database.
+
+Select a feature to rebuild its focused map. This brings in connections that were outside the overview's display limit. The view reports any omitted boxes/lines. Solid lines mean source references were recognized; dashed lines mean a possible connection based on a data name or route path. Neither means that the action succeeded or is available to a visitor.
+
+This is still not the entire working story. Some Tudela actions are passed between screens through properties and callbacks, and some addresses and table names are built while the program runs. Those connections remain unknown. Reading every code file is different from proving every workflow. The next focused improvement is following those selected screen-to-screen callbacks and constructed local API addresses.
+
+Everything stays local and free. Reversium does not start Tudela, contact Supabase or Google, install Tudela's dependencies, or send your archive to an AI service. Your analyzed software may still need paid services when you run it independently. We tested the real ZIP in the browser, checked a focused community map and its database evidence links, and passed 72 automated checks.
+
+## Why use this instead of asking ChatGPT?
+
+ChatGPT may explain an unfamiliar program more fluently and recognize patterns Reversium misses. Reversium's purpose is a repeatable local inspection: the same rules, file-and-line evidence, inspectable diagrams, saved reports and comparisons after code changes, without an account or model/API charge. The useful combination is an evidence-backed map for checking facts and a human or assistant for interpreting them. Reversium does not yet replace a thorough code review or runtime testing.
 
 ## Our focused plan
 
@@ -16,9 +32,9 @@ The next milestone has now been delivered in version 0.6.0. The focused workflow
 
 Open Architecture after analyzing a ZIP, or try either local sample on the home page. The map connects a feature's route to its handler, its helper functions, and recognizable data operations. For example, a contacts listing and a contacts insert can point to the same table-name candidate. Solid lines show references traced in supported code. Dashed lines show inferred data-name connections: matching table names might belong to different databases, so this does not prove the features share real data.
 
-Choose a feature to dim unrelated parts. Select a box or line to see the evidence and unknowns, then follow a source link into Evidence. The catalogue below the map gives short descriptions such as “Read contacts records,” grounded in recognized SQL operations. It does not invent a CRM or other business purpose from a route name.
+Choose a feature to rebuild a focused view of its connections. Select a box or line to see the evidence and unknowns, then follow a source link into Evidence. The catalogue below the map gives short descriptions such as “Read contacts records,” grounded in recognized SQL operations. It does not invent a CRM or other business purpose from a route name.
 
-Download map SVG saves a standalone diagram. HTML/JSON exports include the full map even when you filtered the screen. CLI exports also write `feature-map.svg`. To compare versions, use `python -m reversium newer.zip --compare older-report.json --output reports/newer`. Added map items are green, changed items amber, and removals are listed. A baseline without a map is marked unavailable rather than interpreted as an empty application.
+Download map SVG saves the current diagram view, subject to its displayed limits. HTML/JSON exports retain the full generated map data even when you filtered the screen; HTML rebuilds its overview when reopened. CLI exports also write `feature-map.svg`. To compare versions, use `python -m reversium newer.zip --compare older-report.json --output reports/newer`. Added map items are green, changed items amber, and removals are listed. A baseline without a map is marked unavailable rather than interpreted as an empty application.
 
 The Python sample uses SQLite. The JavaScript/TypeScript sample uses selected Express and PostgreSQL patterns; MySQL calls through selected mysql2 patterns are also recognized. The JavaScript reader uses local rules, not a complete compiler, and does not need Node or install packages. Unsupported syntax, dynamic queries, middleware effects and many frameworks remain unknown. The program being inspected is never run.
 
@@ -50,9 +66,9 @@ Each explanation includes “Still unknown” and a link to its supporting findi
 
 The latest version follows some Python web handlers into helper functions, including helpers in other files. When it recognizes SQLite operations, it can explain that code reads, adds, updates or deletes records, asks to save pending changes, or returns rows or named response fields. For example, the local sample links a request for contacts to the helper that reads the contacts table. The evidence includes both the handler and the data operation.
 
-This is still a code trace, not a successful test run. The code might run only in certain conditions, be unused or fail. Unsupported calls and dynamically built database queries stay unknown. Other languages, class-based handlers and database frameworks are not traced in this version.
+This is still a code trace, not a successful test run. The code might run only in certain conditions, be unused or fail. Unsupported calls and dynamically built database queries stay unknown. Class-based handlers and database frameworks beyond the supported patterns remain unknown; the newer TS/React/Supabase reference reader is described above.
 
-If tabs were missing, start the current version with `./Start-Reversium.ps1` and use the new browser address it opens. The launcher now chooses a free local port, so an older server on port 8765 does not keep serving the old interface. Look for version 0.6.0 at the top. The home page offers sample links for all four sections; after analyzing a ZIP, report navigation stays visible near the top and while scrolling. Without JavaScript, the links still move between visible sections.
+If tabs were missing, start the current version with `./Start-Reversium.ps1` and use the new browser address it opens. The launcher now chooses a free local port, so an older server on port 8765 does not keep serving the old interface. Look for version 0.7.0 at the top. The home page offers sample links for all four sections; after analyzing a ZIP, report navigation stays visible near the top and while scrolling. Without JavaScript, the links still move between visible sections.
 
 ## What is the practical application?
 

@@ -16,12 +16,19 @@ class Token:
     line: int
 
 
-def tokenize(source):
+def tokenize(source, jsx=False):
     output, i, line = [], 0, 1
     while i < len(source):
         if len(output) >= 60000:
             raise ValueError('token limit (60,000)')
         char = source[i]
+        if jsx and char == '<' and re.match(r'<(?:[A-Za-z_$]|>)', source[i:]) and not re.match(r'<[^<>\n]+>\s*\(', source[i:]) and (not output or output[-1].value in {'return', '(', '=', '=>', '&&', '||', '?', ':', '{', ','}):
+            from .jsx import jsx_tokens
+            extra, consumed = jsx_tokens(source[i:], tokenize)
+            output.extend(Token(t.value, t.kind, t.line + line - 1) for t in extra)
+            line += source[i:i + consumed].count('\n')
+            i += consumed
+            continue
         if char.isspace():
             line += char == '\n'
             i += 1
@@ -54,18 +61,41 @@ def tokenize(source):
             value = ''.join(content)
             output.append(Token(value, 'dynamic' if quote == '`' and '${' in value else 'string', start))
             continue
-        # Reject ambiguous regular-expression syntax instead of inspecting its contents as code.
-        if char == '/' and (not output or output[-1].value in {'=', '(', ',', ':', 'return', '=>', '['}):
-            raise ValueError('regular-expression literal is outside supported token syntax')
+        # Consume regex bodies as opaque literals. Their text must never become code.
+        if char == '/' and (not output or output[-1].value in {'=', '(', ',', ':', 'return', '=>', '[', '!', '&&', '||', '?'}):
+            start, bracket = line, False
+            i += 1
+            while i < len(source):
+                if source[i] == '\n':
+                    raise ValueError('unterminated regular-expression literal')
+                if source[i] == '\\':
+                    i += 2
+                    continue
+                if source[i] == '[':
+                    bracket = True
+                elif source[i] == ']':
+                    bracket = False
+                elif source[i] == '/' and not bracket:
+                    i += 1
+                    while i < len(source) and source[i].isalpha():
+                        i += 1
+                    break
+                i += 1
+            else:
+                raise ValueError('unterminated regular-expression literal')
+            output.append(Token('', 'regex', start))
+            continue
         match = TOKEN.match(source, i)
         value = match.group() if match else char
         output.append(Token(value, 'id' if value[0].isalpha() or value[0] in '_$' else 'punct', line))
         i += len(value)
+    if len(output) > 60000:
+        raise ValueError('token limit (60,000)')
     return output
 
 
-def parse_module(source):
-    tokens = tokenize(source)
+def parse_module(source, jsx=False):
+    tokens = tokenize(source, jsx=jsx)
     pairs, stack, depth = {}, [], {}
     for i, token in enumerate(tokens):
         depth[i] = len(stack)

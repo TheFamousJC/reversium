@@ -33,6 +33,17 @@ def explain_software(report):
         return item['value'].lower().replace('_', '-').split('.')[0]
 
     traced_routes = set()
+    mapped = report.get('feature_map', {}).get('features', [])
+    for group in ('react', 'route'):
+        count = 0
+        for feature in mapped:
+            if feature.get('type') != group or feature['description'].startswith('Source references mapped;'):
+                continue
+            add('Mapped source connections', feature['name'] + ' has source references to: ' + feature['description'],
+                ' '.join(feature['unknowns']), feature['evidence_indices'])
+            count += 1
+            if count >= 7:
+                break
     for trace in report.get('route_traces', []):
         if not trace['operations']:
             continue

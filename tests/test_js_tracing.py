@@ -69,8 +69,8 @@ app.get('/x',(req,res)=> {function uncalled(){db.query('DELETE FROM secret_table
         trace = inspect_zip(archive([('app.js', code)]))['route_traces'][0]
         self.assertNotIn('Deletes records', str(trace['operations']))
 
-    def test_unsupported_regex_and_malformed_syntax_are_reported(self):
-        for code in ('const pattern = /app.get("fake")/;', 'function broken( {'):
+    def test_malformed_syntax_is_reported(self):
+        for code in ('const pattern = /unterminated', 'function broken( {'):
             report = inspect_zip(archive([('app.js', code)]))
             self.assertEqual(report['route_traces'], [])
             self.assertTrue(any('tracing skipped' in note for note in report['warnings']))

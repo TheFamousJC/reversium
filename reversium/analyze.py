@@ -14,6 +14,7 @@ from .explain import explain_software
 from .tracing import trace_routes
 from .feature_map import build_feature_map
 from .js_tracing import trace_javascript
+from .workspace_tracing import trace_workspace
 
 LANGUAGES = {'.py': 'Python', '.js': 'JavaScript', '.jsx': 'JavaScript', '.ts': 'TypeScript', '.tsx': 'TypeScript', '.java': 'Java', '.cs': 'C#', '.php': 'PHP', '.go': 'Go', '.rs': 'Rust', '.c': 'C', '.cpp': 'C++', '.h': 'C/C++'}
 BINARY = {'.exe', '.dll', '.apk', '.so', '.class', '.jar', '.dylib'}
@@ -28,6 +29,7 @@ def inspect_zip(path):
     report = {'schema_version': 3, 'files': [], 'findings': [], 'warnings': [], 'scope': 'Static ZIP inspection; no input code is executed.'}
     python_trees = {}
     js_sources = {}
+    sql_sources = {}
     js_source_bytes = 0
     trace_source_bytes = 0
     def finding(kind, value, file, line, confidence='observed'):
@@ -63,7 +65,7 @@ def inspect_zip(path):
             with archive.open(member) as stream:
                 prefix = stream.read(4096)
                 detected = identify(prefix)
-                if not detected and suffix not in BINARY and suffix not in LANGUAGES and p.name not in MANIFESTS | CONFIG_NAMES:
+                if not detected and suffix not in BINARY and suffix not in LANGUAGES and suffix != '.sql' and p.name not in MANIFESTS | CONFIG_NAMES:
                     continue
                 data = prefix + stream.read(MAX_FILE + 1 - len(prefix))
             if len(data) > MAX_FILE:
@@ -82,17 +84,24 @@ def inspect_zip(path):
                 report['warnings'].append(f'{name}: unsupported text encoding.')
                 continue
             item['lines'] = len(source.splitlines())
+            if suffix == '.sql':
+                if len(sql_sources) < 128 and sum(len(s) for s in sql_sources.values()) + len(source) <= 16 * 1024 * 1024:
+                    sql_sources[name] = source
+                    item['analysis'] = 'sql_reference_scan'
+                else:
+                    report['warnings'].append(f'{name}: SQL reference input limit reached.')
+                continue
             if p.name in CONFIG_NAMES:
                 item['analysis'] = 'config_heuristic'
                 config_details(source, name, finding)
                 continue
             item['analysis'] = 'heuristic' if suffix in {'.js', '.jsx', '.ts', '.tsx'} else 'manifest' if p.name in MANIFESTS else 'inventory_only'
-            if suffix in {'.js', '.ts'}:
-                if len(js_sources) < 128 and js_source_bytes + len(data) <= 16 * 1024 * 1024:
+            if suffix in {'.js', '.ts', '.tsx', '.jsx'}:
+                if len(js_sources) < 256 and js_source_bytes + len(data) <= 16 * 1024 * 1024:
                     js_sources[name] = source
                     js_source_bytes += len(data)
                 else:
-                    report['warnings'].append(f'{name}: JS/TS helper tracing input cap reached (128 files / 16 MiB).')
+                    report['warnings'].append(f'{name}: JS/TS helper tracing input cap reached (256 files / 16 MiB).')
             if p.name in MANIFESTS:
                 finding('manifest', p.name, name, 1)
                 manifest_details(source, name, finding)
@@ -149,13 +158,14 @@ def inspect_zip(path):
                         continue
     resolve_imports(report)
     trace_routes(report, python_trees)
-    trace_javascript(report, js_sources)
+    trace_javascript(report, {f: s for f, s in js_sources.items() if not f.endswith(('.tsx', '.jsx'))})
+    trace_workspace(report, js_sources, sql_sources)
     report['summary'] = {'files': len(report['files']), 'bytes': sum(f['bytes'] for f in report['files']), 'languages': dict(Counter(f['language'] for f in report['files'] if f['language'])), 'binary_candidates': sum(f['category'] == 'binary' for f in report['files']), 'findings': len(report['findings'])}
     report['coverage'] = dict(Counter(f['analysis'] for f in report['files']))
     report['platform'] = platform_profile(report)
-    report['behavior'] = explain_software(report)
     report['feature_map'] = build_feature_map(report)
-    report['limitations'] = ['Python symbols/imports use AST parsing; JavaScript/TypeScript imports and endpoint-host candidates use heuristics.', 'Other source languages are inventoried only. No complete call graph, runtime behavior, vulnerability audit, or business requirements recovery is claimed.', 'Binary inspection is bounded static metadata analysis, not decompilation or behavioral verification. Mach-O and DEX receive header identification only. Malformed binaries retain partial findings.', 'Nested containers receive directory inspection only. Files over 4 MiB or compression limits are inventoried without content inspection. Binary string samples may contain private content; URL hosts omit credentials, paths and queries.']
+    report['behavior'] = explain_software(report)
+    report['limitations'] = ['Python symbols/imports use AST parsing; JavaScript/TypeScript imports and endpoint-host candidates use heuristics.', 'Source languages beyond the supported Python, JS/TS and SQL reference readers are inventoried only. No complete call graph, runtime behavior, vulnerability audit, or business requirements recovery is claimed.', 'Binary inspection is bounded static metadata analysis, not decompilation or behavioral verification. Mach-O and DEX receive header identification only. Malformed binaries retain partial findings.', 'Nested containers receive directory inspection only. Files over 4 MiB or compression limits are inventoried without content inspection. Binary string samples may contain private content; URL hosts omit credentials, paths and queries.']
     report['limitations'] += ['Local module links are path candidates, not runtime resolution. Aliases, custom search paths, re-exports and dynamic imports may remain unresolved. Ambiguous matches are not selected.', 'Python decorator routes and ORM base-class names are syntax candidates, not verified framework behavior. Non-Python route and import scans can match comments.', 'Only package.json, requirements.txt and go.mod dependencies are extracted. Other known manifests are identified only. File changes are compared only when both reports contain inspected-content hashes.']
-    report['limitations'].append('Python AST traces cover module-level handlers/helpers, simple SQLite statements and selected requests/httpx host references. JS/TS uses a conservative token recognizer for selected ES-module Express callbacks/helpers and pg/mysql2 literal SQL, not a full parser. CommonJS, JSX/TSX, ORM, class-based, dynamic and complex middleware behavior are untraced. Bounds: 128 files / 16 MiB per source family, 100 combined routes, helper depth 3 / 12 functions and 40 operations per trace; Python scans 10,000 nodes per function and JS/TS 60,000 tokens per file. Branch outcomes and successful execution remain unverified.')
+    report['limitations'].append('Python AST traces and selected pg/mysql2 operation traces retain their bounded execution-path approximation. The additional TS/React/Supabase graph records lexical references, including conditional code and callbacks, not proven execution. Regex and JSX text are opaque; JSX expressions/component references are scanned. Supabase clients are recognized through named imports, factories, aliases and annotated parameters; dynamic receivers, object-property clients, re-exports, namespace imports, prop/event data flow and runtime middleware effects remain unknown. Literal router mounts and API-path matches are candidates, not verified routing. SQL RPC/table links are migration-name candidates; dynamic SQL, applied migrations, RLS and database identity are unverified. Bounds: JS/TS 256 files / 16 MiB, SQL 128 files / 16 MiB, 60,000 tokens per JS file; workspace 4,000 nodes / 12,000 edges; feature traversal depth 6 / 240 nodes. Graph display caps 120 nodes / 240 edges per selected view. Python retains 128 files, 100 routes and depth 3 / 12 functions per trace. No source is evaluated.')
     return report

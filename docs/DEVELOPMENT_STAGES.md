@@ -1,6 +1,25 @@
 # Reversium development stages
 
-Living document. Update completed work, verification and remaining limitations with each stage. Last updated: 2026-10-15.
+Living document. Update completed work, verification and remaining limitations with each stage. Last updated: 2026-10-16.
+
+## v0.7.0 — Tudela TypeScript, React and Supabase reference map
+
+Delivered 2026-10-16 after the real Tudela ZIP exposed the limits of v0.6.0. This extends the focused roadmap; automatic setup/execution and paid services remain deferred.
+
+- Added a dependency-free structural reference reader for nested TypeScript route registrations, expression/block callbacks, multiline named imports, nested helpers, JSX component/value references and React modules. Regex literals and JSX text are opaque, preventing code-looking text from becoming supported connections. JSX expressions are inspected without executing them.
+- Recognize Supabase clients through named createClient imports, direct-return factories, aliases and SupabaseClient parameters. Record literal table read/insert/update/upsert/delete chains, named RPCs, Auth methods and storage operations. Parameter/local-variable shadowing prevents unrelated receivers from being treated as clients. Payloads, keys, passwords, SQL values and storage object paths are not copied into this graph.
+- Add inferred links from named RPCs to dollar-quoted SQL migration function definitions and recognizable table operations. Table references require a public schema qualifier or a declared table; SQL keywords and variables do not become table nodes. Definitions across historical migrations are retained as name candidates, not an applied/current database schema.
+- Literal router factory mounts provide candidate prefixes; unique literal local fetch paths can link to route references. Computed URLs/tables/RPC names stay unknown. Cross-file helper and JSX references distinguish code calls, component mentions, declarations and shared data-name candidates.
+- Feature selection now rebuilds the SVG from the selected feature's graph, including nodes outside the initial overview. A scrollable viewport and omission counts keep larger maps usable. Inspection shows connection endpoints, evidence and unknowns. JSON retains the workspace reference graph and all generated feature data; SVG exports save the current bounded view.
+- Added Supabase and Google authentication clients to supporting-service candidates. The explanation tab can summarize mapped React and route connections. No external API, model, Node installation or third-party runtime dependency was added.
+
+Validation with the user's original ZIP (kept outside Git): 266 files / 5,167,505 uncompressed bytes; 115 JS/TS files structurally scanned, including all 32 JSX/TSX modules; 25 structural route references; 57 map roots total. The 34 older heuristic route candidates include unrelated get() calls, so these counts are not a completeness ratio. The SQL reader inspected 44 SQL files. The final generated workspace graph contains 612 nodes / 1,389 references, and the reachable feature graph contained 470 nodes / 834 connections. Counts describe recognized syntax, not working features.
+
+Verification: 72 automated tests pass, including the local HTTP integration test, regex/division handling, JSX text opacity, typed props/generic arrows, multiline helper imports, event-value references, client shadowing, factories, RPC/Auth/storage, inferred SQL evidence, rejection of fake SQL table names, evidence-index/edge integrity and stable structural IDs after line movement. Browser uploaded the same real ZIP into v0.7.0, confirmed the 25 route / 32 React / 115 file counts, rebuilt TourCommunityPanel's focused map with no view omissions, inspected submit_tour_comment and followed its link to the exact migration line. Coverage explicitly lists computed targets and dynamic table gaps. Local screenshots/exports are ignored under reports/; no Tudela code, ZIP, report or screenshot is committed.
+
+Limits: this is a lexical source-reference map, including conditional/callback code, not a verified call graph or complete user-journey reconstruction. React prop/event-value flow across components, namespace/re-export resolution, complex type semantics, dynamic targets, object-property clients, overloaded RPC identity, middleware behavior, migration application order, RLS/permissions and runtime outcomes remain unknown. Framework/compiler equivalence is not claimed. Bounds: JS input 256 files / 16 MiB; SQL input 128 files / 16 MiB; 60,000 tokens per JS file; 4,000 workspace nodes / 12,000 edges; feature traversal depth 6 / 240 nodes; visible SVG 120 nodes / 240 edges. Source not retained by the browser server after analysis.
+
+Next focused milestone: resolve selected React prop/callback and hook-return references, then computed local API URL patterns, with per-connection evidence and explicit unknowns. These are the remaining barriers to following every Tudela workflow; scanning every source file does not mean understanding every behavior.
 
 ## Focused roadmap — current scope
 
@@ -141,6 +160,8 @@ Separate disposable-VM workflow with explicit user control, network capture and 
 Future setup workflow: produce a reviewable run plan (OS/architecture, pinned dependencies, services, environment-variable names, migrations and startup commands), then validate in a disposable VM. Only successful installation, startup, health checks and service checks may establish that a package runs. Stability additionally needs load, restart/recovery, backup and monitoring validation. None of those steps are performed by v0.3.0.
 
 ## Change log
+
+- 2026-10-16: Delivered v0.7.0 structural TS/React/Supabase and SQL RPC reference mapping, verified against the original Tudela ZIP; 72 regression tests pass. Whole-platform runtime and prop-flow completeness remain unverified.
 
 - 2026-10-15: Resumed with the focused roadmap and delivered v0.6.0 interaction map/catalogue, selected JS/TS tracing, map inspection/filtering and SVG/baseline exports. The scoped MVP's six capabilities are implemented; unsupported syntax and runtime behavior remain explicit unknowns. 59 tests pass and browser workflows were verified.
 - 2026-10-15: Delivered v0.5.0 Python/SQLite handler tracing, stronger visible-tab fallback, live sample/version UI and free-port startup. Added practical-use guidance and expanded verification to 45 tests. No runtime dependencies or paid services added.
