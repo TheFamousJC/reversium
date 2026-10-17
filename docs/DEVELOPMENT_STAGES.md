@@ -261,3 +261,10 @@ Build 0.12.1 adds the supplied 3Sci logo on a dark background, a Reversium by 3S
 Build 0.13.0: enlarged entry CTAs; persistent inventory cards; Architecture/Coverage subsection navigation; hidden outer start/help/footer when a report is ready; embedded logo and shared product/build branding in reports and exports. Restored a browser AI tab with provider selection and editable selected-evidence request download. It is explicitly a manual handoff, not hosted OAuth/inference; no credentials collected, no automatic sharing. Local account assistant is unchanged. Direct in-browser ChatGPT connection remains an unmet request; a supported credential/service design is required.
 
 Verified with Tudela in the browser: redundant outer header hidden, inventory visible, Architecture catalogue/import views and Coverage readiness switching passed. AI evidence preview, provider selection and request download passed without submitting to a provider. 111 tests passed.
+
+
+## Detailed Help — 0.13.1
+
+Build 0.13.1 adds shared eight-chapter detailed Help to Start and reports, a self-contained downloadable PDF and a public guide page. Documentation covers all views, limits, evidence interpretation, file handling, local setup/CLI, exports/comparison, troubleshooting and handover. Online/local differences have their own chapter plus a concise note in AI. PDF generation is build-time only; local analysis has no added dependency.
+
+Help verification: edition-comparison chapter opens and PDF download succeeds in the browser. The eight-page PDF was rendered and visually reviewed. Updated LinkedIn draft is saved in docs/LinkedIn-post.txt.

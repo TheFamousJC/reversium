@@ -12,6 +12,7 @@ from reversium.report import STYLE
 from reversium.presentation import STYLE as MODERN
 from reversium.start_ui import render_start
 from reversium.browser_report import browser_copy
+from reversium.user_guide import SCRIPT as GUIDE_SCRIPT
 
 
 def main():
@@ -28,7 +29,7 @@ def main():
     start = start[:start.index('<script>')]
     start = start.replace('No sign-in is required; AI is optional.', 'No sign-in is required. Optional AI handoff is available after analysis; no account is connected here.')
     start = start.replace('<main>', '<main id="app-content" hidden>', 1)
-    splash = '<section id="splash" class="splash"><div class="logo-panel"><img src="../assets/3sci-logo.png" alt="3Sci" width="210" height="167"></div><p class="brand">FREE · PRIVATE · NO INSTALLATION</p><h1>Reversium by 3Sci Labs</h1><p class="tagline">Understand. Prepare. Develop.</p><p>Turn unfamiliar software into evidence, feature connections and a clearer next step.</p><button id="enter-app">Start exploring →</button><p><small>Your ZIP stays on your device. No account required.</small></p></section>'
+    splash = '<section id="splash" class="splash"><div class="logo-panel"><img src="../assets/3sci-logo.png" alt="3Sci" width="210" height="167"></div><p class="brand">FREE · PRIVATE · NO INSTALLATION</p><h1>Reversium by 3Sci Labs</h1><p class="tagline">Understand. Prepare. Develop.</p><p>Turn unfamiliar software into evidence, feature connections and a clearer next step.</p><button id="enter-app">Start exploring →</button><p><a href="../docs/user-guide.html">Help: read the user guide</a></p><p><small>Your ZIP stays on your device. No account required.</small></p></section>'
     start = start.replace('<main id="app-content" hidden>', splash + '<main id="app-content" hidden>', 1)
     start = start.replace('</style>', '.splash{max-width:850px;margin:60px auto;padding:32px;text-align:center}.logo-panel{display:inline-flex;background:#12213b;border-radius:22px;padding:26px;margin-bottom:22px}.logo-panel img{object-fit:contain}.splash h1{font-size:clamp(32px,6vw,60px)}.tagline{font-size:24px;color:#4058da}.splash button{margin-top:18px;min-width:280px;min-height:70px;font-size:22px;padding:22px 38px}.site-brand{display:flex;align-items:center;gap:16px}.site-brand img{background:#12213b;padding:8px;border-radius:12px;width:64px;height:auto}</style>', 1)
     start = start.replace('<p class="brand">REVERSIUM', '<div class="site-brand"><img src="../assets/3sci-logo.png" alt="3Sci"><p class="brand">REVERSIUM', 1).replace('· LOCAL &amp; FREE</p>', '· LOCAL &amp; FREE</p></div>', 1)
@@ -42,6 +43,7 @@ def main():
     start = start.replace('href="/example-js"', 'href="../demo/report.html"')
     privacy = '''<details class="privacy"><summary>How are my files handled?</summary><p><b>Your ZIP is not uploaded.</b> The analyzer runs in a worker in your browser. GitHub Pages serves the application and Python runtime, not your software. Normal hosting requests expose connection information such as your IP address; they do not include ZIP contents.</p><p>Your file and generated report are held in this page’s memory. Nothing is written to localStorage, IndexedDB or our server. Clear and start again or close the page to release the app’s references; this is not a secure-memory-erasure guarantee. Reports you download remain wherever you save them.</p><p>The browser may cache application/runtime files. No analytics, third-party assets, account sign-in or AI calls are included in this browser edition. The report frame is sandboxed and network-disabled. Do not run modified copies from sites you do not trust.</p><p>Browser limit: 32 MiB ZIP; the existing archive safety and inspection bounds still apply. Large archives can exceed your device’s memory. Cancel stops the worker. Selected code is read, never executed. Optional ChatGPT assistance remains available only in the local application.</p></details>'''
     start = start.replace('<p id="start-step"', privacy + '<p id="start-step"')
+    start += '<script>' + GUIDE_SCRIPT + '</script>'
     start += '''<section id="browser-progress" hidden><h2>Analyzing on your device</h2><p id="browser-message" role="status">Preparing…</p><button id="browser-cancel">Cancel and clear</button></section><section id="browser-results" hidden><nav><button id="browser-clear">Clear and start again</button><span>Your ZIP was analyzed here, not uploaded.</span></nav><iframe id="browser-report" title="Your Reversium analysis" sandbox="allow-scripts allow-downloads allow-popups allow-popups-to-escape-sandbox" style="width:100%;height:85vh;border:1px solid #dce4ef;border-radius:12px;background:white"></iframe></section><script type="module" src="app.js"></script></html>'''
     (web / 'index.html').write_text(start, encoding='utf-8')
     print('Packaged browser analyzer', __version__, len(data), 'bytes')

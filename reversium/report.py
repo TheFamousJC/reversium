@@ -1,6 +1,7 @@
 import html
 import json
 from .report_layout import layout
+from .user_guide import GUIDE, SCRIPT as GUIDE_SCRIPT
 from .help_ui import ABOUT, EXPORT_HELP, FAQ_GENERAL
 from .owner_summary import owner_summary, NEXT_STEPS
 from .presentation import STYLE as MODERN_STYLE, SCRIPT as HELP_SCRIPT
@@ -105,7 +106,7 @@ def render(report):
     }.get(report.get('user_goal', 'understand'), 'Start with supported findings, then check their evidence and gaps.')
     page = f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Reversium report</title><style>{STYLE}{AI_STYLE}{MODERN_STYLE}</style><main>
-<p class="brand">REVERSIUM 0.13.0 / LOCAL ANALYSIS</p>
+<p class="brand">REVERSIUM 0.13.1 / LOCAL ANALYSIS</p>
 <nav><a href="/">Start a new analysis</a><span>Step 3 · Review findings → Step 4 · Save &amp; next steps</span></nav>
 {'<p class="sample-notice">SAMPLE ANALYSIS · Fictional demonstration data. Start a new analysis to inspect your ZIP.</p>' if report.get("example") else ''}
 <p><b>Package:</b> {esc(report.get("archive_name", "Uploaded software package"))} · <b>Your goal:</b> {esc(goal_label)}</p>
@@ -115,7 +116,7 @@ def render(report):
 <a role="tab" href="#panel-architecture" id="tab-architecture" aria-controls="panel-architecture" aria-selected="false">Architecture</a>
 <a role="tab" href="#panel-evidence" id="tab-evidence" aria-controls="panel-evidence" aria-selected="false">Evidence</a>
 <a role="tab" href="#panel-coverage" id="tab-coverage" aria-controls="panel-coverage" aria-selected="false">Coverage</a>
-<a role="tab" href="#panel-assistant" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false">AI assistant · optional</a><button role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false">FAQ</button><button role="tab" id="tab-finish" aria-controls="panel-finish" aria-selected="false">Save &amp; next steps</button></div>
+<a role="tab" href="#panel-assistant" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false">AI assistant · optional</a><button role="tab" id="tab-help" aria-controls="panel-help" aria-selected="false">Help</button><button role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false">FAQ</button><button role="tab" id="tab-finish" aria-controls="panel-finish" aria-selected="false">Save &amp; next steps</button></div>
 <h1>Your file review is complete.</h1><p>{esc(report['scope'])}</p>
 <details><summary>Technical inventory numbers</summary><div class="cards">{''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k.replace("_", " "))}</span></article>' for k,v in report['summary'].items() if k != 'languages')}</div><p>Counts show inspected material, not how complete or reliable the software is.</p></details>
 <section role="tabpanel" id="panel-behavior" aria-labelledby="tab-behavior" tabindex="0">{ABOUT}</section>
@@ -132,9 +133,10 @@ def render(report):
 {binary_section}<h2>Inventory</h2><div class="scroll"><table><tr><th>File</th><th>Type</th><th>Bytes</th><th>Analysis coverage</th></tr>{files}</table></div>{readiness}
 <h2>Coverage and limitations</h2><ul>{notes}</ul></section>
 <section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">{AI_PANEL}</section>
+<section role="tabpanel" id="panel-help" aria-labelledby="tab-help" tabindex="0">{GUIDE}</section>
 <section role="tabpanel" id="panel-faq" aria-labelledby="tab-faq" tabindex="0">{FAQ_GENERAL}{EXPORT_HELP}{FAQ_AI}</section>
-<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><p><b>Recommended for you:</b> save the readable report and send it to the developer. Technical data is optional and mainly useful for scripts or comparing packages.</p><nav><button id="html-export">Save readable report (HTML)</button><button id="json-export">Save technical data (JSON)</button></nav>{EXPORT_HELP}{NEXT_STEPS}<nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.13.0. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
-<script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}{HELP_SCRIPT}</script></html>'''
+<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><p><b>Recommended for you:</b> save the readable report and send it to the developer. Technical data is optional and mainly useful for scripts or comparing packages.</p><nav><button id="html-export">Save readable report (HTML)</button><button id="json-export">Save technical data (JSON)</button></nav>{EXPORT_HELP}{NEXT_STEPS}<nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.13.1. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
+<script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}{HELP_SCRIPT}{GUIDE_SCRIPT}</script></html>'''
     return layout(page)
 
 

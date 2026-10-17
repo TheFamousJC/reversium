@@ -208,3 +208,10 @@ Reversium now welcomes you with the 3Sci logo and a Start exploring button. Choo
 The report now takes the place of the Start screen after analysis. Inventory numbers remain visible. Use Architecture and Coverage buttons to change subsections without scrolling past other sections. Branding and build number travel with saved reports. AI · choose provider lets you choose ChatGPT, Claude, Gemini or another AI, select up to 20 findings and review/download a request. You must paste and submit it yourself; nothing is automatically shared. This is not a live AI connection. The existing account connection remains in the local app.
 
 Verified with Tudela in the browser: redundant outer header hidden, inventory visible, Architecture catalogue/import views and Coverage readiness switching passed. AI evidence preview, provider selection and request download passed without submitting to a provider. 111 tests passed.
+
+
+## Detailed Help — 0.13.1
+
+Choose Help on Start or inside any report for the full user guide. Expand a chapter or download the PDF without sharing your ZIP. The Online and local editions chapter explains how each version runs, its size limit and the different AI options. A short comparison also appears in AI, so opening a provider website is not mistaken for connecting an account.
+
+Help verification: edition-comparison chapter opens and PDF download succeeds in the browser. The eight-page PDF was rendered and visually reviewed. Updated LinkedIn draft is saved in docs/LinkedIn-post.txt.

@@ -1,6 +1,7 @@
 """A short guided entry flow before analysis controls become available."""
 from . import __version__
 from .branding import HEADER
+from .user_guide import GUIDE, SCRIPT as GUIDE_SCRIPT
 from .help_ui import ABOUT, FAQ_GENERAL
 from .assistant_ui import FAQ_AI
 
@@ -9,8 +10,8 @@ def render_start(style, help_script):
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Start · Reversium</title><style>{style}</style><main>
 {HEADER}
-<nav aria-label="Help"><button type="button" data-help-panel="start-about">About</button><button type="button" data-help-panel="start-faq">FAQ</button></nav>
-<section id="start-about" hidden>{ABOUT}</section><section id="start-faq" hidden>{FAQ_GENERAL}{FAQ_AI}</section>
+<nav aria-label="Help"><button type="button" data-help-panel="start-guide">Help</button><button type="button" data-help-panel="start-about">About</button><button type="button" data-help-panel="start-faq">FAQ</button></nav>
+<section id="start-guide" hidden>{GUIDE}</section><section id="start-about" hidden>{ABOUT}</section><section id="start-faq" hidden>{FAQ_GENERAL}{FAQ_AI}</section>
 <p id="start-step" class="assessment">Step 1 of 4 · Start</p>
 <section id="start-screen"><h1>Start with a clear question.</h1><p>Understand a software ZIP before you take it over, change it or plan its future. Reversium checks the files locally and shows evidence, connections and gaps.</p>
 <form id="goal-form"><fieldset><legend>What would you like to achieve?</legend>
@@ -32,4 +33,4 @@ document.querySelector('#start-back').onclick=()=>step(false);
 const picker=document.querySelector('#zip-input');picker.onchange=()=>{{const f=picker.files[0],ok=!!f&&f.size>0&&f.size<=67108864;document.querySelector('#analyze-zip').disabled=!ok;document.querySelector('#status').textContent=!f?'Choose a ZIP to begin.':!ok?'Choose a non-empty ZIP smaller than 64 MiB.':'Selected: '+f.name+' ('+(f.size/1048576).toFixed(1)+' MiB). Ready for local analysis.'}};
 for(const button of document.querySelectorAll('[data-help-panel]'))button.onclick=()=>{{const panel=document.getElementById(button.dataset.helpPanel);panel.hidden=!panel.hidden;button.setAttribute('aria-expanded',String(!panel.hidden))}};
 document.querySelector('#upload-form').onsubmit=async e=>{{e.preventDefault();const file=document.querySelector('#zip-input').files[0],status=document.querySelector('#status'),button=document.querySelector('#analyze-zip');if(!file)return;if(file.size>67108864){{status.textContent='ZIP exceeds 64 MiB. Choose a smaller archive.';return}}button.disabled=true;document.querySelector('#start-back').disabled=true;status.textContent='Analyzing locally. Your findings will appear when ready…';try{{const response=await fetch('/analyze',{{method:'POST',headers:{{'Content-Type':'application/zip','X-Reversium-Goal':goal,'X-Reversium-Archive-Name':encodeURIComponent(file.name)}},body:file}});if(!response.ok)throw Error(await response.text());const page=await response.text();document.open();document.write(page);document.close()}}catch(error){{status.textContent=error.message;button.disabled=false;document.querySelector('#start-back').disabled=false}}}};
-}})();{help_script}</script></html>'''
+}})();{help_script}{GUIDE_SCRIPT}</script></html>'''

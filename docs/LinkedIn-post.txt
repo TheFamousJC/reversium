@@ -1,0 +1,34 @@
+Ever inherited a codebase and spent the first day asking:
+
+Where does this button go?
+Which service does that endpoint depend on?
+And what do I actually need to run this thing?
+
+The README helps. Until it stops three steps before the part you need.
+
+That is the problem we are working on with Reversium by 3Sci Labs.
+
+Give it a source-code ZIP and it builds a starting point for understanding the software: findings, relationship diagrams, source references and the questions it cannot answer yet.
+
+Five reasons to give it a try:
+
+1. Get your bearings: see the languages, frameworks and services referenced in the package.
+2. Follow a feature: explore supported paths from a screen through callbacks and APIs to database operations.
+3. Check the source: go from a finding or diagram connection to its file and line reference.
+4. Make handovers useful: save a readable report with concrete gaps for the next developer to investigate.
+5. Start without setup: it is free, open source and runs in your browser. No installation or account, and your ZIP stays on your device.
+
+Why not just ask AI?
+
+You can, and it can be useful. But a fluent explanation still needs evidence. Reversium adds repeatable inspection, explicit coverage limits and references you can check. Its optional AI handoff lets you choose and review evidence before sharing it with your own AI.
+
+It will not prove that the app runs or magically untangle every dynamic path. The aim is to get you from “what have I inherited?” to a useful first investigation, faster.
+
+Try your own ZIP, or explore the fictional sample:
+https://thefamousjc.github.io/reversium/web/
+
+There is now a full Help guide and downloadable PDF. Browser ZIP limit: 32 MiB.
+
+If you have ever inherited a project with a brave README and a mysterious .env.example, I would love to hear what you would want to find first.
+
+#OpenSource #SoftwareDevelopment #DeveloperTools #SoftwareHandover #3SciLabs
