@@ -19,6 +19,8 @@ class BrowserTests(unittest.TestCase):
         self.assertIn('id="tab-help"',html)
         self.assertIn('Online and local editions',html)
         self.assertIn('Download user guide (PDF)',html)
+        self.assertIn('Open PDF directly',html)
+        self.assertIn("location.href==='about:srcdoc'",html)
         self.assertNotIn('/assistant/ask',html)
         self.assertIn('No account or AI connection',html)
         self.assertIn('data-subsection="architecture-',html)

@@ -270,3 +270,5 @@ Build 0.13.1 adds shared eight-chapter detailed Help to Start and reports, a sel
 Help verification: edition-comparison chapter opens and PDF download succeeds in the browser. The eight-page PDF was rendered and visually reviewed. Updated LinkedIn draft is saved in docs/LinkedIn-post.txt.
 
 Help placement: Help, FAQ and About are now prominent buttons on the public landing and welcome splash, as well as the subsequent Start/ZIP screens and report tabs. First-page buttons open the relevant built-in panel.
+
+PDF reliability fix: only sandboxed about:srcdoc reports forward downloads to the host; other embedded/browser pages download directly. Download anchors are attached for activation and URLs live for 60 seconds. Help also provides an ordinary direct public PDF link. Online ChatGPT account inference remains externally gated: official OpenAI documentation directs remotely hosted applications to the interest process; no hosted account connection or subscription access is claimed.
