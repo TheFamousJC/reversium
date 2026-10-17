@@ -104,3 +104,6 @@ About explains Reversium in plain language and displays its build and Open Sourc
 ## Guided workflow (0.11.0)
 
 Start by choosing a goal, continue to Choose ZIP, then Review findings. Follow the guided actions to inspect connections and gaps. Save & next steps contains HTML/JSON exports and a practical verification checklist; no download controls or AI setup appear before analysis. Samples are labelled fictional demonstrations.
+
+
+Build 0.11.1 improves the owner walkthrough: brief evidence-linked technology clues first, technical details collapsed, selected package identity, and a concrete owner/developer handover checklist with completion criteria. Save readable report (HTML) is the recommended handover action; technical JSON is optional. The overview does not claim the software runs.

@@ -1,6 +1,7 @@
 import html
 import json
 from .help_ui import ABOUT, EXPORT_HELP, FAQ_GENERAL
+from .owner_summary import owner_summary, NEXT_STEPS
 from .presentation import STYLE as MODERN_STYLE, SCRIPT as HELP_SCRIPT
 from .explain import explain_software
 from .feature_map import render_svg
@@ -94,6 +95,7 @@ def render(report):
                         + (f'<p>{behavior["omitted_groups"]} additional explanation groups are omitted from this overview. All findings remain in Evidence.</p>' if behavior['omitted_groups'] else '')
                         + '<h2>What we still do not know</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['unknowns']) + '</ul>'
                         + '<h2>How to confirm the explanation</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['next_steps']) + '</ul>')
+    owner_content = owner_summary(report)
     goal_label = {"understand": "Understand the software", "handover": "Prepare a developer handover", "change": "Plan maintenance or modernization"}.get(report.get("user_goal"), "Understand the software")
     goal_guidance = {
         'understand': 'Focus on the supported features and supporting services. Your next useful result is a short description you can confirm with the software owner.',
@@ -102,10 +104,10 @@ def render(report):
     }.get(report.get('user_goal', 'understand'), 'Start with supported findings, then check their evidence and gaps.')
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Reversium report</title><style>{STYLE}{AI_STYLE}{MODERN_STYLE}</style><main>
-<p class="brand">REVERSIUM 0.11.0 / LOCAL ANALYSIS</p>
+<p class="brand">REVERSIUM 0.11.1 / LOCAL ANALYSIS</p>
 <nav><a href="/">Start a new analysis</a><span>Step 3 · Review findings → Step 4 · Save &amp; next steps</span></nav>
 {'<p class="sample-notice">SAMPLE ANALYSIS · Fictional demonstration data. Start a new analysis to inspect your ZIP.</p>' if report.get("example") else ''}
-<p>Your goal: {esc(goal_label)}</p>
+<p><b>Package:</b> {esc(report.get("archive_name", "Uploaded software package"))} · <b>Your goal:</b> {esc(goal_label)}</p>
 <div role="tablist" aria-label="Report sections">
 <a role="tab" href="#panel-behavior" id="tab-behavior" aria-controls="panel-behavior" aria-selected="false">About</a>
 <a role="tab" href="#panel-software" id="tab-software" aria-controls="panel-software" aria-selected="true">Review findings</a>
@@ -113,10 +115,10 @@ def render(report):
 <a role="tab" href="#panel-evidence" id="tab-evidence" aria-controls="panel-evidence" aria-selected="false">Evidence</a>
 <a role="tab" href="#panel-coverage" id="tab-coverage" aria-controls="panel-coverage" aria-selected="false">Coverage</a>
 <a role="tab" href="#panel-assistant" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false">AI assistant · optional</a><button role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false">FAQ</button><button role="tab" id="tab-finish" aria-controls="panel-finish" aria-selected="false">Save &amp; next steps</button></div>
-<h1>Your analysis is ready.</h1><p>{esc(report['scope'])}</p>
-<div class="cards">{''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k.replace("_", " "))}</span></article>' for k,v in report['summary'].items() if k != 'languages')}</div>
+<h1>Your file review is complete.</h1><p>{esc(report['scope'])}</p>
+<details><summary>Technical inventory numbers</summary><div class="cards">{''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k.replace("_", " "))}</span></article>' for k,v in report['summary'].items() if k != 'languages')}</div><p>Counts show inspected material, not how complete or reliable the software is.</p></details>
 <section role="tabpanel" id="panel-behavior" aria-labelledby="tab-behavior" tabindex="0">{ABOUT}</section>
-<section role="tabpanel" id="panel-software" aria-labelledby="tab-software" tabindex="0"><h2>Review your results</h2><p>Start with these supported explanations. Follow source evidence before treating a clue as a confirmed feature.</p><p>{esc(goal_guidance)}</p><nav><button data-guide="tab-architecture">Explore feature connections</button><button data-guide="tab-coverage">Check gaps and limitations</button><button data-guide="tab-finish">Continue to save &amp; next steps</button></nav>{behavior_content}</section>
+<section role="tabpanel" id="panel-software" aria-labelledby="tab-software" tabindex="0"><h2>Review your results</h2><p>These are clues found in the files. Open “Why we say this” to see where each clue came from. A clue is not proof that a feature works.</p><p>{esc(goal_guidance)}</p>{owner_content}<h3>What should I do next?</h3><p>For a handover, send a readable report to your developer and agree on one feature to verify. You do not need to read every code reference first.</p><nav><button data-guide="tab-architecture">Explore feature connections</button><button data-guide="tab-coverage">Check gaps and limitations</button><button data-guide="tab-finish">Continue to save &amp; next steps</button></nav><details><summary>Detailed findings for a developer</summary>{behavior_content}</details></section>
 <section role="tabpanel" id="panel-architecture" aria-labelledby="tab-architecture" tabindex="0">
 {interaction_map}{platform_section}<h2>Architecture: import and dependency mentions</h2>
 <p>File → local file candidate or referenced package. Labels distinguish internal, external, unresolved and ambiguous references. First 100 unique edges; full references are in the Evidence tab.</p>
@@ -130,7 +132,7 @@ def render(report):
 <h2>Coverage and limitations</h2><ul>{notes}</ul></section>
 <section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">{AI_PANEL}</section>
 <section role="tabpanel" id="panel-faq" aria-labelledby="tab-faq" tabindex="0">{FAQ_GENERAL}{EXPORT_HELP}{FAQ_AI}</section>
-<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><nav><button id="html-export">Download HTML</button><button id="json-export">Download JSON</button></nav>{EXPORT_HELP}<h3>Recommended next checks</h3><ol><li>Ask a developer to trace one important feature using its cited source locations.</li><li>Confirm the required configuration, data and external services with the software owner.</li><li>Test setup and that feature in a separate disposable environment before accepting the handover.</li></ol><nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.11.0. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
+<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><p><b>Recommended for you:</b> save the readable report and send it to the developer. Technical data is optional and mainly useful for scripts or comparing packages.</p><nav><button id="html-export">Save readable report (HTML)</button><button id="json-export">Save technical data (JSON)</button></nav>{EXPORT_HELP}{NEXT_STEPS}<nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.11.1. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
 <script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}{HELP_SCRIPT}</script></html>'''
 
 

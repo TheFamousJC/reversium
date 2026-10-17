@@ -16,7 +16,7 @@ from .feature_map import render_svg
 from .assistant import Assistant
 from .help_ui import ABOUT, EXPORT_HELP, FAQ_GENERAL
 from .assistant_ui import PANEL as AI_PANEL, STYLE as AI_STYLE, SCRIPT as AI_SCRIPT, FAQ_AI
-from urllib.parse import urlsplit, parse_qs
+from urllib.parse import urlsplit, parse_qs, unquote
 import secrets
 import html
 import re
@@ -155,6 +155,8 @@ class Handler(BaseHTTPRequestHandler):
                 result = inspect_zip(stream)
                 goal = self.headers.get('X-Reversium-Goal', 'understand')
                 result['user_goal'] = goal if goal in ('understand', 'handover', 'change') else 'understand'
+                name = unquote(self.headers.get('X-Reversium-Archive-Name', 'Uploaded software package'))
+                result['archive_name'] = ''.join(c for c in name if c.isprintable())[:200]
             self.send(200, render(result))
         except Exception:
             self.send(400, 'Unable to analyze ZIP. Check archive integrity, safe paths, encryption and documented size limits.', 'text/plain; charset=utf-8')

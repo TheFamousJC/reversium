@@ -25,3 +25,5 @@ document.addEventListener('pointerover',e=>show(e.target));document.addEventList
 })();'''
 
 STYLE += 'fieldset{border:0;padding:0;margin:0;width:100%}legend{font-weight:700;margin-bottom:14px}.goal-choice{display:block;background:#f7f9fd;border:1px solid #dce4ef;padding:18px;border-radius:12px;margin-bottom:12px;cursor:pointer}.goal-choice:has(input:checked){border-color:#4058da;background:#edf1ff}.goal-choice input{margin-right:8px}.sample-notice{background:#fff4d9;border:1px solid #dfc37c;padding:14px;border-radius:10px;color:#735414}#start-screen,#upload-screen{max-width:900px}#start-about,#start-faq{background:white;padding:24px;border-radius:16px}'
+
+STYLE += '.action-plan{padding-left:24px;max-width:900px}.action-plan>li{padding:14px 0;border-bottom:1px solid #dce4ef}.action-plan p{margin:7px 0}.action-plan b{color:#253c61}.owner-caution{background:#fff7e6;border:1px solid #ead7a7;padding:18px;border-radius:12px}.owner-caution h3{margin-top:0}'

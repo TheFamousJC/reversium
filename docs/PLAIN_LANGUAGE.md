@@ -173,3 +173,12 @@ Refreshed the home/report UI with light surfaces, indigo controls, compact segme
 Replaced the crowded home with four steps: Start (choose understanding, handover or maintenance goal), Choose ZIP, Review findings, and Save & next steps. The first two steps contain no downloads or account setup. Analysis opens on Review findings with goal-specific reading guidance; buttons lead to feature connections, gaps and the final save step. HTML/JSON downloads are only in Save & next steps after an analysis exists. AI is optional after review. Sample reports are explicitly marked as fictional demonstrations.
 
 Browser verified the full flow against the Tudela ZIP: handover goal carried into analysis, Review findings selected on arrival, downloads hidden during review and visible in the final step. Existing regression suite: 107 passing tests. Analysis remains local/free and uploaded code is not executed.
+
+
+## Non-technical Tudela walkthrough - build 0.11.1 (2026-10-17)
+
+Walked Start to Save with the original Tudela Build 1.zip and the handover goal. The previous first result overwhelmed an owner with a large App.tsx reference list and hundreds of links. Review now leads with a bounded, evidence-linked plain-language profile, explicit uncertainty about whether the software works, and a clear recommendation to save a readable report for a developer. Detailed findings and inventory counts remain available behind expandable sections. The profile describes technology clues, not a recovered business specification.
+
+Choose ZIP now explains compressed packages, source-code preference and local-only inspection; Analyze stays disabled until a non-empty file within 64 MiB is selected. Selected filename/size are displayed, and the report retains an escaped filename and selected goal. Back navigation retains the chosen goal. The final screen prioritizes Save readable report (HTML), labels technical JSON as optional, and assigns three actions to owner/developer with explicit done-when criteria. No checklist state is presented as runtime verification.
+
+Browser verified the real ZIP selection (Build 1.zip, 3.1 MiB), Review default, hidden downloads before Save, evidence navigation to finding 271, and final owner/developer action list. Existing analysis remains local; no Tudela code was run and no AI evidence was shared during this usability walkthrough.
