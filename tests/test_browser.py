@@ -14,10 +14,14 @@ class BrowserTests(unittest.TestCase):
         self.assertIn("connect-src 'none'",html)
         self.assertIn('reversium-download',html)
         self.assertIn('id="report-data"',html)
-        self.assertNotIn('id="panel-assistant"',html)
-        self.assertNotIn('id="tab-assistant"',html)
+        self.assertIn('id="panel-assistant"',html)
+        self.assertIn('Manual handoff',html)
         self.assertNotIn('/assistant/ask',html)
         self.assertIn('No account or AI connection',html)
+        self.assertIn('data-subsection="architecture-',html)
+        self.assertIn('data-subsection="coverage-',html)
+        self.assertIn('class="inventory-numbers"',html)
+        self.assertNotIn('<summary>Technical inventory numbers',html)
 
     def test_shipped_engine_contains_only_application_sources(self):
         with zipfile.ZipFile('web/engine.zip') as z:

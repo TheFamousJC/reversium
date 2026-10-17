@@ -254,3 +254,10 @@ Public verification completed at https://thefamousjc.github.io/reversium/web/ on
 ## Branding and clearer navigation — 0.12.1
 
 Build 0.12.1 adds the supplied 3Sci logo on a dark background, a Reversium by 3Sci Labs splash with Understand. Prepare. Develop., a shorter package selection instruction, direct graphical feature/file relationship controls and a visible browser AI availability explanation. Browser remains free and local; no hosted AI integration was added.
+
+
+## Report navigation and AI handoff — 0.13.0
+
+Build 0.13.0: enlarged entry CTAs; persistent inventory cards; Architecture/Coverage subsection navigation; hidden outer start/help/footer when a report is ready; embedded logo and shared product/build branding in reports and exports. Restored a browser AI tab with provider selection and editable selected-evidence request download. It is explicitly a manual handoff, not hosted OAuth/inference; no credentials collected, no automatic sharing. Local account assistant is unchanged. Direct in-browser ChatGPT connection remains an unmet request; a supported credential/service design is required.
+
+Verified with Tudela in the browser: redundant outer header hidden, inventory visible, Architecture catalogue/import views and Coverage readiness switching passed. AI evidence preview, provider selection and request download passed without submitting to a provider. 111 tests passed.

@@ -1,5 +1,6 @@
 """A short guided entry flow before analysis controls become available."""
 from . import __version__
+from .branding import HEADER
 from .help_ui import ABOUT, FAQ_GENERAL
 from .assistant_ui import FAQ_AI
 
@@ -7,7 +8,7 @@ from .assistant_ui import FAQ_AI
 def render_start(style, help_script):
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Start · Reversium</title><style>{style}</style><main>
-<p class="brand">REVERSIUM {__version__} · LOCAL &amp; FREE</p>
+{HEADER}
 <nav aria-label="Help"><button type="button" data-help-panel="start-about">About</button><button type="button" data-help-panel="start-faq">FAQ</button></nav>
 <section id="start-about" hidden>{ABOUT}</section><section id="start-faq" hidden>{FAQ_GENERAL}{FAQ_AI}</section>
 <p id="start-step" class="assessment">Step 1 of 4 · Start</p>

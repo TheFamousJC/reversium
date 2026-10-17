@@ -3,6 +3,7 @@
 import re
 
 from .report import render
+from .browser_ai import PANEL as BROWSER_AI, SCRIPT as BROWSER_AI_SCRIPT
 
 
 from .assistant_ui import FAQ_AI
@@ -17,9 +18,9 @@ def render_browser(report):
 
     page = browser_copy(render(report))
 
-    page = page.replace('<section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">' + AI_PANEL + '</section>', '')
+    page = page.replace('<section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">' + AI_PANEL + '</section>', '<section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">' + BROWSER_AI + '</section>')
 
-    page = re.sub(r'<a role="tab"[^>]*id="tab-assistant"[^>]*>.*?</a>', '', page)
+    page = page.replace('AI assistant · optional', 'AI · choose provider')
 
     page = re.sub(r'<button data-guide="tab-assistant">.*?</button>', '', page)
 
@@ -36,7 +37,7 @@ def render_browser(report):
 
     reset = "document.querySelectorAll('.browser-reset').forEach(b=>b.onclick=()=>parent.postMessage({type:'reversium-clear'},'*'));"
 
-    return page.replace('</html>', '<script>' + reset + '</script></html>')
+    return page.replace('</html>', '<script>' + reset + BROWSER_AI_SCRIPT + '</script></html>')
 
 
 

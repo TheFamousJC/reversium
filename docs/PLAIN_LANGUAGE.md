@@ -201,3 +201,10 @@ Public verification completed at https://thefamousjc.github.io/reversium/web/ on
 ## Branding and clearer navigation — 0.12.1
 
 Reversium now welcomes you with the 3Sci logo and a Start exploring button. Choose your question, then your source-code package. In Architecture, use Show graphical feature map or Show file relationships. The optional AI assistant is in the local application; the browser version explains this under Where is AI? Files still stay on your device.
+
+
+## Report navigation and AI handoff — 0.13.0
+
+The report now takes the place of the Start screen after analysis. Inventory numbers remain visible. Use Architecture and Coverage buttons to change subsections without scrolling past other sections. Branding and build number travel with saved reports. AI · choose provider lets you choose ChatGPT, Claude, Gemini or another AI, select up to 20 findings and review/download a request. You must paste and submit it yourself; nothing is automatically shared. This is not a live AI connection. The existing account connection remains in the local app.
+
+Verified with Tudela in the browser: redundant outer header hidden, inventory visible, Architecture catalogue/import views and Coverage readiness switching passed. AI evidence preview, provider selection and request download passed without submitting to a provider. 111 tests passed.
