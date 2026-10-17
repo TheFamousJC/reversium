@@ -12,18 +12,33 @@ from .source import compare_reports
 from .sample import sample_archive, javascript_sample_archive
 from . import __version__
 from .feature_map import render_svg
+from .assistant import Assistant
+from .assistant_ui import PANEL as AI_PANEL, STYLE as AI_STYLE, SCRIPT as AI_SCRIPT
+from urllib.parse import urlsplit, parse_qs
+import secrets
+import html
 
-HOME = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium</title><style>''' + STYLE + '''</style><main><p class="brand">REVERSIUM 0.8.0 / PRIVATE BY DESIGN</p><h1>From archive to understanding.</h1><p>Inspect a ZIP on your computer. Discover source files, dependencies, route candidates and architecture evidence. No accounts, API keys or uploads to a cloud service.</p><p>Understand an unfamiliar software package, trace supported features, and prepare maintenance or migration work. Report sections: What this software does, Architecture, Evidence, and Coverage.</p><p><a href="/example">Open a local sample report</a> to see all four tabs, try the <a href="/example-js">JavaScript/TypeScript sample</a>, or analyze your ZIP below.</p><nav aria-label="Preview report sections"><a class="preview-tab" href="/example#panel-behavior">What this software does</a><a class="preview-tab" href="/example#panel-architecture">Architecture</a><a class="preview-tab" href="/example#panel-evidence">Evidence</a><a class="preview-tab" href="/example#panel-coverage">Coverage</a></nav><form><input aria-label="Choose ZIP archive" type="file" accept=".zip" required><button>Analyze archive</button></form><p id="status" role="status">Maximum ZIP size: 64 MiB. Input code is never executed.</p><p>Python AST analysis · JavaScript/TypeScript import scanning · Platform profile · Supporting services · Static binary inspection</p><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=document.querySelector('input').files[0],s=document.querySelector('#status'),b=document.querySelector('button');if(f.size>67108864){s.textContent='ZIP exceeds 64 MiB.';return}b.disabled=true;s.textContent='Analyzing locally…';try{const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/zip'},body:f});if(!r.ok)throw new Error(await r.text());document.open();document.write(await r.text());document.close()}catch(e){s.textContent=e.message;b.disabled=false}};</script></main></html>'''
+HOME = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium</title><style>''' + STYLE + '''</style><main><p class="brand">REVERSIUM 0.10.0 / PRIVATE BY DESIGN</p><h1>From archive to understanding.</h1><p>Inspect a ZIP on your computer. Discover source files, dependencies, route candidates and architecture evidence. No accounts, API keys or uploads to a cloud service.</p><p>Understand an unfamiliar software package, trace supported features, and prepare maintenance or migration work. Report sections: What this software does, Architecture, Evidence, and Coverage.</p><p><a href="/example">Open a local sample report</a> to see all four tabs, try the <a href="/example-js">JavaScript/TypeScript sample</a>, or analyze your ZIP below.</p><nav aria-label="Preview report sections"><a class="preview-tab" href="/example#panel-behavior">What this software does</a><a class="preview-tab" href="/example#panel-architecture">Architecture</a><a class="preview-tab" href="/example#panel-evidence">Evidence</a><a class="preview-tab" href="/example#panel-coverage">Coverage</a></nav><form><input aria-label="Choose ZIP archive" type="file" accept=".zip" required><button>Analyze archive</button></form><p id="status" role="status">Maximum ZIP size: 64 MiB. Input code is never executed.</p><p>Python AST analysis · JavaScript/TypeScript import scanning · Platform profile · Supporting services · Static binary inspection</p><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=document.querySelector('input').files[0],s=document.querySelector('#status'),b=document.querySelector('button');if(f.size>67108864){s.textContent='ZIP exceeds 64 MiB.';return}b.disabled=true;s.textContent='Analyzing locally…';try{const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/zip'},body:f});if(!r.ok)throw new Error(await r.text());document.open();document.write(await r.text());document.close()}catch(e){s.textContent=e.message;b.disabled=false}};</script></main></html>'''
+
+HOME = HOME.replace('</style>', AI_STYLE + '</style>').replace('</main>', '<section id="panel-assistant">' + AI_PANEL + '</section><script>' + AI_SCRIPT + '</script></main>')
 
 
 class Handler(BaseHTTPRequestHandler):
+    def log_message(self, format, *args):
+        # OAuth callback query contains a code; never include request URLs in logs.
+        if not self.path.startswith('/auth/callback'):
+            super().log_message(format, *args)
+
     def send(self, code, body, kind='text/html; charset=utf-8'):
+        if kind.startswith('text/html'):
+            body = body.replace('<!--assistant-session-->', '<meta name="assistant-session" content="' + self.server.assistant_session + '">')
         data = body.encode('utf-8')
         self.send_response(code)
         self.send_header('Content-Type', kind)
         self.send_header('Content-Length', str(len(data)))
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Cache-Control', 'no-store')
+        self.send_header('Referrer-Policy', 'no-referrer')
         self.send_header('Content-Security-Policy', "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'")
         self.end_headers()
         self.wfile.write(data)
@@ -34,6 +49,13 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.valid_host():
             return self.send(403, 'Invalid host.')
+        if urlsplit(self.path).path == '/auth/callback':
+            try:
+                self.server.assistant.callback(parse_qs(urlsplit(self.path).query))
+                message = 'Connected. Return to your Reversium tab and choose Check connection. No report evidence was shared.'
+            except Exception:
+                message = 'Connection could not be completed. Check account eligibility, optional dependencies and consent, then start again. Local analysis still works.'
+            return self.send(200, '<!doctype html><meta charset="utf-8"><title>Reversium connection</title><p>' + html.escape(message) + '</p>')
         if self.path == '/example':
             return self.send(200, render(inspect_zip(sample_archive())))
         if self.path == '/example-js':
@@ -58,6 +80,37 @@ class Handler(BaseHTTPRequestHandler):
             except (ValueError, OSError):
                 pass
             return self.send(403, 'Local requests only.')
+        if self.path.startswith('/assistant/'):
+            if self.headers.get('Origin') != expected_origin or self.headers.get('X-Reversium-Session') != self.server.assistant_session:
+                self.connection.settimeout(2)
+                try:
+                    self.rfile.read(min(max(int(self.headers.get('Content-Length', '0')), 0), 100000))
+                except (ValueError, OSError):
+                    pass
+                return self.send(403, 'Assistant requests require this local browser session.')
+            try:
+                length = int(self.headers.get('Content-Length', '0'))
+                if not 0 < length <= 100000:
+                    raise ValueError('Assistant request exceeds 100 KB.')
+                self.connection.settimeout(90)
+                body = json.loads(self.rfile.read(length))
+                assistant = self.server.assistant
+                if self.path == '/assistant/status':
+                    result = assistant.status()
+                elif self.path == '/assistant/connect':
+                    result = {'url': assistant.begin(expected_origin)}
+                elif self.path == '/assistant/disconnect':
+                    assistant.disconnect()
+                    result = assistant.status()
+                elif self.path == '/assistant/ask':
+                    result = assistant.ask(body)
+                else:
+                    return self.send(404, 'Not found.')
+                return self.send(200, json.dumps(result), 'application/json')
+            except ValueError as error:
+                return self.send(400, json.dumps({'error': str(error)}), 'application/json')
+            except Exception:
+                return self.send(502, json.dumps({'error': 'Account service unavailable or response invalid. Check sign-in, connectivity and plan limits. No automatic retry or API billing fallback.'}), 'application/json')
         if self.path != '/analyze':
             return self.send(404, 'Not found.')
         try:
@@ -84,6 +137,11 @@ class LocalHTTPServer(ThreadingHTTPServer):
     # Windows can let multiple SO_REUSEADDR listeners bind the same port,
     # causing a newly launched browser to reach an older process.
     allow_reuse_address = False
+
+    def __init__(self, *args, **kwargs):
+        self.assistant = Assistant()
+        self.assistant_session = secrets.token_urlsafe(32)
+        super().__init__(*args, **kwargs)
 
     def server_bind(self):
         if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):

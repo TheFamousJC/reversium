@@ -65,7 +65,8 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(len(report['warnings']), 2)
 
     def test_http(self):
-        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+        from reversium.__main__ import LocalHTTPServer
+        server = LocalHTTPServer(('127.0.0.1', 0), Handler)
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         url = f'http://127.0.0.1:{server.server_port}'

@@ -2,6 +2,20 @@
 
 Living document. Update completed work, verification and remaining limitations with each stage. Last updated: 2026-10-16.
 
+## v0.10.0 — Optional account-based AI assistance
+
+Delivered locally 2026-10-17. Resumed development after the Tudela handover rehearsal. Local ZIP inspection, diagrams and reports retain their dependency-free, offline operation. The pending v0.9 workflow view is included: one bounded screen/callback/API/database branch with evidence and explicit static-analysis limitations.
+
+- Added an AI assistant report tab and home-screen setup wizard plus FAQ. Users select up to 30 findings, enter a question, edit the exact outgoing JSON and approve each request. No ZIP, automatic source upload, tool execution or paid API-key fallback.
+- Implemented documented open-source ChatGPT authorization with dynamic client registration, loopback callback, PKCE, state, nonce, signed ID-token validation, granted plan scopes and account-specific model discovery. Optional `requirements-ai.txt` uses maintained PyJWT/cryptography. Tokens stay in process memory; non-token host/client/subject registration metadata stays in ignored reports/. Reconnect after expiry/restart; disconnect clears local tokens, not provider consent.
+- Requests use the public Responses endpoint, store=false and stream=true. Only completed responses are accepted. Claims require selected numeric evidence IDs; invalid/missing citations, failed/incomplete/interrupted streams are rejected. Citations do not validate semantic correctness. AI answers render as plain text with local finding links.
+- Assistant requests require exact Origin, Host and a per-server session capability. OAuth query codes are omitted from HTTP logs; response bodies and tokens are not logged. Remote redirects are refused. HTML exports remove the assistant panel, account identity, question, preview, answer and local session capability. JSON remains the original local analysis only.
+- Wizard/FAQ disclose eligibility/plan limits, optional dependencies, external sharing, best-effort redaction, memory-only tokens, no execution, and account switching. Signing in is never required for analysis.
+
+Validation: 107 tests passed, including consent gates, evidence bounds, citation validation, state expiry/replay rejection, real locally generated RSA signatures and terminal stream handling. Browser checked wizard, disconnected state and sample evidence selection/preview. Live ChatGPT sign-in and inference require the user's consent/account and are not yet verified; do not describe cloud operation as accepted. No private Tudela evidence was sent to OpenAI during development. Browser additionally verified the ChatGPT authorization link, disconnected send gate and editable sample evidence preview. Downloaded HTML was checked to exclude the panel, question and session capability.
+
+Provider contract references (checked 2026-10-17): https://developers.openai.com/siwc/token-sharing-open-source/sign-in and https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference . Current implementation supports RS256 ID tokens and one retained account registration; other signature algorithms fail closed. No automatic token refresh or persisted token vault is provided. Account eligibility, provider policy and plan limits remain external dependencies.
+
 ## v0.8.0 — Selected React callbacks and computed API targets
 
 Delivered 2026-10-16. Extends the Tudela discovery milestone while retaining local, dependency-free static analysis.

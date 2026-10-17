@@ -84,3 +84,13 @@ Browser uploads are capped at 64 MiB. Both entry points reject archives over 10,
 - [Contributing](CONTRIBUTING.md)
 
 Licensed under MIT. The built-in static binary reader has no third-party dependencies. External decompiler adapters remain planned and will have their own license notices. The core continues to work without AI or paid services.
+
+## Optional AI assistant
+
+The report's **AI assistant · optional** tab includes a setup wizard and FAQ. Local analysis remains free, offline and dependency-free. To enable signature verification for the optional ChatGPT account flow, install `python -m pip install -r requirements-ai.txt`. Restart Reversium, choose Continue with ChatGPT, open the provider sign-in link, then return and Check connection. Eligible account models load after consent; availability and plan limits are controlled by OpenAI. No API-key billing fallback is used.
+
+Select findings, enter a question, prepare/edit the sharing preview, then approve and send each request. Only that question/evidence plus the visible instructions are shared. No full ZIP upload or execution tools. Answers cite selected findings and disclose unknowns; citations are not proof of correctness. Cloud sign-in/inference still require live user acceptance testing.
+
+Tokens remain in memory and expire without automatic refresh; reconnect as needed. Ignored `reports/assistant-host.json` and `reports/assistant-registration.json` retain non-token host/account identifiers. To switch accounts, disconnect and remove only the registration file before reconnecting. Local disconnect does not revoke provider-side consent. HTML exports exclude assistant state; analysis JSON never includes it.
+
+Official contract: [registration](https://developers.openai.com/siwc/token-sharing-open-source/sign-in), [models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference).

@@ -2,6 +2,18 @@
 
 Living explanation. Last updated: 2026-10-16.
 
+## Optional help inside Reversium — version 0.10.0
+
+The new AI assistant sits in the same report interface. A three-step wizard helps you connect your own eligible ChatGPT account, choose findings and review exactly what you would share before sending a question. Answers appear beside your report, with links back to selected evidence and a separate list of unknowns. A FAQ explains privacy, setup, limits and troubleshooting.
+
+The local analyzer stays free and works without an account or internet. AI is optional and uses your account's eligibility and plan limits. OpenAI sign-in briefly uses a provider screen; Reversium never asks for your ChatGPT password or a paid API key. Your ZIP is not automatically uploaded. Finding descriptions and file paths may still be private, so inspect and edit the preview. Redaction can miss secrets.
+
+Connecting alone shares no software evidence. Each Send requires fresh approval; the assistant cannot install software, execute commands or edit files. Its citations only establish which selected finding it references, not that the explanation is true. Local tools and actual tests remain the way to confirm behavior.
+
+Tokens remain in memory and disappear on disconnect or restart. Local registration identifiers are retained to reconnect the same account. Saved report exports exclude assistant conversation and account details. Disconnecting locally does not revoke OpenAI-side authorization; use ChatGPT settings for that.
+
+The interface and safety checks have been tested locally. A real account sign-in and cloud answer still need user acceptance. We have not sent Tudela's private source findings to the provider. The earlier local Tudela rehearsal did verify administrator provisioning, draft import and a published five-stop tour in a separate local database; its private handover report retains the results and remaining gaps.
+
 ## Following more Tudela workflows in version 0.8.0
 
 The map can now follow selected actions passed between React screens. For example, the chat screen's send action connects to the callback supplied by the main app, then to the `/api/chat` request and supported backend/data references. A CMS save action can connect to a callback returned by its content-management helper and then to the database code. Click a box or line to inspect the source evidence.
