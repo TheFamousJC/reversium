@@ -104,7 +104,7 @@ def render(report):
     }.get(report.get('user_goal', 'understand'), 'Start with supported findings, then check their evidence and gaps.')
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Reversium report</title><style>{STYLE}{AI_STYLE}{MODERN_STYLE}</style><main>
-<p class="brand">REVERSIUM 0.11.1 / LOCAL ANALYSIS</p>
+<p class="brand">REVERSIUM 0.12.0 / LOCAL ANALYSIS</p>
 <nav><a href="/">Start a new analysis</a><span>Step 3 · Review findings → Step 4 · Save &amp; next steps</span></nav>
 {'<p class="sample-notice">SAMPLE ANALYSIS · Fictional demonstration data. Start a new analysis to inspect your ZIP.</p>' if report.get("example") else ''}
 <p><b>Package:</b> {esc(report.get("archive_name", "Uploaded software package"))} · <b>Your goal:</b> {esc(goal_label)}</p>
@@ -132,7 +132,7 @@ def render(report):
 <h2>Coverage and limitations</h2><ul>{notes}</ul></section>
 <section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">{AI_PANEL}</section>
 <section role="tabpanel" id="panel-faq" aria-labelledby="tab-faq" tabindex="0">{FAQ_GENERAL}{EXPORT_HELP}{FAQ_AI}</section>
-<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><p><b>Recommended for you:</b> save the readable report and send it to the developer. Technical data is optional and mainly useful for scripts or comparing packages.</p><nav><button id="html-export">Save readable report (HTML)</button><button id="json-export">Save technical data (JSON)</button></nav>{EXPORT_HELP}{NEXT_STEPS}<nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.11.1. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
+<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><p><b>Recommended for you:</b> save the readable report and send it to the developer. Technical data is optional and mainly useful for scripts or comparing packages.</p><nav><button id="html-export">Save readable report (HTML)</button><button id="json-export">Save technical data (JSON)</button></nav>{EXPORT_HELP}{NEXT_STEPS}<nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.12.0. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
 <script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}{HELP_SCRIPT}</script></html>'''
 
 
@@ -158,7 +158,7 @@ window.addEventListener('hashchange',revealPanel);revealPanel();
 const filter=document.querySelector('#evidence-filter');
 filter.addEventListener('input',()=>{let count=0;for(const row of document.querySelectorAll('#evidence-table tbody tr')){row.hidden=!row.textContent.toLowerCase().includes(filter.value.toLowerCase());if(!row.hidden)count++}document.querySelector('#filter-count').textContent=count+' findings'});
 function revealFinding(hash){if(!/^#finding-[0-9]+$/.test(hash))return;const row=document.getElementById(hash.slice(1));if(!row)return;activateTab(document.querySelector('#tab-evidence'));filter.value='';filter.dispatchEvent(new Event('input'));row.focus();row.scrollIntoView({block:'center'})}
-for(const link of document.querySelectorAll('.evidence-link'))link.addEventListener('click',()=>revealFinding(link.getAttribute('href')));
+for(const link of document.querySelectorAll('.evidence-link'))link.addEventListener('click',event=>{event.preventDefault();revealFinding(link.getAttribute('href'))});
 window.addEventListener('hashchange',()=>revealFinding(window.location.hash));revealFinding(window.location.hash);
 const reportData=JSON.parse(document.querySelector('#report-data').textContent),graph=reportData.feature_map||{nodes:[],edges:[],features:[]};
 const mapColumns={feature:0,module:1,handler:1,helper:2,data:3,external:3,rpc:3,storage:3,auth:3};

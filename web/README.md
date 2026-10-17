@@ -1,0 +1,7 @@
+# Browser edition
+
+Served on GitHub Pages at /reversium/web/. No backend, subscription, sign-in, analytics or external runtime CDN is used. ZIP bytes are transferred to a module worker and inspected in Pyodide memory; input code is never executed. The worker disables network APIs before source inspection and is terminated when finished, cancelled or timed out. Results run in an opaque-origin sandbox with connect-src none. Clear removes page references; this is not secure memory erasure. Browser caches can retain application assets, not ZIPs saved by this app. Downloaded reports may contain private evidence. GitHub receives normal page/asset requests and IP connection information, never ZIP contents through this app.
+
+32 MiB compressed input; analyzer limits remain 10,000 files, 256 MiB expanded, 4 MiB inspected per file, plus documented graph/token bounds. Five-minute stop. Desktop browsers recommended; large reports may exhaust device memory. No installation or runtime verification of input software; optional ChatGPT assistance requires the local application.
+
+Build with `python scripts/build_browser.py`; it packages only reversium/*.py. Serve the repository through HTTP for local testing; file:// workers are unsupported. Runtime is pinned to Pyodide 314.0.7 (Python 3.14.2), distributed from its official jsDelivr distribution and self-hosted. MANIFEST.json records original hashes. PYODIDE-LICENSE contains the Pyodide license; PYTHON-LICENSE contains CPython terms. Reversium remains under the repository license.

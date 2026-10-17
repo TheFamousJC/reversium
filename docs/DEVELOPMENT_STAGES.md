@@ -242,3 +242,8 @@ Verification: 109 tests pass, including two new checks that owner-profile clues 
 Added a GitHub Pages landing page and interactive report generated only from five fictional community-library files. Visitors can explore owner findings, inspect evidence, follow the Add book screen/callback/API/database path and save sample HTML/JSON without installing Reversium. This is a sample-only static demonstration, not online analysis of visitor ZIPs. No upload endpoint, AI sign-in, assistant request script, analytics or third-party assets are included. The local Python application is still required for analysing real packages.
 
 The existing public repository Pages configuration already publishes the root of codex/initial-workbench. scripts/build_demo.py rebuilds index.html and demo/report.html; .nojekyll preserves the static output. Private Tudela archives, reports, tokens and test data are excluded. Browser verified the local landing-to-report navigation and the complete supported fictional feature path before publication.
+
+
+## Browser-local edition — 0.12.0
+
+Ported the existing Python analyzer through self-hosted pinned Pyodide to a module worker. Added guided own-ZIP flow, cancellation, bounded processing, sandboxed offline reports and local exports. No source execution, upload API, account or AI service. Tudela local browser verification found 266 files and 3,882 findings, matching native analysis; traced AskHerzlChat to /api/chat and ai_usage_events with existing candidate labels. GitHub Pages publication is the deployment target; public verification follows push. Browser input limit 32 MiB; static evidence is not runtime proof.

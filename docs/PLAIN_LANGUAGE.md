@@ -189,3 +189,8 @@ Browser verified the real ZIP selection (Build 1.zip, 3.1 MiB), Review default, 
 Added a GitHub Pages landing page and interactive report generated only from five fictional community-library files. Visitors can explore owner findings, inspect evidence, follow the Add book screen/callback/API/database path and save sample HTML/JSON without installing Reversium. This is a sample-only static demonstration, not online analysis of visitor ZIPs. No upload endpoint, AI sign-in, assistant request script, analytics or third-party assets are included. The local Python application is still required for analysing real packages.
 
 The existing public repository Pages configuration already publishes the root of codex/initial-workbench. scripts/build_demo.py rebuilds index.html and demo/report.html; .nojekyll preserves the static output. Private Tudela archives, reports, tokens and test data are excluded. Browser verified the local landing-to-report navigation and the complete supported fictional feature path before publication.
+
+
+## Use Reversium without installing it
+
+You can open the browser edition, choose a question and select your own ZIP. Your computer reads it and produces the familiar findings, feature connections, evidence and gaps. It does not upload your ZIP. GitHub supplies the app files and sees normal website connection information. Clear or close the page when finished; saved reports remain your responsibility. The browser edition has no ChatGPT connection and no sign-in. Larger ZIPs above 32 MiB need the local application. Tudela produced the same file and finding counts in browser and local analysis. This helps investigate a handover; it does not prove that the software works.

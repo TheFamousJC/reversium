@@ -1,6 +1,9 @@
 # Reversium
 
-[Try the free interactive sample demo](https://thefamousjc.github.io/reversium/) — no installation or sign-up. Explore fictional findings, feature paths and report downloads. This static demo does not accept your ZIP or connect to AI; use the local application below for your own software.
+[Use Reversium in your browser](https://thefamousjc.github.io/reversium/web/) — analyze your own ZIP without installation or an account. Files stay on your device; no uploads or AI calls. Browser limit: 32 MiB. First use downloads the self-hosted Python runtime (about 14 MB). [Sample report](https://thefamousjc.github.io/reversium/demo/report.html) uses fictional data.
+
+
+[Try the free interactive sample demo](https://thefamousjc.github.io/reversium/) — no installation or sign-up. Explore fictional findings, feature paths and report downloads. The sample uses fictional data; the browser version above accepts your own ZIP locally.
 
 An open-source, local and free-to-run archive analysis workbench. No external services, API keys, JavaScript packages or Python dependencies are required. Python 3.10+ is required.
 
