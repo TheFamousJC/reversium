@@ -235,3 +235,10 @@ Choose ZIP now explains compressed packages, source-code preference and local-on
 Browser verified the real ZIP selection (Build 1.zip, 3.1 MiB), Review default, hidden downloads before Save, evidence navigation to finding 271, and final owner/developer action list. Existing analysis remains local; no Tudela code was run and no AI evidence was shared during this usability walkthrough.
 
 Verification: 109 tests pass, including two new checks that owner-profile clues require supported dependency/import findings, retain real evidence IDs and escape source paths. An initial Windows loopback connection reset did not recur on the full rerun; the real-ZIP browser flow passed.
+
+
+## Free public sample demo (2026-10-17)
+
+Added a GitHub Pages landing page and interactive report generated only from five fictional community-library files. Visitors can explore owner findings, inspect evidence, follow the Add book screen/callback/API/database path and save sample HTML/JSON without installing Reversium. This is a sample-only static demonstration, not online analysis of visitor ZIPs. No upload endpoint, AI sign-in, assistant request script, analytics or third-party assets are included. The local Python application is still required for analysing real packages.
+
+The existing public repository Pages configuration already publishes the root of codex/initial-workbench. scripts/build_demo.py rebuilds index.html and demo/report.html; .nojekyll preserves the static output. Private Tudela archives, reports, tokens and test data are excluded. Browser verified the local landing-to-report navigation and the complete supported fictional feature path before publication.

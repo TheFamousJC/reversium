@@ -182,3 +182,10 @@ Walked Start to Save with the original Tudela Build 1.zip and the handover goal.
 Choose ZIP now explains compressed packages, source-code preference and local-only inspection; Analyze stays disabled until a non-empty file within 64 MiB is selected. Selected filename/size are displayed, and the report retains an escaped filename and selected goal. Back navigation retains the chosen goal. The final screen prioritizes Save readable report (HTML), labels technical JSON as optional, and assigns three actions to owner/developer with explicit done-when criteria. No checklist state is presented as runtime verification.
 
 Browser verified the real ZIP selection (Build 1.zip, 3.1 MiB), Review default, hidden downloads before Save, evidence navigation to finding 271, and final owner/developer action list. Existing analysis remains local; no Tudela code was run and no AI evidence was shared during this usability walkthrough.
+
+
+## Free public sample demo (2026-10-17)
+
+Added a GitHub Pages landing page and interactive report generated only from five fictional community-library files. Visitors can explore owner findings, inspect evidence, follow the Add book screen/callback/API/database path and save sample HTML/JSON without installing Reversium. This is a sample-only static demonstration, not online analysis of visitor ZIPs. No upload endpoint, AI sign-in, assistant request script, analytics or third-party assets are included. The local Python application is still required for analysing real packages.
+
+The existing public repository Pages configuration already publishes the root of codex/initial-workbench. scripts/build_demo.py rebuilds index.html and demo/report.html; .nojekyll preserves the static output. Private Tudela archives, reports, tokens and test data are excluded. Browser verified the local landing-to-report navigation and the complete supported fictional feature path before publication.

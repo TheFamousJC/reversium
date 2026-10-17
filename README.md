@@ -1,5 +1,7 @@
 # Reversium
 
+[Try the free interactive sample demo](https://thefamousjc.github.io/reversium/) — no installation or sign-up. Explore fictional findings, feature paths and report downloads. This static demo does not accept your ZIP or connect to AI; use the local application below for your own software.
+
 An open-source, local and free-to-run archive analysis workbench. No external services, API keys, JavaScript packages or Python dependencies are required. Python 3.10+ is required.
 
 ## Run
@@ -107,3 +109,8 @@ Start by choosing a goal, continue to Choose ZIP, then Review findings. Follow t
 
 
 Build 0.11.1 improves the owner walkthrough: brief evidence-linked technology clues first, technical details collapsed, selected package identity, and a concrete owner/developer handover checklist with completion criteria. Save readable report (HTML) is the recommended handover action; technical JSON is optional. The overview does not claim the software runs.
+
+
+## Rebuild the public demo
+
+Run `python scripts/build_demo.py`. It generates index.html and demo/report.html from fictional in-code fixtures only, using the real analyzer and renderer. Existing GitHub Pages publishes the root of codex/initial-workbench. Do not replace these fixtures with private customer code.
