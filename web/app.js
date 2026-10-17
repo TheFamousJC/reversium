@@ -1,4 +1,4 @@
-const $=s=>document.querySelector(s);
+const $=s=>document.querySelector(s);$('#enter-app').onclick=()=>{document.querySelector('#splash').hidden=true;document.querySelector('#app-content').hidden=false;document.querySelector('#start-screen h1').setAttribute('tabindex','-1');document.querySelector('#start-screen h1').focus()};
 const start=$('#start-screen'),upload=$('#upload-screen'),progress=$('#browser-progress'),results=$('#browser-results'),frame=$('#browser-report');
 let goal='understand',worker=null,timer=null;
 const names={understand:'Understand the software',handover:'Prepare a developer handover',change:'Plan maintenance or modernization'};
