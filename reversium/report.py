@@ -1,6 +1,7 @@
 import html
 import json
 from .help_ui import ABOUT, EXPORT_HELP, FAQ_GENERAL
+from .presentation import STYLE as MODERN_STYLE, SCRIPT as HELP_SCRIPT
 from .explain import explain_software
 from .feature_map import render_svg
 from .workflow_paths import workflow_paths
@@ -94,8 +95,8 @@ def render(report):
                         + '<h2>What we still do not know</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['unknowns']) + '</ul>'
                         + '<h2>How to confirm the explanation</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['next_steps']) + '</ul>')
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>Reversium report</title><style>{STYLE}{AI_STYLE}</style><main>
-<p class="brand">REVERSIUM 0.10.1 / LOCAL ANALYSIS</p>
+<title>Reversium report</title><style>{STYLE}{AI_STYLE}{MODERN_STYLE}</style><main>
+<p class="brand">REVERSIUM 0.10.2 / LOCAL ANALYSIS</p>
 <nav><a href="/">Analyze another ZIP</a><button id="json-export">Download JSON</button><button id="html-export">Download HTML</button></nav>{EXPORT_HELP}
 <div role="tablist" aria-label="Report sections">
 <a role="tab" href="#panel-behavior" id="tab-behavior" aria-controls="panel-behavior" aria-selected="true">About</a>
@@ -121,8 +122,8 @@ def render(report):
 <h2>Coverage and limitations</h2><ul>{notes}</ul></section>
 <section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">{AI_PANEL}</section>
 <section role="tabpanel" id="panel-faq" aria-labelledby="tab-faq" tabindex="0">{FAQ_GENERAL}{EXPORT_HELP}{FAQ_AI}</section>
-<p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.10.1. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
-<script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}</script></html>'''
+<p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.10.2. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
+<script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}{HELP_SCRIPT}</script></html>'''
 
 
 STYLE = 'body{margin:0;background:#101823;color:#e8edf5;font:16px system-ui}main{max-width:1180px;margin:60px auto;padding:0 28px}.brand{color:#66d9c2;letter-spacing:3px;font-size:12px}h1{font-size:48px;letter-spacing:-2px}h2{margin-top:45px}p,li{color:#afbdce;line-height:1.7}.cards{display:flex;gap:14px;flex-wrap:wrap}article{padding:24px;background:#1c2838;border-radius:12px;min-width:130px}strong{display:block;font-size:30px}span{color:#afbdce}table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;padding:12px;border-bottom:1px solid #304056;overflow-wrap:anywhere}.scroll{overflow:auto}svg{width:100%;min-width:650px;background:#162130;border-radius:12px}button{background:#66d9c2;color:#101823;border:0;border-radius:8px;padding:14px 24px;font-weight:700;cursor:pointer}input{padding:20px}a{color:#66d9c2}'
@@ -186,6 +187,6 @@ drawMap();
 function download(text,type,name){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 document.querySelector('#svg-export').onclick=()=>{const copy=document.querySelector('#feature-map-svg').cloneNode(true);for(const item of copy.querySelectorAll('.map-dimmed'))item.classList.remove('map-dimmed');download(copy.outerHTML,'image/svg+xml','reversium-feature-map.svg')};
 document.querySelector('#json-export').onclick=()=>download(document.querySelector('#report-data').textContent,'application/json','reversium-report.json');
-document.querySelector('#html-export').onclick=()=>{const copy=document.documentElement.cloneNode(true);copy.querySelector('#panel-assistant')?.remove();copy.querySelector('#tab-assistant')?.remove();copy.querySelector('meta[name=assistant-session]')?.remove();copy.querySelector('#evidence-filter').value='';copy.querySelector('#map-filter').value='';if(copy.querySelector('#workflow-filter'))copy.querySelector('#workflow-filter').value='0';for(const path of copy.querySelectorAll('[data-workflow]'))path.hidden=path.dataset.workflow!=='0';for(const item of copy.querySelectorAll('.map-dimmed'))item.classList.remove('map-dimmed');for(const row of copy.querySelectorAll('tr'))row.removeAttribute('hidden');for(const panel of copy.querySelectorAll('[role=tabpanel]'))panel.removeAttribute('hidden');for(const tab of copy.querySelectorAll('[role=tab]'))tab.removeAttribute('tabindex');copy.querySelector('#filter-count').textContent=copy.querySelectorAll('#evidence-table tbody tr').length+' findings';download('<!doctype html>'+copy.outerHTML,'text/html','reversium-report.html')};'''
+document.querySelector('#html-export').onclick=()=>{const copy=document.documentElement.cloneNode(true);copy.querySelector('#control-help')?.remove();for(const el of copy.querySelectorAll('[aria-describedby]')){if(el.getAttribute('aria-describedby')==='control-help')el.removeAttribute('aria-describedby')}copy.querySelector('#panel-assistant')?.remove();copy.querySelector('#tab-assistant')?.remove();copy.querySelector('meta[name=assistant-session]')?.remove();copy.querySelector('#evidence-filter').value='';copy.querySelector('#map-filter').value='';if(copy.querySelector('#workflow-filter'))copy.querySelector('#workflow-filter').value='0';for(const path of copy.querySelectorAll('[data-workflow]'))path.hidden=path.dataset.workflow!=='0';for(const item of copy.querySelectorAll('.map-dimmed'))item.classList.remove('map-dimmed');for(const row of copy.querySelectorAll('tr'))row.removeAttribute('hidden');for(const panel of copy.querySelectorAll('[role=tabpanel]'))panel.removeAttribute('hidden');for(const tab of copy.querySelectorAll('[role=tab]'))tab.removeAttribute('tabindex');copy.querySelector('#filter-count').textContent=copy.querySelectorAll('#evidence-table tbody tr').length+' findings';download('<!doctype html>'+copy.outerHTML,'text/html','reversium-report.html')};'''
 
 STYLE += '.map-viewport{max-height:650px;border:1px solid #304056;border-radius:12px}'
