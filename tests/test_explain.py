@@ -53,7 +53,9 @@ class ExplanationTests(unittest.TestCase):
     def test_html_explanations_escape_names_and_link_findings(self):
         report = inspect_zip(archive([('app.py', '@app.get("/<script>")\ndef route(): pass')]))
         output = render(report)
-        self.assertIn('What this software does', output)
+        self.assertIn('Software findings', output)
+        self.assertIn('About Reversium', output)
+        self.assertIn('id="tab-faq"', output)
         self.assertNotIn('“/<script>”', output)
         self.assertIn('“/&lt;script&gt;”', output)
         for item in report['behavior']['explanations']:

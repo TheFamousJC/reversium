@@ -207,3 +207,8 @@ Future setup workflow: produce a reviewable run plan (OS/architecture, pinned de
 
 
 Update 2026-10-17: live ChatGPT sign-in/model discovery succeeded, but the first minimal evidence request failed before an answer was displayed. No AI answer has been accepted against source evidence. Fixed assistant initialization after in-page ZIP uploads and added safe provider HTTP status/code diagnostics without raw provider messages, tokens or evidence. Reconnection after restart is required for the next live test.
+
+
+## About, FAQ and report downloads - build 0.10.1 (2026-10-17)
+
+About now explains Reversium in plain language: practical handover and maintenance uses, a simple reading workflow, optional AI and limitations. Build 0.10.1 and Open Source / 3Sci.com / 2026 are displayed. Uploaded-code explanations remain available in Software findings. FAQ has its own report button and home help button, including the assistant questions. HTML is the readable report for offline review and handover; JSON is structured findings for scripts, tools and baseline comparison. Both can contain private analysis details; neither is the original ZIP or a runnable backup.

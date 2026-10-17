@@ -31,6 +31,9 @@ PANEL = '''<!--assistant-session--><h2>Optional AI assistant</h2>
 <details><summary>What is saved?</summary><p>Tokens and answers are held only for the running session. Local host and account-registration identifiers are retained under reports/assistant-host.json and reports/assistant-registration.json so the same account can reconnect. To switch accounts, disconnect and remove the registration file locally before reconnecting. Disconnect removes local account tokens; it does not revoke provider-side consent. Manage app authorization in ChatGPT settings. Saved HTML exports omit the question, preview, selection, account identity and AI answer. Export the local analysis separately.</p></details>
 <details><summary>Can the assistant install or run the uploaded software?</summary><p>No. It can explain selected findings and suggest checks. It has no command, file-editing or execution tools.</p></details>'''
 
+PANEL, FAQ_AI = PANEL.split('<h3>Frequently asked questions</h3>', 1)
+FAQ_AI = '<h3>AI assistant questions</h3>' + FAQ_AI
+
 PANEL = PANEL.replace('{assistant_instructions}', html.escape(INSTRUCTIONS))
 
 STYLE = '''.ai-findings{max-height:280px;overflow:auto;border:1px solid #657890;padding:12px}.ai-findings label{display:block;overflow-wrap:anywhere;margin:10px 0}textarea{display:block;box-sizing:border-box;width:100%;max-width:950px;margin:12px 0;padding:12px;background:#162130;color:#e8edf5;border:1px solid #657890;border-radius:8px}#ai-answer{white-space:pre-wrap;overflow-wrap:anywhere}#panel-assistant details{margin:16px 0}#panel-assistant label{line-height:1.7}'''

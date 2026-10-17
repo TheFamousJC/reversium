@@ -94,3 +94,8 @@ Select findings, enter a question, prepare/edit the sharing preview, then approv
 Tokens remain in memory and expire without automatic refresh; reconnect as needed. Ignored `reports/assistant-host.json` and `reports/assistant-registration.json` retain non-token host/account identifiers. To switch accounts, disconnect and remove only the registration file before reconnecting. Local disconnect does not revoke provider-side consent. HTML exports exclude assistant state; analysis JSON never includes it.
 
 Official contract: [registration](https://developers.openai.com/siwc/token-sharing-open-source/sign-in), [models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference).
+
+
+## About and FAQ (build 0.10.1)
+
+About explains Reversium in plain language and displays its build and Open Source / 3Sci.com / 2026 attribution. Software findings keeps the uploaded-code explanations. FAQ has its own report button and home help button. Expand “What are the downloads for?” beside the exports: HTML is a readable report for offline review or handover; JSON is structured findings for scripts, integrations and CLI baseline comparisons. Neither export is a runnable software backup or includes the original ZIP.

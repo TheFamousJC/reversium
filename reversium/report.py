@@ -1,9 +1,10 @@
 import html
 import json
+from .help_ui import ABOUT, EXPORT_HELP, FAQ_GENERAL
 from .explain import explain_software
 from .feature_map import render_svg
 from .workflow_paths import workflow_paths
-from .assistant_ui import PANEL as AI_PANEL, STYLE as AI_STYLE, SCRIPT as AI_SCRIPT
+from .assistant_ui import PANEL as AI_PANEL, STYLE as AI_STYLE, SCRIPT as AI_SCRIPT, FAQ_AI
 
 
 def render(report):
@@ -87,24 +88,26 @@ def render(report):
     for explanation in behavior['explanations']:
         links = ' · '.join(f'<a class="evidence-link" href="#finding-{index}">{location(findings[index]["evidence"])}</a>' for index in explanation['evidence_indices'])
         explanation_cards.append(f'<article class="explanation"><h3>{esc(explanation["topic"])}</h3><p>{esc(explanation["explanation"])}</p><p class="assessment">{esc(explanation["assessment"])}</p><p><b>Still unknown:</b> {esc(explanation["unknown"])}</p><p><b>Evidence:</b> {links}</p></article>')
-    behavior_content = ('<h2>What this software does</h2><p>' + esc(behavior['summary']) + '</p><p>' + esc(behavior['method']) + '</p>'
+    behavior_content = ('<h2>Software findings</h2><p>' + esc(behavior['summary']) + '</p><p>' + esc(behavior['method']) + '</p>'
                         + (''.join(explanation_cards) or '<p>No behavior explanation is supported by the current findings. Missing findings do not mean the software has no features.</p>')
                         + (f'<p>{behavior["omitted_groups"]} additional explanation groups are omitted from this overview. All findings remain in Evidence.</p>' if behavior['omitted_groups'] else '')
                         + '<h2>What we still do not know</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['unknowns']) + '</ul>'
                         + '<h2>How to confirm the explanation</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['next_steps']) + '</ul>')
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Reversium report</title><style>{STYLE}{AI_STYLE}</style><main>
-<p class="brand">REVERSIUM 0.10.0 / LOCAL ANALYSIS</p>
-<nav><a href="/">Analyze another ZIP</a><button id="json-export">Download JSON</button><button id="html-export">Download HTML</button></nav>
+<p class="brand">REVERSIUM 0.10.1 / LOCAL ANALYSIS</p>
+<nav><a href="/">Analyze another ZIP</a><button id="json-export">Download JSON</button><button id="html-export">Download HTML</button></nav>{EXPORT_HELP}
 <div role="tablist" aria-label="Report sections">
-<a role="tab" href="#panel-behavior" id="tab-behavior" aria-controls="panel-behavior" aria-selected="true">What this software does</a>
+<a role="tab" href="#panel-behavior" id="tab-behavior" aria-controls="panel-behavior" aria-selected="true">About</a>
+<a role="tab" href="#panel-software" id="tab-software" aria-controls="panel-software" aria-selected="false">Software findings</a>
 <a role="tab" href="#panel-architecture" id="tab-architecture" aria-controls="panel-architecture" aria-selected="false">Architecture</a>
 <a role="tab" href="#panel-evidence" id="tab-evidence" aria-controls="panel-evidence" aria-selected="false">Evidence</a>
 <a role="tab" href="#panel-coverage" id="tab-coverage" aria-controls="panel-coverage" aria-selected="false">Coverage</a>
-<a role="tab" href="#panel-assistant" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false">AI assistant · optional</a></div>
+<a role="tab" href="#panel-assistant" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false">AI assistant · optional</a><button role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false">FAQ</button></div>
 <h1>Understand what’s inside.</h1><p>{esc(report['scope'])}</p>
 <div class="cards">{''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k.replace("_", " "))}</span></article>' for k,v in report['summary'].items() if k != 'languages')}</div>
-<section role="tabpanel" id="panel-behavior" aria-labelledby="tab-behavior" tabindex="0">{behavior_content}</section>
+<section role="tabpanel" id="panel-behavior" aria-labelledby="tab-behavior" tabindex="0">{ABOUT}</section>
+<section role="tabpanel" id="panel-software" aria-labelledby="tab-software" tabindex="0">{behavior_content}</section>
 <section role="tabpanel" id="panel-architecture" aria-labelledby="tab-architecture" tabindex="0">
 {interaction_map}{platform_section}<h2>Architecture: import and dependency mentions</h2>
 <p>File → local file candidate or referenced package. Labels distinguish internal, external, unresolved and ambiguous references. First 100 unique edges; full references are in the Evidence tab.</p>
@@ -117,7 +120,8 @@ def render(report):
 {binary_section}<h2>Inventory</h2><div class="scroll"><table><tr><th>File</th><th>Type</th><th>Bytes</th><th>Analysis coverage</th></tr>{files}</table></div>{readiness}
 <h2>Coverage and limitations</h2><ul>{notes}</ul></section>
 <section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">{AI_PANEL}</section>
-<p>Generated locally by Reversium 0.10.0. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
+<section role="tabpanel" id="panel-faq" aria-labelledby="tab-faq" tabindex="0">{FAQ_GENERAL}{EXPORT_HELP}{FAQ_AI}</section>
+<p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.10.1. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
 <script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}</script></html>'''
 
 
