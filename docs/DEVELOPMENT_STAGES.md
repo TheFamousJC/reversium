@@ -268,3 +268,5 @@ Verified with Tudela in the browser: redundant outer header hidden, inventory vi
 Build 0.13.1 adds shared eight-chapter detailed Help to Start and reports, a self-contained downloadable PDF and a public guide page. Documentation covers all views, limits, evidence interpretation, file handling, local setup/CLI, exports/comparison, troubleshooting and handover. Online/local differences have their own chapter plus a concise note in AI. PDF generation is build-time only; local analysis has no added dependency.
 
 Help verification: edition-comparison chapter opens and PDF download succeeds in the browser. The eight-page PDF was rendered and visually reviewed. Updated LinkedIn draft is saved in docs/LinkedIn-post.txt.
+
+Help placement: Help, FAQ and About are now prominent buttons on the public landing and welcome splash, as well as the subsequent Start/ZIP screens and report tabs. First-page buttons open the relevant built-in panel.

@@ -26,3 +26,8 @@ $('#upload-form').onsubmit=async event=>{
  try{const bytes=await file.arrayBuffer();if(worker)worker.postMessage({bytes,name:file.name,goal},[bytes])}catch(error){stop();$('#browser-message').textContent='The selected file could not be read. Cancel and choose it again.'}
 };
 window.addEventListener('pagehide',stop);
+
+function showEntryHelp(id){$('#enter-app').click();const button=document.querySelector('[data-help-panel="'+id+'"]');if(button&&document.getElementById(id).hidden)button.click();document.getElementById(id)?.scrollIntoView({block:'start'})}
+for(const button of document.querySelectorAll('[data-entry-panel]'))button.onclick=()=>showEntryHelp(button.dataset.entryPanel);
+const requestedHelp=new URLSearchParams(location.search).get('help');
+if(['guide','faq','about'].includes(requestedHelp))showEntryHelp('start-'+requestedHelp);

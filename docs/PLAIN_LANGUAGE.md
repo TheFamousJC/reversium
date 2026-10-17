@@ -215,3 +215,5 @@ Verified with Tudela in the browser: redundant outer header hidden, inventory vi
 Choose Help on Start or inside any report for the full user guide. Expand a chapter or download the PDF without sharing your ZIP. The Online and local editions chapter explains how each version runs, its size limit and the different AI options. A short comparison also appears in AI, so opening a provider website is not mistaken for connecting an account.
 
 Help verification: edition-comparison chapter opens and PDF download succeeds in the browser. The eight-page PDF was rendered and visually reviewed. Updated LinkedIn draft is saved in docs/LinkedIn-post.txt.
+
+Help placement: Help, FAQ and About are now prominent buttons on the public landing and welcome splash, as well as the subsequent Start/ZIP screens and report tabs. First-page buttons open the relevant built-in panel.
