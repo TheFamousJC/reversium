@@ -99,3 +99,8 @@ Official contract: [registration](https://developers.openai.com/siwc/token-shari
 ## About and FAQ (build 0.10.1)
 
 About explains Reversium in plain language and displays its build and Open Source / 3Sci.com / 2026 attribution. Software findings keeps the uploaded-code explanations. FAQ has its own report button and home help button. Expand “What are the downloads for?” beside the exports: HTML is a readable report for offline review or handover; JSON is structured findings for scripts, integrations and CLI baseline comparisons. Neither export is a runnable software backup or includes the original ZIP.
+
+
+## Guided workflow (0.11.0)
+
+Start by choosing a goal, continue to Choose ZIP, then Review findings. Follow the guided actions to inspect connections and gaps. Save & next steps contains HTML/JSON exports and a practical verification checklist; no download controls or AI setup appear before analysis. Samples are labelled fictional demonstrations.

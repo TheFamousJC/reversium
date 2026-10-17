@@ -94,21 +94,29 @@ def render(report):
                         + (f'<p>{behavior["omitted_groups"]} additional explanation groups are omitted from this overview. All findings remain in Evidence.</p>' if behavior['omitted_groups'] else '')
                         + '<h2>What we still do not know</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['unknowns']) + '</ul>'
                         + '<h2>How to confirm the explanation</h2><ul>' + ''.join('<li>' + esc(x) + '</li>' for x in behavior['next_steps']) + '</ul>')
+    goal_label = {"understand": "Understand the software", "handover": "Prepare a developer handover", "change": "Plan maintenance or modernization"}.get(report.get("user_goal"), "Understand the software")
+    goal_guidance = {
+        'understand': 'Focus on the supported features and supporting services. Your next useful result is a short description you can confirm with the software owner.',
+        'handover': 'Focus on source locations, missing setup requirements and one important workflow. Your next useful result is a developer handover with explicit checks still to perform.',
+        'change': 'Focus on feature connections and shared data or services before estimating a change. Your next useful result is a shortlist of affected components and unresolved dependencies.'
+    }.get(report.get('user_goal', 'understand'), 'Start with supported findings, then check their evidence and gaps.')
     return f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Reversium report</title><style>{STYLE}{AI_STYLE}{MODERN_STYLE}</style><main>
-<p class="brand">REVERSIUM 0.10.2 / LOCAL ANALYSIS</p>
-<nav><a href="/">Analyze another ZIP</a><button id="json-export">Download JSON</button><button id="html-export">Download HTML</button></nav>{EXPORT_HELP}
+<p class="brand">REVERSIUM 0.11.0 / LOCAL ANALYSIS</p>
+<nav><a href="/">Start a new analysis</a><span>Step 3 · Review findings → Step 4 · Save &amp; next steps</span></nav>
+{'<p class="sample-notice">SAMPLE ANALYSIS · Fictional demonstration data. Start a new analysis to inspect your ZIP.</p>' if report.get("example") else ''}
+<p>Your goal: {esc(goal_label)}</p>
 <div role="tablist" aria-label="Report sections">
-<a role="tab" href="#panel-behavior" id="tab-behavior" aria-controls="panel-behavior" aria-selected="true">About</a>
-<a role="tab" href="#panel-software" id="tab-software" aria-controls="panel-software" aria-selected="false">Software findings</a>
+<a role="tab" href="#panel-behavior" id="tab-behavior" aria-controls="panel-behavior" aria-selected="false">About</a>
+<a role="tab" href="#panel-software" id="tab-software" aria-controls="panel-software" aria-selected="true">Review findings</a>
 <a role="tab" href="#panel-architecture" id="tab-architecture" aria-controls="panel-architecture" aria-selected="false">Architecture</a>
 <a role="tab" href="#panel-evidence" id="tab-evidence" aria-controls="panel-evidence" aria-selected="false">Evidence</a>
 <a role="tab" href="#panel-coverage" id="tab-coverage" aria-controls="panel-coverage" aria-selected="false">Coverage</a>
-<a role="tab" href="#panel-assistant" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false">AI assistant · optional</a><button role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false">FAQ</button></div>
-<h1>Understand what’s inside.</h1><p>{esc(report['scope'])}</p>
+<a role="tab" href="#panel-assistant" id="tab-assistant" aria-controls="panel-assistant" aria-selected="false">AI assistant · optional</a><button role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false">FAQ</button><button role="tab" id="tab-finish" aria-controls="panel-finish" aria-selected="false">Save &amp; next steps</button></div>
+<h1>Your analysis is ready.</h1><p>{esc(report['scope'])}</p>
 <div class="cards">{''.join(f'<article><strong>{esc(v)}</strong><span>{esc(k.replace("_", " "))}</span></article>' for k,v in report['summary'].items() if k != 'languages')}</div>
 <section role="tabpanel" id="panel-behavior" aria-labelledby="tab-behavior" tabindex="0">{ABOUT}</section>
-<section role="tabpanel" id="panel-software" aria-labelledby="tab-software" tabindex="0">{behavior_content}</section>
+<section role="tabpanel" id="panel-software" aria-labelledby="tab-software" tabindex="0"><h2>Review your results</h2><p>Start with these supported explanations. Follow source evidence before treating a clue as a confirmed feature.</p><p>{esc(goal_guidance)}</p><nav><button data-guide="tab-architecture">Explore feature connections</button><button data-guide="tab-coverage">Check gaps and limitations</button><button data-guide="tab-finish">Continue to save &amp; next steps</button></nav>{behavior_content}</section>
 <section role="tabpanel" id="panel-architecture" aria-labelledby="tab-architecture" tabindex="0">
 {interaction_map}{platform_section}<h2>Architecture: import and dependency mentions</h2>
 <p>File → local file candidate or referenced package. Labels distinguish internal, external, unresolved and ambiguous references. First 100 unique edges; full references are in the Evidence tab.</p>
@@ -122,7 +130,7 @@ def render(report):
 <h2>Coverage and limitations</h2><ul>{notes}</ul></section>
 <section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">{AI_PANEL}</section>
 <section role="tabpanel" id="panel-faq" aria-labelledby="tab-faq" tabindex="0">{FAQ_GENERAL}{EXPORT_HELP}{FAQ_AI}</section>
-<p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.10.2. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
+<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><nav><button id="html-export">Download HTML</button><button id="json-export">Download JSON</button></nav>{EXPORT_HELP}<h3>Recommended next checks</h3><ol><li>Ask a developer to trace one important feature using its cited source locations.</li><li>Confirm the required configuration, data and external services with the software owner.</li><li>Test setup and that feature in a separate disposable environment before accepting the handover.</li></ol><nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.11.0. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
 <script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}{HELP_SCRIPT}</script></html>'''
 
 
@@ -141,7 +149,8 @@ SCRIPT = '''document.querySelector('#workflow-filter')?.addEventListener('change
 const tabs=Array.from(document.querySelectorAll('[role=tab]'));
 function activateTab(tab,focus=false){for(const item of tabs){const selected=item===tab;item.setAttribute('aria-selected',String(selected));item.tabIndex=selected?0:-1;document.getElementById(item.getAttribute('aria-controls')).hidden=!selected}if(focus)tab.focus()}
 for(const tab of tabs){tab.addEventListener('click',event=>{event.preventDefault();activateTab(tab)});tab.addEventListener('keydown',event=>{let index=tabs.indexOf(tab);if(event.key==='ArrowRight')index=(index+1)%tabs.length;else if(event.key==='ArrowLeft')index=(index+tabs.length-1)%tabs.length;else if(event.key==='Home')index=0;else if(event.key==='End')index=tabs.length-1;else return;event.preventDefault();activateTab(tabs[index],true)})}
-activateTab(tabs[0]);
+activateTab(document.querySelector('#tab-software')||tabs[0]);
+for(const button of document.querySelectorAll('[data-guide]'))button.onclick=()=>{activateTab(document.getElementById(button.dataset.guide));document.getElementById(document.getElementById(button.dataset.guide).getAttribute('aria-controls')).focus()};
 function revealPanel(){const tab=tabs.find(item=>'#'+item.getAttribute('aria-controls')===window.location.hash);if(tab)activateTab(tab)}
 window.addEventListener('hashchange',revealPanel);revealPanel();
 const filter=document.querySelector('#evidence-filter');

@@ -217,3 +217,10 @@ About now explains Reversium in plain language: practical handover and maintenan
 ## Contemporary interface and short control help - build 0.10.2 (2026-10-17)
 
 Refreshed the home/report UI with light surfaces, indigo controls, compact segmented navigation, responsive typography, bordered content cards and clearer form styling. All visual assets remain local. Short explanations appear on pointer hover and keyboard focus for buttons, navigation, expandable explanations, graph inspection controls and the archive picker. Escape dismisses help; it is linked with aria-describedby, placed within the viewport and omitted from saved HTML. Reduced-motion preferences are respected. Browser verified the light report layout, wrapped navigation and Download HTML keyboard tooltip; all 107 regression checks passed.
+
+
+## Guided Start flow - build 0.11.0 (2026-10-17)
+
+Replaced the crowded home with four steps: Start (choose understanding, handover or maintenance goal), Choose ZIP, Review findings, and Save & next steps. The first two steps contain no downloads or account setup. Analysis opens on Review findings with goal-specific reading guidance; buttons lead to feature connections, gaps and the final save step. HTML/JSON downloads are only in Save & next steps after an analysis exists. AI is optional after review. Sample reports are explicitly marked as fictional demonstrations.
+
+Browser verified the full flow against the Tudela ZIP: handover goal carried into analysis, Review findings selected on arrival, downloads hidden during review and visible in the final step. Existing regression suite: 107 passing tests. Analysis remains local/free and uploaded code is not executed.
