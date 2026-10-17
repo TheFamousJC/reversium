@@ -194,3 +194,5 @@ The existing public repository Pages configuration already publishes the root of
 ## Use Reversium without installing it
 
 You can open the browser edition, choose a question and select your own ZIP. Your computer reads it and produces the familiar findings, feature connections, evidence and gaps. It does not upload your ZIP. GitHub supplies the app files and sees normal website connection information. Clear or close the page when finished; saved reports remain your responsibility. The browser edition has no ChatGPT connection and no sign-in. Larger ZIPs above 32 MiB need the local application. Tudela produced the same file and finding counts in browser and local analysis. This helps investigate a handover; it does not prove that the software works.
+
+Public verification completed at https://thefamousjc.github.io/reversium/web/ on 17 October 2026: Tudela produced 266 files and 3,882 findings. Architecture workflow selection, evidence navigation, JSON and HTML downloads succeeded on GitHub Pages. All 111 automated tests passed. Private Tudela files/reports were excluded from the published repository.

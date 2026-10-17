@@ -247,3 +247,5 @@ The existing public repository Pages configuration already publishes the root of
 ## Browser-local edition — 0.12.0
 
 Ported the existing Python analyzer through self-hosted pinned Pyodide to a module worker. Added guided own-ZIP flow, cancellation, bounded processing, sandboxed offline reports and local exports. No source execution, upload API, account or AI service. Tudela local browser verification found 266 files and 3,882 findings, matching native analysis; traced AskHerzlChat to /api/chat and ai_usage_events with existing candidate labels. GitHub Pages publication is the deployment target; public verification follows push. Browser input limit 32 MiB; static evidence is not runtime proof.
+
+Public verification completed at https://thefamousjc.github.io/reversium/web/ on 17 October 2026: Tudela produced 266 files and 3,882 findings. Architecture workflow selection, evidence navigation, JSON and HTML downloads succeeded on GitHub Pages. All 111 automated tests passed. Private Tudela files/reports were excluded from the published repository.
