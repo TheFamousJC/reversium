@@ -36,6 +36,7 @@ PANEL = PANEL.replace('{assistant_instructions}', html.escape(INSTRUCTIONS))
 STYLE = '''.ai-findings{max-height:280px;overflow:auto;border:1px solid #657890;padding:12px}.ai-findings label{display:block;overflow-wrap:anywhere;margin:10px 0}textarea{display:block;box-sizing:border-box;width:100%;max-width:950px;margin:12px 0;padding:12px;background:#162130;color:#e8edf5;border:1px solid #657890;border-radius:8px}#ai-answer{white-space:pre-wrap;overflow-wrap:anywhere}#panel-assistant details{margin:16px 0}#panel-assistant label{line-height:1.7}'''
 
 SCRIPT = r'''
+(()=>{
 const aiPanel=document.querySelector('#panel-assistant');
 if(aiPanel){
  const $=s=>aiPanel.querySelector(s), chosen=new Set();let connected=false,busy=false;
@@ -56,4 +57,5 @@ if(aiPanel){
  $('#ai-send').onclick=async()=>{busy=true;gate();$('#ai-progress').textContent='Request in progress. No automatic retries.';$('#ai-answer').replaceChildren();try{const packet=JSON.parse($('#ai-preview').value);const ids=new Set(packet.evidence.map(e=>e.id));if(packet.evidence.some(e=>!Number.isInteger(e.id)||!findings[e.id]))throw Error('Evidence IDs must refer to this report.');const answer=await api('ask',{model:$('#ai-model').value,packet,consent:true});const heading=document.createElement('h3');heading.textContent='AI interpretation — check its cited evidence';$('#ai-answer').append(heading);for(const c of answer.claims){const p=document.createElement('p');p.textContent=c.text+' ';for(const id of c.evidence_ids){if(!ids.has(id))throw Error('Unshared citation rejected.');const a=document.createElement('a');a.href='#finding-'+id;a.textContent='[Finding '+id+'] ';a.onclick=()=>revealFinding(a.getAttribute('href'));p.append(a)}$('#ai-answer').append(p)}const h=document.createElement('h3');h.textContent='Unknowns';$('#ai-answer').append(h);for(const u of answer.unknowns){const p=document.createElement('p');p.textContent=u;$('#ai-answer').append(p)}$('#ai-progress').textContent='Completed. Citations are selected evidence references, not verification of correctness.'}catch(e){$('#ai-progress').textContent=e.message}finally{busy=false;invalidate()}};
  showFindings();gate();
 }
+})();
 '''

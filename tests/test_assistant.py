@@ -23,6 +23,18 @@ class AssistantTests(unittest.TestCase):
                 self.assertEqual(response.status, expected)
                 response.read()
                 conn.close()
+            from urllib.error import HTTPError
+            error = HTTPError('https://api.openai.com/v1/responses', 400, 'Bad request', {},
+                              io.BytesIO(b'{"error":{"code":"unsupported_parameter","param":"max_output_tokens","message":"private request text"}}'))
+            with patch.object(server.assistant, 'ask', side_effect=error):
+                conn = http.client.HTTPConnection('127.0.0.1', server.server_port)
+                conn.request('POST', '/assistant/ask', '{}', {'Origin': origin, 'X-Reversium-Session': server.assistant_session})
+                response = conn.getresponse()
+                text = response.read().decode()
+                self.assertEqual(response.status, 502)
+                self.assertIn('unsupported_parameter', text)
+                self.assertNotIn('private request text', text)
+                conn.close()
         finally:
             server.shutdown()
             server.server_close()

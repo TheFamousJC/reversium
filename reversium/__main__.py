@@ -17,6 +17,8 @@ from .assistant_ui import PANEL as AI_PANEL, STYLE as AI_STYLE, SCRIPT as AI_SCR
 from urllib.parse import urlsplit, parse_qs
 import secrets
 import html
+import re
+from urllib.error import HTTPError
 
 HOME = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Reversium</title><style>''' + STYLE + '''</style><main><p class="brand">REVERSIUM 0.10.0 / PRIVATE BY DESIGN</p><h1>From archive to understanding.</h1><p>Inspect a ZIP on your computer. Discover source files, dependencies, route candidates and architecture evidence. No accounts, API keys or uploads to a cloud service.</p><p>Understand an unfamiliar software package, trace supported features, and prepare maintenance or migration work. Report sections: What this software does, Architecture, Evidence, and Coverage.</p><p><a href="/example">Open a local sample report</a> to see all four tabs, try the <a href="/example-js">JavaScript/TypeScript sample</a>, or analyze your ZIP below.</p><nav aria-label="Preview report sections"><a class="preview-tab" href="/example#panel-behavior">What this software does</a><a class="preview-tab" href="/example#panel-architecture">Architecture</a><a class="preview-tab" href="/example#panel-evidence">Evidence</a><a class="preview-tab" href="/example#panel-coverage">Coverage</a></nav><form><input aria-label="Choose ZIP archive" type="file" accept=".zip" required><button>Analyze archive</button></form><p id="status" role="status">Maximum ZIP size: 64 MiB. Input code is never executed.</p><p>Python AST analysis · JavaScript/TypeScript import scanning · Platform profile · Supporting services · Static binary inspection</p><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=document.querySelector('input').files[0],s=document.querySelector('#status'),b=document.querySelector('button');if(f.size>67108864){s.textContent='ZIP exceeds 64 MiB.';return}b.disabled=true;s.textContent='Analyzing locally…';try{const r=await fetch('/analyze',{method:'POST',headers:{'Content-Type':'application/zip'},body:f});if(!r.ok)throw new Error(await r.text());document.open();document.write(await r.text());document.close()}catch(e){s.textContent=e.message;b.disabled=false}};</script></main></html>'''
 
@@ -107,6 +109,23 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     return self.send(404, 'Not found.')
                 return self.send(200, json.dumps(result), 'application/json')
+            except HTTPError as error:
+                # Provider diagnostics must never echo tokens, evidence or raw bodies.
+                details = []
+                try:
+                    provider = json.loads(error.read(65536)).get('error', {})
+                    if isinstance(provider, dict):
+                        for key in ('code', 'type', 'param'):
+                            value = provider.get(key)
+                            if isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9_.-]{1,100}', value):
+                                details.append(key + '=' + value)
+                except (ValueError, OSError, AttributeError):
+                    pass
+                message = 'OpenAI returned HTTP ' + str(error.code)
+                if details:
+                    message += ' (' + ', '.join(details) + ')'
+                message += '. Request failed; no automatic retry or API billing fallback.'
+                return self.send(502, json.dumps({'error': message}), 'application/json')
             except ValueError as error:
                 return self.send(400, json.dumps({'error': str(error)}), 'application/json')
             except Exception:
