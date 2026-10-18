@@ -1,10 +1,13 @@
+import {createOnlineAI} from './online-ai.mjs';
+import {onlineAIConfig,approvedAdapter} from './online-ai-config.mjs';
+const onlineAI=createOnlineAI({...onlineAIConfig,adapter:approvedAdapter});
 const $=s=>document.querySelector(s);$('#enter-app').onclick=()=>{document.querySelector('#splash').hidden=true;document.querySelector('#app-content').hidden=false;document.querySelector('#start-screen h1').setAttribute('tabindex','-1');document.querySelector('#start-screen h1').focus()};
 const start=$('#start-screen'),upload=$('#upload-screen'),progress=$('#browser-progress'),results=$('#browser-results'),frame=$('#browser-report');
 let goal='understand',worker=null,timer=null;
 const names={understand:'Understand the software',handover:'Prepare a developer handover',change:'Plan maintenance or modernization'};
 function step(two){start.hidden=two;upload.hidden=!two;$('#start-step').textContent=two?'Step 2 of 4 · Choose ZIP':'Step 1 of 4 · Start';$('#chosen-goal').textContent='Your goal: '+names[goal]}
 function stop(){if(worker)worker.terminate();worker=null;clearTimeout(timer)}
-function clear(){document.querySelector('#app-content').hidden=false;stop();frame.srcdoc='';$('#zip-input').value='';$('#analyze-zip').disabled=true;$('#status').textContent='Choose a ZIP to begin. Your file stays on this device.';progress.hidden=true;results.hidden=true;$('#start-step').hidden=false;step(false)}
+function clear(){onlineAI.disconnect();document.querySelector('#app-content').hidden=false;stop();frame.srcdoc='';$('#zip-input').value='';$('#analyze-zip').disabled=true;$('#status').textContent='Choose a ZIP to begin. Your file stays on this device.';progress.hidden=true;results.hidden=true;$('#start-step').hidden=false;step(false)}
 $('#goal-form').onsubmit=e=>{e.preventDefault();goal=document.querySelector('input[name=goal]:checked').value;step(true)};
 $('#start-back').onclick=()=>step(false);
 for(const button of document.querySelectorAll('[data-help-panel]'))button.onclick=()=>{const panel=document.getElementById(button.dataset.helpPanel);panel.hidden=!panel.hidden;button.setAttribute('aria-expanded',String(!panel.hidden))};
@@ -25,9 +28,16 @@ $('#upload-form').onsubmit=async event=>{
  worker.onmessage=({data})=>{if(data.stage)$('#browser-message').textContent=data.stage;if(data.error){stop();$('#browser-message').textContent=data.error}if(data.html){stop();document.querySelector('#app-content').hidden=true;progress.hidden=true;results.hidden=false;$('#start-step').hidden=true;frame.srcdoc=data.html;results.scrollIntoView({block:'start'})}};
  try{const bytes=await file.arrayBuffer();if(worker)worker.postMessage({bytes,name:file.name,goal},[bytes])}catch(error){stop();$('#browser-message').textContent='The selected file could not be read. Cancel and choose it again.'}
 };
-window.addEventListener('pagehide',stop);
+window.addEventListener('pagehide',()=>{stop();onlineAI.disconnect()});
 
 function showEntryHelp(id){$('#enter-app').click();const button=document.querySelector('[data-help-panel="'+id+'"]');if(button&&document.getElementById(id).hidden)button.click();document.getElementById(id)?.scrollIntoView({block:'start'})}
 for(const button of document.querySelectorAll('[data-entry-panel]'))button.onclick=()=>showEntryHelp(button.dataset.entryPanel);
 const requestedHelp=new URLSearchParams(location.search).get('help');
 if(['guide','faq','about'].includes(requestedHelp))showEntryHelp('start-'+requestedHelp);
+
+window.addEventListener('message',async event=>{
+ if(event.source!==frame.contentWindow||event.data?.type!=='reversium-account-ai')return;
+ const d=event.data;if(typeof d.requestId!=='string'||d.requestId.length>80)return;
+ const reply=(result,error)=>frame.contentWindow.postMessage({type:'reversium-account-ai-result',requestId:d.requestId,...result,error},'*');
+ try{let result;if(d.action==='status')result=onlineAI.snapshot();else if(d.action==='connect')result=await onlineAI.connect();else if(d.action==='disconnect')result=await onlineAI.disconnect();else if(d.action==='cancel')result=onlineAI.cancel();else if(d.action==='ask')result=await onlineAI.ask(d.packet,d.approved);else return;reply(result);}catch(error){reply(onlineAI.snapshot(),error.message)}
+});

@@ -219,3 +219,10 @@ Help verification: edition-comparison chapter opens and PDF download succeeds in
 Help placement: Help, FAQ and About are now prominent buttons on the public landing and welcome splash, as well as the subsequent Start/ZIP screens and report tabs. First-page buttons open the relevant built-in panel.
 
 PDF reliability fix: only sandboxed about:srcdoc reports forward downloads to the host; other embedded/browser pages download directly. Download anchors are attached for activation and URLs live for 60 seconds. Help also provides an ordinary direct public PDF link. Online ChatGPT account inference remains externally gated: official OpenAI documentation directs remotely hosted applications to the interest process; no hosted account connection or subscription access is claimed.
+
+
+## Online account integration preparation
+
+The online AI tab now shows the planned account connection and answer area, clearly marked as awaiting approval. You can prepare and review selected evidence, but cannot connect or send yet. The existing manual handoff remains usable. Once an approved connection is implemented and tested, answers can appear here without exporting a request. This preparation does not enable ChatGPT subscription access.
+
+Browser verification with fictional source confirmed pending-approval status, disabled connect/send, exact selected-evidence preview, approval reset after edits and working manual fallback. Eight fake-adapter tests pass without network calls. The regression suite hit an intermittent Windows loopback reset; the affected HTTP test file passed when run separately. No hosted account sign-in or inference was performed.

@@ -15,4 +15,4 @@ Source: https://github.com/TheFamousJC/reversium
 
 After access is confirmed: implement the provider-approved OAuth/session flow; review exact outgoing question/evidence before each request; validate returned citations; show replies inside Reversium; support disconnect/revocation; exclude credentials and chats from report exports. If a backend is required, select hosting and disclose its handling of selected evidence. Raw ZIPs remain device-local. Keep analysis independent from AI. Provider eligibility, usage limits and hosting costs must be confirmed; do not promise unlimited/free hosted inference.
 
-No application has been submitted and no account inference has been enabled by this investigation.
+The user reports submitting the interest form on 18 October 2026. Approval has not been confirmed and hosted account inference is not enabled. The UI and provider-neutral lifecycle are prepared behind a disabled configuration; see docs/Online-AI-adapter.txt.
