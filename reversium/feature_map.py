@@ -17,6 +17,8 @@ def build_feature_map(report):
         entry = nodes.setdefault(identity, {'id': identity, 'kind': kind, 'label': label, 'evidence_indices': [], 'features': [], 'unknowns': list(unknowns)})
         entry['evidence_indices'] = sorted(set(entry['evidence_indices'] + list(evidence)))
         entry['features'] = sorted(set(entry['features'] + [feature]))
+        if kind in {'module', 'helper', 'handler', 'feature'} and isinstance(key, tuple):
+            entry['file'] = key[0]
         return identity
 
     def edge(source, target, label, confidence, evidence, feature):

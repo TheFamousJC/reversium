@@ -7,6 +7,7 @@ import zipfile
 from collections import Counter
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
+from .handover import setup_details, build_handover, TEMPLATES
 from .source import python_details, manifest_details, resolve_imports
 from .binary import identify, inspect_binary
 from .platform import CONFIG_NAMES, config_details, platform_profile
@@ -65,7 +66,7 @@ def inspect_zip(path):
             with archive.open(member) as stream:
                 prefix = stream.read(4096)
                 detected = identify(prefix)
-                if not detected and suffix not in BINARY and suffix not in LANGUAGES and suffix != '.sql' and p.name not in MANIFESTS | CONFIG_NAMES:
+                if not detected and suffix not in BINARY and suffix not in LANGUAGES and suffix != '.sql' and p.name not in MANIFESTS | CONFIG_NAMES | TEMPLATES:
                     continue
                 data = prefix + stream.read(MAX_FILE + 1 - len(prefix))
             if len(data) > MAX_FILE:
@@ -83,6 +84,7 @@ def inspect_zip(path):
             except UnicodeDecodeError:
                 report['warnings'].append(f'{name}: unsupported text encoding.')
                 continue
+            setup_details(source, name, finding)
             item['lines'] = len(source.splitlines())
             if suffix == '.sql':
                 if len(sql_sources) < 128 and sum(len(s) for s in sql_sources.values()) + len(source) <= 16 * 1024 * 1024:
@@ -168,4 +170,5 @@ def inspect_zip(path):
     report['limitations'] = ['Python symbols/imports use AST parsing; JavaScript/TypeScript imports and endpoint-host candidates use heuristics.', 'Source languages beyond the supported Python, JS/TS and SQL reference readers are inventoried only. No complete call graph, runtime behavior, vulnerability audit, or business requirements recovery is claimed.', 'Binary inspection is bounded static metadata analysis, not decompilation or behavioral verification. Mach-O and DEX receive header identification only. Malformed binaries retain partial findings.', 'Nested containers receive directory inspection only. Files over 4 MiB or compression limits are inventoried without content inspection. Binary string samples may contain private content; URL hosts omit credentials, paths and queries.']
     report['limitations'] += ['Local module links are path candidates, not runtime resolution. Aliases, custom search paths, re-exports and dynamic imports may remain unresolved. Ambiguous matches are not selected.', 'Python decorator routes and ORM base-class names are syntax candidates, not verified framework behavior. Non-Python route and import scans can match comments.', 'Only package.json, requirements.txt and go.mod dependencies are extracted. Other known manifests are identified only. File changes are compared only when both reports contain inspected-content hashes.']
     report['limitations'].append('Python AST traces and selected pg/mysql2 operation traces retain their bounded execution-path approximation. The additional TS/React/Supabase graph records lexical references, including conditional code and callbacks, not proven execution. Regex and JSX text are opaque; JSX expressions/component references are scanned. Supabase clients are recognized through named imports, factories, aliases and annotated parameters; dynamic receivers, object-property clients, re-exports, namespace imports, complex prop/event data flow and runtime middleware effects remain unknown. Selected explicit JSX prop bindings, destructured/object props, immutable callback aliases, React useCallback/returned-hook callbacks and literal React.lazy imports receive candidate links. Multiple component usages are combined as possible bindings, not runtime instances. Computed fetch targets use bounded constant strings/concatenation/templates and per-caller helper arguments with method-aware route candidates; arbitrary expressions, mutable bindings, unknown origins and methods remain unresolved. Literal router mounts and API-path matches are candidates, not verified routing. SQL RPC/table links are migration-name candidates; dynamic SQL, applied migrations, RLS and database identity are unverified. Bounds: JS/TS 256 files / 16 MiB, SQL 128 files / 16 MiB, 60,000 tokens per JS file; workspace 4,000 nodes / 12,000 edges; feature traversal depth 10 / 360 nodes; computed API helper depth 4 / 5,000 contexts / 400 outputs, 2,000 characters per target expression. Graph display caps 120 nodes / 240 edges per selected view. Python retains 128 files, 100 routes and depth 3 / 12 functions per trace. No source is evaluated.')
+    report['handover'] = build_handover(report)
     return report

@@ -16,7 +16,7 @@ $('#browser-cancel').onclick=clear;$('#browser-clear').onclick=clear;
 window.addEventListener('message',event=>{
  if(event.source!==frame.contentWindow)return;
  if(event.data?.type==='reversium-clear')clear();
- const d=event.data,formats={'Reversium-User-Guide.pdf':'application/pdf','reversium-ai-request.txt':'text/plain','reversium-report.json':'application/json','reversium-report.html':'text/html','reversium-feature-map.svg':'image/svg+xml'};
+ const d=event.data,formats={'Reversium-User-Guide.pdf':'application/pdf','reversium-ai-request.txt':'text/plain','reversium-handover.txt':'text/plain','reversium-handover.json':'application/json','reversium-report.json':'application/json','reversium-report.html':'text/html','reversium-feature-map.svg':'image/svg+xml'};
  if(d?.type==='reversium-download'&&formats[d.name]===d.mime&&typeof d.text==='string'&&d.text.length<100000000){const url=URL.createObjectURL(new Blob([d.mime==='application/pdf'?Uint8Array.from(atob(d.text),c=>c.charCodeAt(0)):d.text],{type:d.mime}));const a=document.createElement('a');a.href=url;a.download=d.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 });
 $('#upload-form').onsubmit=async event=>{

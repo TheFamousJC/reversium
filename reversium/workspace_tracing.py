@@ -29,6 +29,8 @@ def trace_workspace(report, sources, sql_sources=None):
         if identity not in nodes and len(nodes) < MAX_NODES:
             nodes[identity] = {'id': identity, 'kind': kind, 'label': label,
                                'evidence_indices': list(evidence), 'features': [], 'unknowns': []}
+        if identity in nodes and kind in {'module', 'helper', 'handler', 'feature'}:
+            nodes[identity]['file'] = key if kind == 'module' else key[0]
         return identity
 
     def link(source, target, label, file, line, confidence='traced'):
