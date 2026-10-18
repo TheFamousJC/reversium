@@ -327,3 +327,16 @@ Save linked test record (JSON) keeps the record for later use; Save readable tes
 There is a trust limit: someone can edit a JSON record. Matching the ZIP identifies the delivery it claims to describe, not who made the record or whether every claim is true. Review the original private logs when needed. We inspected the exported HTML and validated its saved record, but the testing browser blocked opening downloaded local HTML files, so that particular reopening action was not browser-tested. The live browser attachment and saved-JSON restoration were tested.
 
 Help now includes a fourteenth chapter explaining the workflow, its limits and saving choices. Everything remains free and local; no new account or paid service is needed. The browser still does not run the uploaded program. Private sandbox files and live Tudela remain separate.
+
+
+## Build 0.22.0 — a real disposable publishing test
+
+The local sandbox can now create its own temporary database, login service and file store. They run inside the isolated virtual computer, using invented test users and new local credentials. No live Tudela database, account or storage is used. There is no internet connection from that virtual computer and no preview port exposed to your computer.
+
+We tested the actual Tudela package: it built, started, logged in an editor and a reviewer, rejected a wrong password, checked access restrictions, uploaded an image, approved and published a tour with two stops, then read back the public tour and the exact image. All 14 isolation checks and 26 application checks passed. Cleanup closed the test tenants and suspended the test users; stopping the guest discarded its temporary database and files.
+
+This was an end-to-end API test: the test script performed the requests behind the screens. We have not yet clicked through the CMS publishing screens, tested real emails or external sign-in, live maps or AI, or demonstrated production reliability. A successful test is useful evidence for this particular package and journey, not a promise that every feature works.
+
+After the existing local sandbox preparation, run python scripts/prepare_tudela_services.py, then python -m reversium --sandbox-tudela-tour "path/to/Tudela.zip" --sandbox-accelerator whpx if WHPX is already available. Help explains the prerequisites and slower default emulation option. This profile needs 3 GiB guest memory, local disk space and public dependency downloads, but no paid hosting or API account. It is a reviewed Tudela profile, not a general run-any-program feature.
+
+In Setup & readiness, select reports/qemu-lab/latest-run-evidence.json and review it before attaching. Reversium matches the exact original ZIP fingerprint, shows what passed and what remains unknown, and keeps runtime checks separate from file analysis. The result is an editable local record, not an independently signed certificate. Source-bearing input images, caches and logs remain privately on the host after the guest stops; do not distribute them. Help and its downloadable PDF now cover this workflow.

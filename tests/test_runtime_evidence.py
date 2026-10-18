@@ -43,3 +43,12 @@ class PortableRuntimeEvidenceTests(unittest.TestCase):
                 data,sha,_=sanitize_delivery(path)
             self.assertEqual(sha,hashlib.sha256(original).hexdigest())
             with zipfile.ZipFile(io.BytesIO(data)) as z:self.assertEqual(z.read('app/main.py'),b'first = True')
+
+    def test_tour_projection_has_separate_schema_and_never_exports_credentials(self):
+        raw={'profile':'tudela-offline-tour-v1','delivery':{'source_archive_sha256':'a'*64,'sanitized_archive_sha256':'b'*64,'omitted_sensitive_or_generated_members':[]},'accelerator':'whpx','checks':{'services_ready':True,'tour_acceptance':False},'input_media_unchanged':True,'guest_process_stopped':True,'credentials':'never-export'}
+        r=portable_result(raw,{'checks':dict.fromkeys(ISOLATION_KEYS,True)},'abcdef123456','2026-10-18T08:00:00Z')
+        self.assertEqual(r['version'],2);self.assertEqual(r['guest_ram_mib'],3072)
+        self.assertEqual(len(r['checks']),26)
+        self.assertIsNone(r['checks']['editor_login'])
+        self.assertFalse(r['checks']['tour_acceptance'])
+        self.assertNotIn('never-export',str(r))

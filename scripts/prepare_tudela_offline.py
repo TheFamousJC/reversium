@@ -54,8 +54,8 @@ def npm_entries(lock):
     return result
 
 
-def prepare_node(lab):
-    root=lab/'node-packages';root.mkdir(exist_ok=True)
+def prepare_node(lab, extra_roots=(), directory="node-packages"):
+    root=lab/directory;root.mkdir(exist_ok=True)
     packages={};providers={}
     for repo in ('main','community'):
         base='https://dl-cdn.alpinelinux.org/alpine/v3.23/'+repo+'/x86_64/'
@@ -69,7 +69,7 @@ def prepare_node(lab):
             if 'P' not in info:continue
             info['base']=base;packages[info['P']]=info
             for provided in info.get('p','').split():providers.setdefault(re.split(r'[=<>~]',provided)[0],info['P'])
-    needed={};pending=['nodejs','npm','openssl']
+    needed={};pending=['nodejs','npm','openssl',*extra_roots]
     while pending:
         name=pending.pop()
         if name in needed:continue

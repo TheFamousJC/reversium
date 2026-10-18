@@ -53,12 +53,13 @@ def verify_lab(lab):
     return lab
 
 
-def argv(lab, media=None, accelerator="tcg"):
+def argv(lab, media=None, accelerator="tcg", ram_mib=1024):
+    if ram_mib not in (1024,3072):raise ValueError("Unsupported bounded guest RAM profile.")
     if accelerator not in ("tcg", "whpx"):raise ValueError("Unsupported explicit accelerator.")
     lab = Path(lab).resolve()
     args = [str(lab/'qemu/qemu-system-x86_64.exe'), '-L', str(lab/'qemu/share'),
             '-nodefaults', '-no-user-config', '-machine', 'q35', '-accel', accelerator,
-            '-m', '1024', '-smp', '2', '-display', 'none', '-monitor', 'none',
+            '-m', str(ram_mib), '-smp', '2', '-display', 'none', '-monitor', 'none',
             '-serial', 'stdio', '-nic', 'none', '-no-reboot',
             '-kernel', str(lab/'alpine/boot/vmlinuz-virt'), '-initrd', str(lab/'alpine/boot/initramfs-virt'),
             '-append', 'console=ttyS0 modules=loop,squashfs,sd-mod,usb-storage quiet',
@@ -105,12 +106,12 @@ class WindowsJob:
 
 
 class Guest:
-    def __init__(self, lab, media=None, seconds=180, accelerator="tcg"):
+    def __init__(self, lab, media=None, seconds=180, accelerator="tcg", ram_mib=1024):
         if not 1 <= seconds <= 600:
             raise ValueError('Guest timeout must be 1–600 seconds.')
         self.lab, self.buffer, self.q = Path(lab), bytearray(), queue.Queue(maxsize=1024)
         self.nonce, self.expired = secrets.token_hex(16), False
-        self.process = subprocess.Popen(argv(lab, media, accelerator), cwd=Path(lab)/'qemu', stdin=subprocess.PIPE,
+        self.process = subprocess.Popen(argv(lab, media, accelerator, ram_mib), cwd=Path(lab)/'qemu', stdin=subprocess.PIPE,
                                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=subprocess.CREATE_NO_WINDOW)
         try:
             self.job = WindowsJob(self.process)
@@ -207,7 +208,7 @@ def mount_input(guest):
     return guest.command('mkdir -p /mnt/input; for d in /dev/sr*; do mount -o ro "$d" /mnt/input 2>/dev/null || continue; test -f /mnt/input/reversium-input && break; umount /mnt/input; done; test -f /mnt/input/reversium-input')[0] == 0
 
 
-def self_test(lab, accelerator="tcg"):
+def self_test(lab, accelerator="tcg", ram_mib=1024):
     lab = verify_lab(lab)
     run = lab/'runs'/('self-test-'+secrets.token_hex(6)); run.mkdir(parents=True)
     media = run/'input.iso'
@@ -217,10 +218,10 @@ def self_test(lab, accelerator="tcg"):
     canary_hash=digest(canary)
     listener=socket.socket();listener.bind(('127.0.0.1',0));listener.listen(1);listener.settimeout(.2)
     port=listener.getsockname()[1]
-    result={'stage':'blank guest isolation checks','accelerator':accelerator,'passed':False,'checks':{},'limits':{'guest_ram_mib':1024,'guest_cpus':2,'serial_log_bytes':MAX_LOG,'no_network':True,'no_host_shares':True},'scope':'Selected configuration/behavior tests, not proof against emulator vulnerabilities or a guarantee of safety.'}
+    result={'stage':'blank guest isolation checks','accelerator':accelerator,'passed':False,'checks':{},'limits':{'guest_ram_mib':ram_mib,'guest_cpus':2,'serial_log_bytes':MAX_LOG,'no_network':True,'no_host_shares':True},'scope':'Selected configuration/behavior tests, not proof against emulator vulnerabilities or a guarantee of safety.'}
     guest=None
     try:
-        guest=Guest(lab,media,seconds=180,accelerator=accelerator);guest.login()
+        guest=Guest(lab,media,seconds=180,accelerator=accelerator,ram_mib=ram_mib);guest.login()
         checks=result['checks']
         checks['expected_alpine']=guest.command('test "$(cat /etc/alpine-release)" = 3.23.6')[0]==0
         checks['loopback_only']=guest.command('test "$(ls /sys/class/net)" = lo')[0]==0
@@ -236,10 +237,10 @@ def self_test(lab, accelerator="tcg"):
         checks['host_canary_unchanged']=digest(canary)==canary_hash
         try: listener.accept();checks['no_host_connection']=False
         except socket.timeout:checks['no_host_connection']=True
-        guest=Guest(lab,seconds=150,accelerator=accelerator);guest.login()
+        guest=Guest(lab,seconds=150,accelerator=accelerator,ram_mib=ram_mib);guest.login()
         checks['fresh_guest_no_marker']=guest.command('test ! -e /tmp/reversium-marker && test ! -e /mnt/host/host-canary.txt')[0]==0
         guest.close(run/'fresh-guest-private.log');guest=None
-        guest=Guest(lab,seconds=1,accelerator=accelerator)
+        guest=Guest(lab,seconds=1,accelerator=accelerator,ram_mib=ram_mib)
         guest.process.wait(timeout=15)
         checks['hard_timeout_stops_process']=guest.expired and guest.process.poll() is not None
         guest.close(run/'timeout-private.log');guest=None
@@ -329,22 +330,31 @@ console.log('Offline locked libraries unpacked; lifecycle install scripts were n
     return files,{'source_archive_sha256':source_hash,'sanitized_archive_sha256':hashlib.sha256(delivery).hexdigest(),'omitted_sensitive_or_generated_members':omitted,'project_root':root,'npm_entries':len(npm_manifest),'apk_entries':len(apks)}
 
 
-def probe_tudela(lab,archive, accelerator="tcg"):
+def probe_tudela(lab,archive, accelerator="tcg", tour=False):
     """A fixed, reviewed build/start experiment; always retest isolation first."""
     started_at=utc_now()
     lab=verify_lab(lab)
     print('Running fresh blank-guest isolation tests before loading application input…',flush=True)
-    isolation=self_test(lab,accelerator=accelerator)
+    ram_mib=3072 if tour else 1024
+    isolation=self_test(lab,accelerator=accelerator,ram_mib=ram_mib)
     if isolation.get('passed') is not True:raise RuntimeError('Isolation self-test failed; no application guest was started.')
     files,metadata=bundle_files(lab,archive)
+    if tour:
+        from .service_inputs import add_services
+        add_services(lab,files)
+        metadata['apk_entries']=sum(name.endswith('.apk') for name in files)
     run=lab/'runs'/('tudela-'+secrets.token_hex(6));run.mkdir(parents=True)
     media=run/'application-input.iso';input_iso(lab,media,files);before=digest(media)
     result={'stage':'experimental offline Tudela build/start','accelerator':accelerator,'isolation_passed':True,'checks':{},'delivery':metadata,
             'scope':'Fixed build/start profile, synthetic configuration, no NIC or host shares. Not a complete platform acceptance, security audit or production deployment.'}
+    if tour:
+        result['profile']='tudela-offline-tour-v1'
+        result['stage']='experimental offline Tudela API tour journey'
+        result['scope']='Real disposable PostgreSQL/Auth/REST/Storage with synthetic users; guest-only API acceptance, not CMS browser clicks or production certification.'
     guest=None
     try:
         print('Booting separate application guest; networking remains absent…',flush=True)
-        guest=Guest(lab,media,seconds=600,accelerator=accelerator);guest.login()
+        guest=Guest(lab,media,seconds=600,accelerator=accelerator,ram_mib=ram_mib);guest.login()
         checks=result['checks']
         checks['loopback_only']=guest.command('test "$(ls /sys/class/net)" = lo && test -z "$(ip route)"')[0]==0
         checks['input_mounted']=mount_input(guest)
@@ -359,11 +369,33 @@ def probe_tudela(lab,archive, accelerator="tcg"):
         result['runtime_versions']=re.findall(r'(?<![A-Za-z0-9])(v?\d+\.\d+\.\d+)(?=\r?\n)',versions)
         root=metadata['project_root']
         if not re.fullmatch(r'[A-Za-z0-9_./-]*',root):raise ValueError('Project root unsupported by reviewed guest profile.')
+        if tour:
+            rc,_=guest.command('mkdir -p /work && mount -t tmpfs -o size=2048m,nosuid,nodev tmpfs /work')
+            if rc:raise RuntimeError('Bounded guest RAM workspace mount failed.')
         rc,_=guest.command('mkdir -p /work; cd /work && unzip -q /mnt/input/project.zip && cd '+(root or '.')+' && node /mnt/input/install-libraries.cjs',seconds=180)
         checks['libraries_unpacked_without_hooks']=rc==0
         if rc:raise RuntimeError('Offline library unpack failed.')
+        if tour:
+            print('Starting real disposable PostgreSQL, Auth, REST and Storage inside guest…',flush=True)
+            rc,_=guest.command('sh /mnt/input/services-bootstrap.sh > /tmp/services-setup.log 2>&1',seconds=180)
+            checks['services_bootstrap']=rc==0
+            if rc:
+                guest.command('tail -n 35 /tmp/services-setup.log; tail -n 15 /tmp/bootstrap-sql.log')
+                raise RuntimeError('Disposable service bootstrap failed; see private log.')
+            rc,_=guest.command('node /mnt/input/services-health.cjs > /tmp/services-health.log 2>&1',seconds=90)
+            checks['services_ready']=rc==0
+            guest.command('cat /tmp/services-health.log; tail -n 15 /tmp/auth.log; tail -n 15 /tmp/storage.log')
+            if rc:raise RuntimeError('Disposable service health failed; see private log.')
+            root_path='/work/'+(root or '.')
+            rc,_=guest.command('sh /mnt/input/services-migrate.sh '+root_path+' > /tmp/tudela-migrations.log 2>&1',seconds=90)
+            checks['migrations_applied']=rc==0
+            if rc:
+                guest.command('tail -n 20 /tmp/tudela-migrations.log')
+                raise RuntimeError('Tudela migrations failed; see private log.')
+
         print('Building Tudela inside the offline guest…',flush=True)
         env='NODE_OPTIONS=--max-old-space-size=384 VITE_SUPABASE_URL=https://reversium-sandbox.invalid VITE_SUPABASE_PUBLISHABLE_KEY=synthetic-publishable-no-live-key'
+        if tour:env='set -a; . /work/runtime.env; set +a; NODE_OPTIONS=--max-old-space-size=384'
         rc,_=guest.command('cd /work/'+(root or '.')+' && '+env+' node node_modules/vite/bin/vite.js build --configLoader runner > /tmp/build.log 2>&1',seconds=240)
         checks['frontend_build']=rc==0
         if rc:
@@ -375,14 +407,29 @@ def probe_tudela(lab,archive, accelerator="tcg"):
             guest.command('tail -n 30 /tmp/typescript.log')
             raise RuntimeError('Backend compilation failed; private guest log records the blocker.')
         print('Starting compiled server with synthetic offline service configuration…',flush=True)
-        rc,_=guest.command('cd /work/'+(root or '.')+' && NODE_ENV=production PORT=18765 APP_URL=https://reversium-app.invalid SUPABASE_URL=https://reversium-sandbox.invalid VITE_SUPABASE_URL=https://reversium-sandbox.invalid SUPABASE_SECRET_KEY=synthetic-server-secret-no-live-key VITE_SUPABASE_PUBLISHABLE_KEY=synthetic-publishable-no-live-key HERZL_MODE=simulator node dist/server.js > /tmp/server.log 2>&1 & echo guest-server-launch-requested')
+        if not tour:rc,_=guest.command('cd /work/'+(root or '.')+' && NODE_ENV=production PORT=18765 APP_URL=https://reversium-app.invalid SUPABASE_URL=https://reversium-sandbox.invalid VITE_SUPABASE_URL=https://reversium-sandbox.invalid SUPABASE_SECRET_KEY=synthetic-server-secret-no-live-key VITE_SUPABASE_PUBLISHABLE_KEY=synthetic-publishable-no-live-key HERZL_MODE=simulator node dist/server.js > /tmp/server.log 2>&1 & echo guest-server-launch-requested')
+        if tour:
+            guest.command('cd /work/'+(root or '.')+' && (set -a; . /work/runtime.env; set +a; node dist/server.js > /tmp/server.log 2>&1) & echo tour-server-launch-requested')
         # Poll from within the guest; no host forwarding or preview exposure.
         rc,_=guest.command('for n in 1 2 3 4 5 6 7 8 9 10; do wget -q -T 2 -O /tmp/home.html http://127.0.0.1:18765/ && break; sleep 1; done; test -s /tmp/home.html',seconds=60)
         checks['guest_local_home_responded']=rc==0
         guest.command('tail -n 20 /tmp/server.log')
         if not checks['guest_local_home_responded']:raise RuntimeError('Guest-local home page did not respond; see private server log.')
+        if tour:
+            print('Running reviewed editor/reviewer publication and media journey…',flush=True)
+            rc,_=guest.command('cd /work/'+(root or '.')+' && set -a; . /work/runtime.env; set +a; node /mnt/input/prepare-tour-test.cjs && node node_modules/tsx/dist/cli.mjs scripts/reversium-tour-acceptance.ts > /tmp/tour-test.log 2>&1',seconds=150)
+            checks['tour_acceptance']=False if rc else None
+            guest.command('tail -n 35 /tmp/tour-test.log')
+            if rc:raise RuntimeError('Tour acceptance failed; see private log.')
+            rc,journey=guest.command('cat /tmp/tour-journey.json')
+            if rc:raise RuntimeError('Tour journey record missing.')
+            result['tour_journey']=json.loads(journey[journey.index('{'):journey.index('}')+1])
+            expected=('editor_login','reviewer_login','tour_published','two_ordered_stops','validated_media_upload','public_content_http','public_media_bytes','tenant_isolation','role_separation','wrong_password_rejected')
+            if set(result['tour_journey'])!=set(expected) or any(v is not True for v in result['tour_journey'].values()):raise RuntimeError('Invalid guest journey result.')
+            checks['tour_acceptance']=True
+            checks.update(result['tour_journey']);checks['test_data_cleanup']=True
         checks['still_no_external_route']=guest.command('test "$(ls /sys/class/net)" = lo && test -z "$(ip route)"')[0]==0
-        result['remaining_gaps']=['No real Supabase/database/auth/storage services provisioned.','Synthetic keys are not live credentials.','No published-tour or authenticated workflow acceptance test.','No host browser preview or host port forwarding.']
+        result['remaining_gaps']=['Interactive CMS/browser publishing clicks, production operation, external email/OAuth/AI/maps and full security remain unverified.'] if tour else ['No real Supabase/database/auth/storage services provisioned.','Synthetic keys are not live credentials.','No published-tour or authenticated workflow acceptance test.','No host browser preview or host port forwarding.']
     except Exception as error:
         result['blocker']=type(error).__name__+': '+str(error)
     finally:

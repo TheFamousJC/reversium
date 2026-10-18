@@ -28,6 +28,10 @@ class QemuLabTests(unittest.TestCase):
             accelerated=argv(lab,accelerator='whpx')
             self.assertEqual(accelerated[accelerated.index('-accel')+1],'whpx')
             with self.assertRaises(ValueError):argv(lab,accelerator='automatic')
+            larger=argv(lab,accelerator='whpx',ram_mib=3072)
+            self.assertEqual(larger[larger.index('-m')+1],'3072')
+            self.assertEqual(larger[larger.index('-nic')+1],'none')
+            with self.assertRaises(ValueError):argv(lab,ram_mib=4096)
 
     def test_delivery_sanitization_stays_in_memory_and_omits_common_credentials(self):
         stream=io.BytesIO()

@@ -210,14 +210,15 @@ def main():
     parser.add_argument('--sandbox-accelerator', choices=['tcg','whpx'], default='tcg', help='Explicit local CPU backend; WHPX requires already enabled Windows hypervisor support')
     parser.add_argument('--sandbox-self-test', action='store_true', help='Explicitly boot benign offline guests and test isolation/teardown')
     parser.add_argument('--sandbox-tudela', metavar='ZIP', help='Experimental fixed Tudela build/start profile; retests isolation first')
+    parser.add_argument('--sandbox-tudela-tour',metavar='ZIP',help='Experimental offline disposable-service API tour journey; fresh isolation first')
     args = parser.parse_args()
-    actions=sum(bool(x) for x in (args.sandbox_check,args.sandbox_plan,args.sandbox_self_test,args.sandbox_tudela))
+    actions=sum(bool(x) for x in (args.sandbox_check,args.sandbox_plan,args.sandbox_self_test,args.sandbox_tudela,args.sandbox_tudela_tour))
     if actions>1 or (actions and args.archive):
         parser.error('Choose exactly one sandbox action, separately from archive analysis.')
-    if args.sandbox_self_test or args.sandbox_tudela:
+    if args.sandbox_self_test or args.sandbox_tudela or args.sandbox_tudela_tour:
         from .qemu_lab import self_test, probe_tudela
         try:
-            result=probe_tudela(args.sandbox_lab,args.sandbox_tudela,accelerator=args.sandbox_accelerator) if args.sandbox_tudela else self_test(args.sandbox_lab,accelerator=args.sandbox_accelerator)
+            result=probe_tudela(args.sandbox_lab,args.sandbox_tudela_tour or args.sandbox_tudela,accelerator=args.sandbox_accelerator,tour=bool(args.sandbox_tudela_tour)) if (args.sandbox_tudela or args.sandbox_tudela_tour) else self_test(args.sandbox_lab,accelerator=args.sandbox_accelerator)
         except (OSError,ValueError,ImportError,RuntimeError) as error:
             parser.error('Sandbox stopped: '+str(error))
         print(json.dumps(result,indent=2))

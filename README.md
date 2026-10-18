@@ -149,3 +149,17 @@ The default accelerator is TCG software emulation. If WHPX is already enabled, a
 Build 0.20.0: [Searchable user guide](docs/user-guide.html), [PDF guide](output/pdf/Reversium-User-Guide.pdf), [commercial assessment and development priorities](docs/market-position.html), and [elevator pitch](docs/Elevator-pitch.txt). The guide is rebuilt with every release; run `python scripts/check_release_docs.py` before publication. Core analysis remains free and local.
 
 Build 0.21.0: Setup & readiness can preview and attach a portable sandbox `run-evidence.json` to the exact analysed ZIP SHA-256. New local Tudela attempts also save `reports/qemu-lab/latest-run-evidence.json`. Applied records survive readable HTML export or separate JSON save; technical report JSON remains static. The tested filtered-copy identity, individual outcomes and unknowns stay separate from source findings. Imports are bounded, local and unauthenticated reviewer evidence, not a signed certificate. No runtime record enters AI requests or marks checklist tasks verified.
+
+
+### Disposable Tudela services and API acceptance (0.22.0)
+
+After the existing lab and dependency preparation:
+
+```powershell
+python scripts/prepare_tudela_services.py
+python -m reversium --sandbox-tudela-tour "path/to/Tudela.zip" --sandbox-accelerator whpx
+```
+
+Use WHPX only where already available; omission uses bounded, potentially slower TCG emulation. This separate profile requires 3 GiB guest RAM and repeats isolation checks at that size. Real PostgreSQL 17.11, Auth 2.197.0, PostgREST 16.4 and Storage 1.83.5 run on guest loopback with disposable credentials and RAM-backed data. No host services, live credentials, guest NIC or forwarded ports are introduced. Public artifacts are pinned and cached; no source is uploaded. Original application migrations and access policies remain in force.
+
+The real Tudela test passed 14 isolation and 26 application checks, including editor/reviewer login, rejected password, role/tenant boundaries, validated media upload, approval/publication of a two-stop tour, public HTTP JSON/image readback and cleanup. This is API end-to-end acceptance, not an interactive CMS browser journey or production certification. The v2 result attaches to the exact original ZIP in Setup & readiness; v1 records remain supported. Private input images/logs/caches stay ignored on the host. See [Help](docs/user-guide.html) and [sandbox design](docs/SANDBOX_DESIGN.md) for preparation, retention and remaining gaps.
