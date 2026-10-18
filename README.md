@@ -1,11 +1,11 @@
 # Reversium
 
-[Use Reversium in your browser](https://thefamousjc.github.io/reversium/web/) — analyze your own ZIP without installation or an account. Files stay on your device; no uploads or AI calls. Browser limit: 32 MiB. First use downloads the self-hosted Python runtime (about 14 MB). [Sample report](https://thefamousjc.github.io/reversium/demo/report.html) uses fictional data.
+[Use Reversium in your browser](web/) — analyze your own ZIP without installation or an account. Files stay on your device; no uploads or AI calls. Browser limit: 32 MiB. First use downloads the self-hosted Python runtime (about 14 MB). [Sample report](demo/report.html) uses fictional data.
 
 
-[Try the free interactive sample demo](https://thefamousjc.github.io/reversium/) — no installation or sign-up. Explore fictional findings, feature paths and report downloads. The sample uses fictional data; the browser version above accepts your own ZIP locally.
+[Try the free interactive sample demo](index.html) — no installation or sign-up. Explore fictional findings, feature paths and report downloads. The sample uses fictional data; the browser version above accepts your own ZIP locally.
 
-An open-source, local and free-to-run handover and maintenance-discovery workbench. [Market comparison and roadmap](https://thefamousjc.github.io/reversium/docs/market-position.html).
+A local and free-to-run handover and maintenance-discovery workbench. [Market comparison and roadmap](docs/market-position.html).
 
 New in 0.14.0: **Handover** provides names-only configuration/script/runtime clues and reviewer-owned tasks with local checklist export. **Change impact** explores bounded upstream/downstream graph candidates associated with a selected file. Neither claims working setup or complete change coverage.
 
@@ -87,7 +87,7 @@ Browser uploads are capped at 64 MiB. Both entry points reject archives over 10,
 
 ## Project
 
-- GitHub: https://github.com/TheFamousJC/reversium
+- User guide: docs/user-guide.html
 - [Development stages](docs/DEVELOPMENT_STAGES.md)
 - [Plain-language explanation](docs/PLAIN_LANGUAGE.md)
 - [Contributing](CONTRIBUTING.md)
@@ -102,12 +102,12 @@ Select findings, enter a question, prepare/edit the sharing preview, then approv
 
 Tokens remain in memory and expire without automatic refresh; reconnect as needed. Ignored `reports/assistant-host.json` and `reports/assistant-registration.json` retain non-token host/account identifiers. To switch accounts, disconnect and remove only the registration file before reconnecting. Local disconnect does not revoke provider-side consent. HTML exports exclude assistant state; analysis JSON never includes it.
 
-Official contract: [registration](https://developers.openai.com/siwc/token-sharing-open-source/sign-in), [models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference).
+Official contract: [registration](https://developers.openai.com/), [models and inference](https://developers.openai.com/).
 
 
 ## About and FAQ (build 0.10.1)
 
-About explains Reversium in plain language and displays its build and Open Source / 3Sci.com / 2026 attribution. Software findings keeps the uploaded-code explanations. FAQ has its own report button and home help button. Expand “What are the downloads for?” beside the exports: HTML is a readable report for offline review or handover; JSON is structured findings for scripts, integrations and CLI baseline comparisons. Neither export is a runnable software backup or includes the original ZIP.
+About explains Reversium in plain language and displays its build and 3Sci.com / 2026 attribution. Software findings keeps the uploaded-code explanations. FAQ has its own report button and home help button. Expand “What are the downloads for?” beside the exports: HTML is a readable report for offline review or handover; JSON is structured findings for scripts, integrations and CLI baseline comparisons. Neither export is a runnable software backup or includes the original ZIP.
 
 
 ## Guided workflow (0.11.0)
@@ -120,7 +120,7 @@ Build 0.11.1 improves the owner walkthrough: brief evidence-linked technology cl
 
 ## Rebuild the public demo
 
-Run `python scripts/build_demo.py`. It generates index.html and demo/report.html from fictional in-code fixtures only, using the real analyzer and renderer. Existing GitHub Pages publishes the root of codex/initial-workbench. Do not replace these fixtures with private customer code.
+Run `python scripts/build_demo.py`. It generates index.html and demo/report.html from fictional in-code fixtures only, using the real analyzer and renderer. Existing Static web hosting publishes the root of codex/initial-workbench. Do not replace these fixtures with private customer code.
 
 Browser review (0.15.0): restore handover JSON with a preview and delivery fingerprint, or open Compare reports to compare a previous report locally. Legacy checklists require independent delivery confirmation. Browser comparison covers files, findings and (since 0.16.0) feature-map relationships, not runtime behavior. Save comparison notes records the displayed bounded results.
 
@@ -145,3 +145,5 @@ Requires existing 7-Zip. Downloads pinned QEMU/Alpine assets and the optional py
 The lab retains private source-bearing input images and logs; do not commit or share them. Browser analysis remains separate and never executes ZIP contents. A successful build/start is not database/auth/tour acceptance. See [sandbox design and test record](docs/SANDBOX_DESIGN.md) for tested boundaries and remaining gaps.
 
 The default accelerator is TCG software emulation. If WHPX is already enabled, append `--sandbox-accelerator whpx` to either execution command; the same backend is tested before application use. No Windows feature is enabled automatically.
+
+Build 0.20.0: [Searchable user guide](docs/user-guide.html), [PDF guide](output/pdf/Reversium-User-Guide.pdf), [commercial assessment and development priorities](docs/market-position.html), and [elevator pitch](docs/Elevator-pitch.txt). The guide is rebuilt with every release; run `python scripts/check_release_docs.py` before publication. Core analysis remains free and local.

@@ -160,7 +160,7 @@ Update 2026-10-17: live ChatGPT sign-in/model discovery succeeded, but the first
 
 ## About, FAQ and report downloads - build 0.10.1 (2026-10-17)
 
-About now explains Reversium in plain language: practical handover and maintenance uses, a simple reading workflow, optional AI and limitations. Build 0.10.1 and Open Source / 3Sci.com / 2026 are displayed. Uploaded-code explanations remain available in Software findings. FAQ has its own report button and home help button, including the assistant questions. HTML is the readable report for offline review and handover; JSON is structured findings for scripts, tools and baseline comparison. Both can contain private analysis details; neither is the original ZIP or a runnable backup.
+About now explains Reversium in plain language: practical handover and maintenance uses, a simple reading workflow, optional AI and limitations. Build 0.10.1 and 3Sci.com / 2026 are displayed. Uploaded-code explanations remain available in Software findings. FAQ has its own report button and home help button, including the assistant questions. HTML is the readable report for offline review and handover; JSON is structured findings for scripts, tools and baseline comparison. Both can contain private analysis details; neither is the original ZIP or a runnable backup.
 
 
 ## Contemporary interface and short control help - build 0.10.2 (2026-10-17)
@@ -186,16 +186,16 @@ Browser verified the real ZIP selection (Build 1.zip, 3.1 MiB), Review default, 
 
 ## Free public sample demo (2026-10-17)
 
-Added a GitHub Pages landing page and interactive report generated only from five fictional community-library files. Visitors can explore owner findings, inspect evidence, follow the Add book screen/callback/API/database path and save sample HTML/JSON without installing Reversium. This is a sample-only static demonstration, not online analysis of visitor ZIPs. No upload endpoint, AI sign-in, assistant request script, analytics or third-party assets are included. The local Python application is still required for analysing real packages.
+Added a Static web hosting landing page and interactive report generated only from five fictional community-library files. Visitors can explore owner findings, inspect evidence, follow the Add book screen/callback/API/database path and save sample HTML/JSON without installing Reversium. This is a sample-only static demonstration, not online analysis of visitor ZIPs. No upload endpoint, AI sign-in, assistant request script, analytics or third-party assets are included. The local Python application is still required for analysing real packages.
 
 The existing public repository Pages configuration already publishes the root of codex/initial-workbench. scripts/build_demo.py rebuilds index.html and demo/report.html; .nojekyll preserves the static output. Private Tudela archives, reports, tokens and test data are excluded. Browser verified the local landing-to-report navigation and the complete supported fictional feature path before publication.
 
 
 ## Use Reversium without installing it
 
-You can open the browser edition, choose a question and select your own ZIP. Your computer reads it and produces the familiar findings, feature connections, evidence and gaps. It does not upload your ZIP. GitHub supplies the app files and sees normal website connection information. Clear or close the page when finished; saved reports remain your responsibility. The browser edition has no ChatGPT connection and no sign-in. Larger ZIPs above 32 MiB need the local application. Tudela produced the same file and finding counts in browser and local analysis. This helps investigate a handover; it does not prove that the software works.
+You can open the browser edition, choose a question and select your own ZIP. Your computer reads it and produces the familiar findings, feature connections, evidence and gaps. It does not upload your ZIP. repository hosting supplies the app files and sees normal website connection information. Clear or close the page when finished; saved reports remain your responsibility. The browser edition has no ChatGPT connection and no sign-in. Larger ZIPs above 32 MiB need the local application. Tudela produced the same file and finding counts in browser and local analysis. This helps investigate a handover; it does not prove that the software works.
 
-Public verification completed at https://thefamousjc.github.io/reversium/web/ on 17 October 2026: Tudela produced 266 files and 3,882 findings. Architecture workflow selection, evidence navigation, JSON and HTML downloads succeeded on GitHub Pages. All 111 automated tests passed. Private Tudela files/reports were excluded from the published repository.
+Public verification completed at ../web/ on 17 October 2026: Tudela produced 266 files and 3,882 findings. Architecture workflow selection, evidence navigation, JSON and HTML downloads succeeded on Static web hosting. All 111 automated tests passed. Private Tudela files/reports were excluded from the published repository.
 
 
 ## Branding and clearer navigation — 0.12.1
@@ -274,7 +274,7 @@ Click a color to filter the list, or choose Possible damage / invalid format. Ea
 
 Tudela's 266 members passed the bounded CRC read. Its results were zero red, 144 yellow and 122 green. Most yellow results concern inspection limits or active formats; these are not 144 corrupted files. We separately tested an intentionally damaged file and a suspicious-looking executable name in an inert sample ZIP, and confirmed that alerts and evidence navigation work without running anything. No file is sent to an external scanning service, deleted or quarantined. These checks do not replace antivirus or a developer's security review.
 
-A sandbox to try the software is possible, but it needs a local companion and a disposable virtual machine; the online GitHub Pages edition cannot supply arbitrary native execution. We documented an offline-first design with no live credentials, restricted sharing, reviewed setup commands and a stop control. Windows Sandbox needs a supported Windows edition and hardware; a Linux VM is another route. Offline mode may prevent dependency installation or external services from working. This run feature is not built yet, and no isolation system guarantees zero risk. Traffic lights never grant permission to execute a ZIP.
+A sandbox to try the software is possible, but it needs a local companion and a disposable virtual machine; the online Static web hosting edition cannot supply arbitrary native execution. We documented an offline-first design with no live credentials, restricted sharing, reviewed setup commands and a stop control. Windows Sandbox needs a supported Windows edition and hardware; a Linux VM is another route. Offline mode may prevent dependency installation or external services from working. This run feature is not built yet, and no isolation system guarantees zero risk. Traffic lights never grant permission to execute a ZIP.
 
 
 ## Readable handover and a practical setup plan — build 0.18.0
@@ -298,4 +298,17 @@ We then used a separate guest to install verified public libraries offline and b
 
 That is useful evidence that this delivery can build and start on Linux. It does not yet prove that users can sign in, save data, upload media or publish a tour. Those need disposable database, account and storage services, followed by a proper user-journey test. We deliberately have not exposed the guest website in your browser or connected it to live Tudela.
 
-The local setup commands are in Help and README. They download public packages, not upload your ZIP. Common environment and key files are omitted from the guest copy, but this cannot guarantee that code contains no embedded secrets. Private input copies and logs remain in the ignored reports/qemu-lab folder after the temporary computer stops; do not share or commit them. The original ZIP and live platform were untouched. Reversium remains free, local and open source, and ChatGPT access remains disabled while approval is pending.
+The local setup commands are in Help and README. They download public packages, not upload your ZIP. Common environment and key files are omitted from the guest copy, but this cannot guarantee that code contains no embedded secrets. Private input copies and logs remain in the ignored reports/qemu-lab folder after the temporary computer stops; do not share or commit them. The original ZIP and live platform were untouched. Reversium remains free and local, and ChatGPT access remains disabled while approval is pending.
+
+
+## A maintained guide and a clearer purpose — build 0.20.0
+
+Help now contains a searchable guide with thirteen chapters, available before you upload anything and again in your report. Type a word such as handover, evidence, AI or sandbox to open the relevant chapters. Clear the search to see the whole guide. You can keep a PDF copy, and its build number tells you which version it describes. The release process now checks that the website, built-in guide and downloadable PDF agree; the developer must also update the instructions when features change.
+
+We simplified the product attribution and removed repository links from the interface and documentation. Product-document links stay within the site. Existing legal notices and licence terms remain intact; this is a presentation change, not a change to hosting or account access. The PDF's direct link also works in the local application.
+
+There may be a business here, especially when an agency inherits a project or an owner changes developers. The useful outcome is a clearer handover: what the files show, how supported features connect and which questions a developer must verify. Other tools already sell architecture and quality checks, so diagrams alone do not make Reversium unique. We have not yet proved that customers will pay. The commercial assessment proposes five real handover trials and a small assisted-review service before adding subscription or billing features. Analysis stays free and local.
+
+Our pitch is: taking over software should not start with guesswork. Reversium turns an unfamiliar package into an evidence-backed handover and a practical plan for the next developer, while keeping the ZIP on your device. AI can help explain code and use tools too; Reversium's proposed value is a repeatable process with evidence, comparisons and visible gaps.
+
+Next we plan to connect a developer-reviewed test outcome to the exact ZIP it tested, then work toward a complete isolated user journey with disposable supporting services. These are next steps, not completed features. The current sandbox still proves only the narrow Tudela build/start experiment; hosted ChatGPT remains disabled pending approval.

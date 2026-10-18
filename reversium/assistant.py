@@ -165,7 +165,7 @@ class Assistant:
         if registration and client != registration['client_id']:
             raise ValueError('Account registration mismatch.')
         if not client.startswith('oaiapp_') or not code:
-            raise ValueError('Open-source account registration was incomplete.')
+            raise ValueError('Account registration was incomplete.')
         tokens = read_json(AUTH + '/api/accounts/oauth/token', form=True, data={
             'grant_type': 'authorization_code', 'client_id': client, 'code': code,
             'code_verifier': p['verifier'], 'redirect_uri': p['redirect'], 'resource': API})

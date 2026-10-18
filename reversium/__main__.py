@@ -42,7 +42,7 @@ class Handler(BaseHTTPRequestHandler):
     def send(self, code, body, kind='text/html; charset=utf-8'):
         if kind.startswith('text/html'):
             body = body.replace('<!--assistant-session-->', '<meta name="assistant-session" content="' + self.server.assistant_session + '">')
-        data = body.encode('utf-8')
+        data = body.encode('utf-8') if isinstance(body,str) else body
         self.send_response(code)
         self.send_header('Content-Type', kind)
         self.send_header('Content-Length', str(len(data)))
@@ -63,6 +63,11 @@ class Handler(BaseHTTPRequestHandler):
         return self.headers.get('Host') == f'127.0.0.1:{self.server.server_port}'
 
     def do_GET(self):
+        documents={'/docs/user-guide.html':('docs/user-guide.html','text/html; charset=utf-8'),'/docs/market-position.html':('docs/market-position.html','text/html; charset=utf-8'),'/output/pdf/Reversium-User-Guide.pdf':('output/pdf/Reversium-User-Guide.pdf','application/pdf')}
+        if self.path in documents:
+            path,kind=documents[self.path]
+            source=Path(__file__).resolve().parents[1]/path
+            return self.send(200,source.read_text(encoding='utf-8') if kind.startswith('text/') else source.read_bytes(),kind)
         if not self.valid_host():
             return self.send(403, 'Invalid host.')
         if urlsplit(self.path).path == '/auth/callback':

@@ -24,7 +24,7 @@ def render_start(style, help_script):
 <section id="upload-screen" hidden><h1>Choose your software ZIP.</h1><p id="chosen-goal"></p><p>Choose the project’s source-code package for the clearest results. An installer alone provides fewer clues.</p><p>Choose the package you want to understand. You will review its findings next, then decide what to save or investigate. Nothing is sent to an AI provider during analysis.</p>
 <form id="upload-form"><label for="zip-input">Software ZIP (maximum 64 MiB)</label><input id="zip-input" aria-label="Choose ZIP archive" type="file" accept=".zip" required><button id="analyze-zip" disabled>Analyze ZIP locally</button></form>
 <p id="status" role="status">Choose a ZIP to begin. No report exists yet.</p><button type="button" id="start-back">Back to Start</button></section>
-<footer><p>Open Source · 3Sci.com · 2026</p></footer></main><script>
+<footer><p>3Sci.com · 2026</p></footer></main><script>
 (()=>{{let goal='understand';const names={{understand:'Understand the software',handover:'Prepare a developer handover',change:'Plan maintenance or modernization'}};
 const start=document.querySelector('#start-screen'),upload=document.querySelector('#upload-screen');
 function step(two){{start.hidden=two;upload.hidden=!two;document.querySelector('#start-step').textContent=two?'Step 2 of 4 · Choose ZIP':'Step 1 of 4 · Start';document.querySelector(two?'#upload-screen h1':'#start-screen h1').setAttribute('tabindex','-1');document.querySelector(two?'#upload-screen h1':'#start-screen h1').focus()}}

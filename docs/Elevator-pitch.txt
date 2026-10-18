@@ -1,0 +1,9 @@
+Reversium by 3Sci Labs — elevator pitch
+
+Taking over software should not start with guesswork. Reversium by 3Sci Labs turns an unfamiliar software package into a clear handover: what the code appears to do, how supported features connect, and what a developer still needs to verify. It links explanations to evidence, helps compare deliveries and keeps your ZIP on your device. Start free in your browser, with no installation, then give the next developer a practical plan to investigate, run and maintain the software.
+
+Short version
+Understand the software you inherit. Give its next developer an evidence-backed handover, with your ZIP kept on your device.
+
+Claim limits
+Supported static tracing is incomplete. Browser analysis does not execute the software. The local sandbox supports one reviewed experimental profile. This is not a security or production-readiness certificate.

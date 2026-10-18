@@ -4,7 +4,7 @@ Status: preparation stage implemented in 0.18.0; VM execution remains unimplemen
 
 ## What is possible
 
-A local companion could create a disposable virtual machine, expose its local application preview and return a run log to the same Reversium UI. GitHub Pages cannot create a native VM, execute arbitrary EXE/server applications or supply free remote compute. A first release should support one explicit guest platform and known runtime instead of promising to run every project.
+A local companion could create a disposable virtual machine, expose its local application preview and return a run log to the same Reversium UI. Static web hosting cannot create a native VM, execute arbitrary EXE/server applications or supply free remote compute. A first release should support one explicit guest platform and known runtime instead of promising to run every project.
 
 Windows Sandbox is a candidate on an existing supported Windows Pro, Enterprise or Education machine, with virtualization available and the feature enabled. Home is unsupported. It is not a universal zero-cost entitlement: a user without the required edition or hardware needs another option. A Linux guest with a suitable local VM engine is a possible alternative; guest OS, runtime and dependency licenses must be checked. Ordinary containers are useful for trusted development, but are not the proposed sole boundary for unknown programs.
 

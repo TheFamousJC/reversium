@@ -4,10 +4,17 @@ import unittest
 import zipfile
 from pathlib import Path
 from unittest.mock import patch
-from reversium.qemu_lab import argv, sanitize_delivery, probe_tudela, bundle_files, Guest
+from reversium.qemu_lab import argv, sanitize_delivery, probe_tudela, bundle_files, Guest, digest
 
 
 class QemuLabTests(unittest.TestCase):
+    def test_streaming_digest_matches_known_bytes(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/'asset';data=b'known input'*(200000);path.write_bytes(data)
+            for algorithm in ('sha256','sha512'):
+                self.assertEqual(digest(path,algorithm),hashlib.new(algorithm,data).hexdigest())
+
     def test_profile_has_no_network_share_disk_or_remote_control(self):
         with tempfile.TemporaryDirectory() as d:
             lab=Path(d);args=argv(lab,lab/'input.iso')

@@ -49,7 +49,7 @@ def browser_copy(page):
 
     page = re.sub(r'<p><b>Ask for an explanation.</b>.*?</p>', '<p><b>Keep analysis private.</b> This browser edition reads files on your device, with no AI connection or sign-in. Internet access is needed to load the application first.</p>', page)
 
-    page = page.replace('Local analysis is free and open source; optional cloud AI follows your provider’s eligibility and usage limits.', 'Analysis is free and open source. This browser edition has no cloud AI connection.')
+    page = page.replace('Local analysis is free; optional cloud AI follows your provider’s eligibility and usage limits.', 'Analysis is free. This browser edition has no cloud AI connection.')
 
     page = page.replace('AI is optional. Connecting an account is not needed to read or save this report.', 'No account or AI connection is used in this browser edition.')
 

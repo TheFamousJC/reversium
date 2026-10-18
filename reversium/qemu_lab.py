@@ -27,7 +27,9 @@ MAX_LOG = 2 * 1024 * 1024
 
 def digest(path, algorithm='sha256'):
     with Path(path).open('rb') as stream:
-        return hashlib.file_digest(stream, algorithm).hexdigest()
+        result=hashlib.new(algorithm)
+        while chunk:=stream.read(1024*1024):result.update(chunk)
+        return result.hexdigest()
 
 
 def verify_lab(lab):
