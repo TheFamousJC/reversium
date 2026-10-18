@@ -58,8 +58,9 @@ class SourceStageTests(unittest.TestCase):
         self.assertEqual(delta['changed_source_files'], ['a.py'])
         self.assertEqual(delta['added_files'], ['added.txt'])
         self.assertEqual(delta['removed_files'], ['removed.txt'])
-        self.assertEqual([f['value'] for f in delta['added_findings']], ['json'])
-        self.assertEqual(delta['removed_findings'], [])
+        self.assertEqual([f['value'] for f in delta['added_findings'] if f['kind'] != 'file_review_signal'], ['json'])
+        self.assertEqual([(f['kind'], f['file']) for f in delta['removed_findings']], [('file_review_signal', 'removed.txt')])
+        self.assertEqual([f['file'] for f in delta['added_findings'] if f['kind']=='file_review_signal'], ['added.txt'])
         with self.assertRaises(ValueError):
             compare_reports(after, {'schema_version': 99})
 

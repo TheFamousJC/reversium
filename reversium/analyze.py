@@ -4,6 +4,7 @@ import json
 import re
 import stat
 import zipfile
+import zlib
 from collections import Counter
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
@@ -16,6 +17,7 @@ from .tracing import trace_routes
 from .feature_map import build_feature_map
 from .js_tracing import trace_javascript
 from .workspace_tracing import trace_workspace
+from .file_review import inspect_name, inspect_content, signal, finish_review
 
 LANGUAGES = {'.py': 'Python', '.js': 'JavaScript', '.jsx': 'JavaScript', '.ts': 'TypeScript', '.tsx': 'TypeScript', '.java': 'Java', '.cs': 'C#', '.php': 'PHP', '.go': 'Go', '.rs': 'Rust', '.c': 'C', '.cpp': 'C++', '.h': 'C/C++'}
 BINARY = {'.exe', '.dll', '.apk', '.so', '.class', '.jar', '.dylib'}
@@ -67,20 +69,32 @@ def inspect_zip(path):
             item = {'path': name, 'bytes': member.file_size, 'language': LANGUAGES.get(suffix), 'category': 'binary' if suffix in BINARY else 'source' if suffix in LANGUAGES else 'other'}
             item['analysis'] = 'inventory_only'
             report['files'].append(item)
+            inspect_name(item)
             if member.flag_bits & 1:
+                signal(item, 'yellow', 'encrypted', 'Encrypted member: integrity and content could not be checked.')
                 report['warnings'].append(f'{name}: encrypted; content skipped.')
                 continue
             if member.file_size > MAX_FILE or member.file_size / max(member.compress_size, 1) > 200:
+                signal(item, 'yellow', 'read_limit', 'Size/compression safety limit reached; integrity and content unverified.')
                 report['warnings'].append(f'{name}: content skipped by size/compression limit.')
                 continue
-            with archive.open(member) as stream:
-                prefix = stream.read(4096)
-                detected = identify(prefix)
-                if not detected and suffix not in BINARY and suffix not in LANGUAGES and suffix != '.sql' and p.name not in MANIFESTS | CONFIG_NAMES | TEMPLATES:
-                    continue
-                data = prefix + stream.read(MAX_FILE + 1 - len(prefix))
+            try:
+                with archive.open(member) as stream:
+                    data = stream.read(MAX_FILE + 1)
+            except (zipfile.BadZipFile, EOFError, zlib.error):
+                item['file_review']['integrity'] = 'failed'
+                signal(item, 'yellow', 'integrity_failed', 'CRC/decompression integrity check failed; possible damaged member. Obtain a replacement before use.')
+                report['warnings'].append(f'{name}: member integrity check failed; content skipped.')
+                continue
+            except (RuntimeError, NotImplementedError):
+                signal(item, 'yellow', 'unsupported_member', 'Member compression/encryption is unsupported; integrity and content unverified.')
+                continue
             if len(data) > MAX_FILE:
                 raise ValueError('Member exceeds read limit.')
+            inspect_content(item, data)
+            detected = identify(data[:4096])
+            if not detected and suffix not in BINARY and suffix not in LANGUAGES and suffix != '.sql' and p.name not in MANIFESTS | CONFIG_NAMES | TEMPLATES:
+                continue
             item['sha256'] = hashlib.sha256(data).hexdigest()
             binary = inspect_binary(data, name, suffix in BINARY)
             if binary:
@@ -172,6 +186,7 @@ def inspect_zip(path):
     trace_routes(report, python_trees)
     trace_javascript(report, {f: s for f, s in js_sources.items() if not f.endswith(('.tsx', '.jsx'))})
     trace_workspace(report, js_sources, sql_sources)
+    finish_review(report)
     report['summary'] = {'files': len(report['files']), 'bytes': sum(f['bytes'] for f in report['files']), 'languages': dict(Counter(f['language'] for f in report['files'] if f['language'])), 'binary_candidates': sum(f['category'] == 'binary' for f in report['files']), 'findings': len(report['findings'])}
     report['coverage'] = dict(Counter(f['analysis'] for f in report['files']))
     report['platform'] = platform_profile(report)

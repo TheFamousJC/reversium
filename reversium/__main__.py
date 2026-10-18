@@ -170,7 +170,7 @@ class Handler(BaseHTTPRequestHandler):
                 result['archive_name'] = ''.join(c for c in name if c.isprintable())[:200]
             self.send(200, render(result))
         except Exception:
-            self.send(400, 'Unable to analyze ZIP. Check archive integrity, safe paths, encryption and documented size limits.', 'text/plain; charset=utf-8')
+            self.send(400, 'ZIP blocked or unreadable. Check archive integrity, safe paths, encryption/compression and documented size limits. No ZIP code was executed.', 'text/plain; charset=utf-8')
 
 
 class LocalHTTPServer(ThreadingHTTPServer):

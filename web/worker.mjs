@@ -39,6 +39,6 @@ browser_html
     self.postMessage({html});
   } catch(error) {
     // Avoid including filenames, source text or Python tracebacks in UI telemetry.
-    self.postMessage({error:'Unable to analyze this ZIP in your browser. Check that it is unencrypted, valid and within the archive limits. If runtime loading failed, check your connection or try a current desktop browser. No file was uploaded.'});
+    self.postMessage({error:'ZIP blocked or unreadable. It may contain unsafe paths, invalid structure, unsupported encryption/compression, or exceed archive limits. No ZIP code was executed. If runtime loading failed, check your connection or try a current desktop browser. No file was uploaded.'});
   }
 };

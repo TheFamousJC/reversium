@@ -264,3 +264,14 @@ The useful question is: “What should my developer check after this change?” 
 We tested with Tudela. Comparing identical reports found no map changes. In a disposable test copy we renamed one table reference, without touching the original or live platform. The comparison identified a changed data-read connection and pointed directly to the chat API and AskHerzlChat screen for investigation. We also tested a clearly labelled confidence-only change. Neither result proves that a user-facing feature failed or that the database changed: a developer still needs to inspect the source and test the workflow separately.
 
 This remains free and local. Your ZIP and reports are not uploaded, and no AI connection is needed. The guide explains the limits and how to read the comparison. ChatGPT access is still disabled pending approval.
+
+
+## Traffic-light file alerts — build 0.17.0
+
+There is now a File alerts tab and a shortcut showing the counts above the inventory. Green means the supported checks found no warning signs; it never means guaranteed safe. Yellow means possible damage, an executable/script that needs review, or something Reversium could not inspect fully. Red means a potentially dangerous pattern or misleading filename worth investigating; it is not a declaration that a file is malware.
+
+Click a color to filter the list, or choose Possible damage / invalid format. Each alert explains its reason and links to evidence. The integrity summary tells you how many ZIP members passed CRC, failed, or were not checked. CRC catches some accidental damage; a malicious file can still have a valid CRC. Unsupported, encrypted, nested and oversized files leave gaps, and suspicious code examples can cause alerts.
+
+Tudela's 266 members passed the bounded CRC read. Its results were zero red, 144 yellow and 122 green. Most yellow results concern inspection limits or active formats; these are not 144 corrupted files. We separately tested an intentionally damaged file and a suspicious-looking executable name in an inert sample ZIP, and confirmed that alerts and evidence navigation work without running anything. No file is sent to an external scanning service, deleted or quarantined. These checks do not replace antivirus or a developer's security review.
+
+A sandbox to try the software is possible, but it needs a local companion and a disposable virtual machine; the online GitHub Pages edition cannot supply arbitrary native execution. We documented an offline-first design with no live credentials, restricted sharing, reviewed setup commands and a stop control. Windows Sandbox needs a supported Windows edition and hardware; a Linux VM is another route. Offline mode may prevent dependency installation or external services from working. This run feature is not built yet, and no isolation system guarantees zero risk. Traffic lights never grant permission to execute a ZIP.

@@ -52,7 +52,8 @@ class AnalysisTests(unittest.TestCase):
 
     def test_large_content_skipped(self):
         report = inspect_zip(archive([('large.py', 'x' * (MAX_FILE + 1))]))
-        self.assertEqual(report['findings'], [])
+        self.assertFalse(any(f['kind']!='file_review_signal' for f in report['findings']))
+        self.assertEqual(report['files'][0]['file_review']['level'], 'yellow')
         self.assertTrue(report['warnings'])
 
     def test_html_escape(self):
