@@ -64,6 +64,35 @@ class AnalysisTests(unittest.TestCase):
         report = inspect_zip(archive([('broken.py', 'def :'), ('package.json', '{broken')]))
         self.assertEqual(len(report['warnings']), 2)
 
+    def test_large_http_response_reuses_framed_connection(self):
+        from reversium.__main__ import LocalHTTPServer
+        # Several writes and multiple requests must arrive intact on one socket.
+        payload = 'framed-response-' * 70000
+        class LargeHandler(Handler):
+            def do_GET(self):
+                self.send(200, payload, 'text/plain; charset=utf-8')
+        server = LocalHTTPServer(('127.0.0.1', 0), LargeHandler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        connection = http.client.HTTPConnection('127.0.0.1', server.server_port, timeout=5)
+        try:
+            sock = None
+            for _ in range(4):
+                connection.request('GET', '/')
+                response = connection.getresponse()
+                self.assertEqual(response.version, 11)
+                self.assertFalse(response.will_close)
+                self.assertEqual(int(response.getheader('Content-Length')), len(payload))
+                self.assertEqual(response.read(), payload.encode())
+                if sock is None:
+                    sock = connection.sock
+                self.assertIs(connection.sock, sock)
+        finally:
+            connection.close()
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
+
     def test_http(self):
         from reversium.__main__ import LocalHTTPServer
         server = LocalHTTPServer(('127.0.0.1', 0), Handler)
@@ -86,6 +115,7 @@ class AnalysisTests(unittest.TestCase):
             connection.request('POST', '/analyze', body=data, headers={'Origin': 'https://example.com'})
             response = connection.getresponse()
             self.assertEqual(response.status, 403)
+            self.assertEqual(response.getheader('Connection'), 'close')
             response.read()
             connection.close()
         finally:

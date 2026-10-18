@@ -226,3 +226,10 @@ PDF reliability fix: only sandboxed about:srcdoc reports forward downloads to th
 The online AI tab now shows the planned account connection and answer area, clearly marked as awaiting approval. You can prepare and review selected evidence, but cannot connect or send yet. The existing manual handoff remains usable. Once an approved connection is implemented and tested, answers can appear here without exporting a request. This preparation does not enable ChatGPT subscription access.
 
 Browser verification with fictional source confirmed pending-approval status, disabled connect/send, exact selected-evidence preview, approval reset after edits and working manual fallback. Eight fake-adapter tests pass without network calls. The regression suite hit an intermittent Windows loopback reset; the affected HTTP test file passed when run separately. No hosted account sign-in or inference was performed.
+
+
+## Tudela check and local reliability fix — 18 October 2026
+
+We tested the prepared online AI controls using the real Tudela ZIP. The browser found the expected 266 files and 3,882 findings. We selected three chat-related clues and confirmed that the review contained only the question and those selected clues. Editing the request removed the approval tick. Connection and Send stayed unavailable while approval is pending. The manual option still prepared the same selected clues, and Clear removed the file selection and displayed report. Nothing was submitted to ChatGPT.
+
+We also reproduced and fixed a local-server connection problem on Windows: the connection could close while a larger report was still being read. Successful responses now reuse a correctly sized HTTP connection; errors close it deliberately. Six complete test runs finished without the reset, including a new check that transfers several large responses over one connection. One optional identity-signature check was skipped because its extra libraries are not installed. The eight simulated AI lifecycle checks also pass. Live ChatGPT access remains disabled and still needs approval plus provider-specific integration and verification.
