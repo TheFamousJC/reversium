@@ -28,7 +28,7 @@ def check():
     if meta.get('version')!=__version__ or hashlib.sha256(engine.read_bytes()).hexdigest()!=meta.get('sha256'):
         problems.append('Browser analyzer metadata is stale.')
     with zipfile.ZipFile(engine) as z:
-        if z.read('reversium/user_guide.py')!=(ROOT/'reversium/user_guide.py').read_bytes():
+        if z.read('reversium/user_guide.py').decode('utf-8').replace('\r\n','\n')!=(ROOT/'reversium/user_guide.py').read_text(encoding='utf-8'):
             problems.append('Browser analyzer contains a stale guide.')
     # Product copy only: dependency licence notices and vendor assets are preserved.
     targets=[ROOT/'README.md',ROOT/'CONTRIBUTING.md',ROOT/'index.html',ROOT/'demo/report.html',ROOT/'web/index.html',ROOT/'web/README.md']
