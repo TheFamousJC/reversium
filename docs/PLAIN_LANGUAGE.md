@@ -1,6 +1,6 @@
 # Reversium, explained without technical background
 
-Living explanation. Last updated: 2026-10-16.
+Living explanation. Last updated: 2026-10-18.
 
 ## Optional help inside Reversium — version 0.10.0
 
@@ -286,3 +286,16 @@ The market comparison now makes our gaps explicit. Tools such as CodeBoarding of
 We have built the first sandbox preparation step, not a running sandbox. The local application can check prerequisites and write offline starter profiles. Nothing is launched and no ZIP is placed inside them. This computer has Windows Home, so Windows Sandbox is not available; QEMU is also absent, and Docker's engine was unavailable. WSL is not being used as the safety boundary. A free Linux guest running under QEMU is the next route to investigate without paying for a Windows upgrade or cloud service. It still needs a trusted guest image, tested isolation, a stop/timeout mechanism and reviewed dependencies before trying Tudela.
 
 Tudela's new readiness plan and download were checked in the browser. The local prerequisite button correctly reports missing backends, while the online edition explains that it cannot inspect host programs. Files remain local and no AI is required. No software from the ZIP was executed during this stage.
+
+
+## Trying Tudela inside a disposable Linux computer — build 0.19.0
+
+We now have an experimental free local sandbox for the reviewed Tudela package. Think of it as a temporary Linux computer inside your Windows computer. We obtained QEMU and Alpine Linux from official or officially referred sources and checked their published file checksums. No Windows upgrade, paid cloud machine or change to Windows features was needed. This is currently a developer command-line feature; the online site still analyzes ZIPs without running them.
+
+Before introducing Tudela, we ran 14 checks on an empty guest. They confirmed the selected setup had no external network connection or shared host folders, could read but not change its input files, could not contact our host test service, lost its temporary marker when replaced with a fresh guest, and stopped when its deadline expired. All passed, including with the faster hardware acceleration already available here. These checks reduce specific risks; they cannot promise that a virtual machine has no security weaknesses.
+
+We then used a separate guest to install verified public libraries offline and build Tudela. Its frontend and backend compiled successfully. The production server started and its home page returned a successful HTTP response inside the guest. We used fake keys and reserved invalid service addresses, with no live account or database connection. Tudela's own production configuration checks remained in place. The guest was stopped afterward and its input image was unchanged.
+
+That is useful evidence that this delivery can build and start on Linux. It does not yet prove that users can sign in, save data, upload media or publish a tour. Those need disposable database, account and storage services, followed by a proper user-journey test. We deliberately have not exposed the guest website in your browser or connected it to live Tudela.
+
+The local setup commands are in Help and README. They download public packages, not upload your ZIP. Common environment and key files are omitted from the guest copy, but this cannot guarantee that code contains no embedded secrets. Private input copies and logs remain in the ignored reports/qemu-lab folder after the temporary computer stops; do not share or commit them. The original ZIP and live platform were untouched. Reversium remains free, local and open source, and ChatGPT access remains disabled while approval is pending.

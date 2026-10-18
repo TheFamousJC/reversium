@@ -54,7 +54,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Cache-Control', 'no-store')
         self.send_header('Referrer-Policy', 'no-referrer')
-        self.send_header('Content-Security-Policy', "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'")
+        self.send_header('Content-Security-Policy', "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'")
         self.end_headers()
         self.wfile.write(data)
         self.wfile.flush()
@@ -201,7 +201,24 @@ def main():
     parser.add_argument('--compare', help='Prior report.json to compare with CLI analysis')
     parser.add_argument('--sandbox-check', action='store_true', help='Read local backend availability; no execution')
     parser.add_argument('--sandbox-plan', metavar='NEW_DIRECTORY', help='Write offline preparation profiles; never boot or run ZIPs')
+    parser.add_argument('--sandbox-lab', default='reports/qemu-lab', help='Private QEMU lab directory (not uploaded or published)')
+    parser.add_argument('--sandbox-accelerator', choices=['tcg','whpx'], default='tcg', help='Explicit local CPU backend; WHPX requires already enabled Windows hypervisor support')
+    parser.add_argument('--sandbox-self-test', action='store_true', help='Explicitly boot benign offline guests and test isolation/teardown')
+    parser.add_argument('--sandbox-tudela', metavar='ZIP', help='Experimental fixed Tudela build/start profile; retests isolation first')
     args = parser.parse_args()
+    actions=sum(bool(x) for x in (args.sandbox_check,args.sandbox_plan,args.sandbox_self_test,args.sandbox_tudela))
+    if actions>1 or (actions and args.archive):
+        parser.error('Choose exactly one sandbox action, separately from archive analysis.')
+    if args.sandbox_self_test or args.sandbox_tudela:
+        from .qemu_lab import self_test, probe_tudela
+        try:
+            result=probe_tudela(args.sandbox_lab,args.sandbox_tudela,accelerator=args.sandbox_accelerator) if args.sandbox_tudela else self_test(args.sandbox_lab,accelerator=args.sandbox_accelerator)
+        except (OSError,ValueError,ImportError,RuntimeError) as error:
+            parser.error('Sandbox stopped: '+str(error))
+        print(json.dumps(result,indent=2))
+        if result.get('passed') is False or result.get('blocker'):
+            parser.exit(1)
+        return
     if args.sandbox_check or args.sandbox_plan:
         if args.archive or (args.sandbox_check and args.sandbox_plan):
             parser.error('Sandbox preparation/check is separate from ZIP analysis; choose one action.')

@@ -126,6 +126,22 @@ Browser review (0.15.0): restore handover JSON with a preview and delivery finge
 
 Feature-map review (0.16.0): Compare reports now shows changed relationships, earlier/current evidence, focused diagrams and directly recorded features separately from broader candidate effects. Traversal/display bounds and omissions are explicit. Nothing is uploaded or executed.
 
-File alerts (0.17.0): local traffic-light triage for bounded ZIP member integrity, selected filename/header disguises and suspicious script patterns. Green is not a safety certificate; yellow includes inspection gaps and potentially damaged files, and red is a review signal rather than a malware verdict. Nothing is executed or sent to a scanning service. See [isolated execution proposal](docs/SANDBOX_DESIGN.md) for the separate, unimplemented VM-based run milestone.
+File alerts (0.17.0): local traffic-light triage for bounded ZIP member integrity, selected filename/header disguises and suspicious script patterns. Green is not a safety certificate; yellow includes inspection gaps and potentially damaged files, and red is a review signal rather than a malware verdict. Nothing is executed or sent to a scanning service. See [isolated execution proposal](docs/SANDBOX_DESIGN.md) for the separate experimental VM-based run milestone.
 
 Setup/readiness (0.18.0): eight inventory-backed preparation checks, with explicit unknowns and a local text export. Handover cards now use an explicit light theme. Read-only sandbox prerequisites: `python -m reversium --sandbox-check`. Offline profile preparation: `python -m reversium --sandbox-plan reports/new-sandbox-plan` (new directory only). Preparation does not boot a VM or execute ZIPs; QEMU and Windows Sandbox profiles remain unvalidated runtime drafts. See the updated [market comparison](docs/market-position.html) for missing features and local/free priorities.
+
+
+Experimental local QEMU pilot (0.19.0, Windows only):
+
+```powershell
+python scripts/bootstrap_qemu_lab.py
+python scripts/prepare_tudela_offline.py "path/to/Tudela.zip"
+python -m reversium --sandbox-self-test
+python -m reversium --sandbox-tudela "path/to/Tudela.zip"
+```
+
+Requires existing 7-Zip. Downloads pinned QEMU/Alpine assets and the optional pycdlib ISO library into `reports/qemu-lab`; no QEMU installer or global PATH change is used. Public runtime/dependency packages are cached on the host, not installed there. Uploaded ZIP/source contents are not sent to providers. Publisher checksums are verified over HTTPS; this is not independent signature attestation or a malware clearance. Alpine APK trust remains enforced in the offline guest. Every application probe reruns blank-guest isolation checks first. Only the reviewed Tudela build/start profile is supported, with reserved .invalid service addresses and synthetic keys. No guest network adapter, host-folder sharing, clipboard integration or host port forwarding is enabled. Windows job supervision and deadlines stop the guest. This is not a guarantee against VM/emulator vulnerabilities.
+
+The lab retains private source-bearing input images and logs; do not commit or share them. Browser analysis remains separate and never executes ZIP contents. A successful build/start is not database/auth/tour acceptance. See [sandbox design and test record](docs/SANDBOX_DESIGN.md) for tested boundaries and remaining gaps.
+
+The default accelerator is TCG software emulation. If WHPX is already enabled, append `--sandbox-accelerator whpx` to either execution command; the same backend is tested before application use. No Windows feature is enabled automatically.

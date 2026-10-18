@@ -18,8 +18,22 @@ def capabilities():
     display_edition='Home' if edition.startswith('Core') else edition
     windows=bool(shutil.which('WindowsSandbox.exe'))
     qemu=bool(shutil.which('qemu-system-x86_64'))
+    lab=Path('reports/qemu-lab')
+    portable=system=='Windows' and (lab/'qemu/qemu-system-x86_64.exe').is_file()
+    record=None
+    if portable:
+        path=lab/'latest-self-test.json'
+        try:
+            if path.stat().st_size<1024*1024:
+                data=json.loads(path.read_text(encoding='utf-8'))
+                checks=data.get('checks',{})
+                if isinstance(checks,dict) and checks and all(isinstance(v,bool) for v in checks.values()):
+                    record={'passed':data.get('passed') is True and all(checks.values()) and len(checks)>=14,'passed_checks':sum(checks.values()),'total_checks':len(checks)}
+        except (OSError,ValueError,AttributeError):pass
+    detail=('Workspace QEMU found. Latest lab record (not this report): '+str(record['passed_checks'])+'/'+str(record['total_checks'])+' checks passed. Fresh isolation tests are required before every application probe.' if record else 'Workspace QEMU '+('found; guest validation is untested.' if portable else 'not found; guest boot and isolation are untested.'))
     return {'system':system,'edition':edition,'windows_sandbox_executable':windows,'qemu_executable':qemu,
-            'execution_enabled':False,'summary':f'Host: {system} ({display_edition}). Windows Sandbox executable: {"found" if windows else "not found"}; QEMU executable: {"found" if qemu else "not found"}. Preparation only; guest boot and isolation are untested.'}
+            'portable_qemu_present':portable,'recorded_self_test':record,'execution_enabled':False,
+            'summary':f'Host: {system} ({display_edition}). Windows Sandbox executable: {"found" if windows else "not found"}; QEMU on PATH: {"found" if qemu else "not found"}. '+detail+' Automatic browser execution remains disabled; experimental execution is an explicit local CLI action.'}
 
 
 def prepare(destination):
