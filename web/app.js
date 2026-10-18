@@ -22,7 +22,7 @@ window.addEventListener('message',event=>{
 $('#upload-form').onsubmit=async event=>{
  event.preventDefault();const file=$('#zip-input').files[0];if(!file||file.size>33554432||file.size===0||worker)return;
  upload.hidden=true;progress.hidden=false;$('#browser-message').textContent='Preparing the local analysis…';
- worker=new Worker('./worker.mjs?v=0.15.0',{type:'module'});
+ worker=new Worker('./worker.mjs?v=0.16.0',{type:'module'});
  timer=setTimeout(()=>{stop();$('#browser-message').textContent='Analysis stopped after five minutes. Try a smaller archive or a more capable device. Nothing was uploaded.'},300000);
  worker.onerror=()=>{stop();$('#browser-message').textContent='Browser runtime could not start. Check your connection and browser support, then cancel and retry. Nothing was uploaded.'};
  worker.onmessage=({data})=>{if(data.stage)$('#browser-message').textContent=data.stage;if(data.error){stop();$('#browser-message').textContent=data.error}if(data.html){stop();document.querySelector('#app-content').hidden=true;progress.hidden=true;results.hidden=false;$('#start-step').hidden=true;frame.srcdoc=data.html;results.scrollIntoView({block:'start'})}};

@@ -1,5 +1,7 @@
 """Offline browser review tools; imported data is never interpreted as markup."""
-PANEL = '''<h2>Compare with a saved report</h2><p>Choose an earlier Reversium report JSON. Both reports stay on this device. This compares file inventory, available content hashes and finding identities, not runtime behavior or graph relationships. Different analyzer versions can produce different findings from identical code. Checklist notes are preserved.</p><label>Earlier report (JSON, maximum 32 MiB) <input id="baseline-import" type="file" accept=".json,application/json"></label><button id="baseline-save" disabled>Save comparison notes</button><button id="baseline-clear">Clear comparison</button><p id="baseline-status" role="status">Save a report JSON after each delivery to compare it here later.</p><div id="baseline-results"></div>'''
+from .map_review import FUNCTIONS as MAP_FUNCTIONS, UI as MAP_UI
+
+PANEL = '''<h2>Compare with a saved report</h2><p>Choose an earlier Reversium report JSON. Both reports stay on this device. This compares file inventory, available content hashes and finding identities, feature-map relationships, not runtime behavior. Different analyzer versions can produce different findings from identical code. Checklist notes are preserved.</p><label>Earlier report (JSON, maximum 32 MiB) <input id="baseline-import" type="file" accept=".json,application/json"></label><button id="baseline-save" disabled>Save comparison notes</button><button id="baseline-clear">Clear comparison</button><p id="baseline-status" role="status">Save a report JSON after each delivery to compare it here later.</p><div id="baseline-results"></div>'''
 
 FUNCTIONS = r"""
 function validateChecklist(saved,report){
@@ -26,7 +28,9 @@ function compareLocal(current,previous){
 }
 """
 
-SCRIPT = FUNCTIONS + r"""
+FUNCTIONS += MAP_FUNCTIONS
+
+SCRIPT = FUNCTIONS + MAP_UI + r"""
 (()=>{
 const $=s=>document.querySelector(s),report=JSON.parse($('#report-data').textContent);let pending=null,restoreSerial=0,compareSerial=0;
 if(parent!==window&&location.href==='about:srcdoc'){for(const kind of ['handover','baseline'])$('#'+kind+'-import').onclick=e=>{e.preventDefault();parent.postMessage({type:'reversium-review-pick',kind},'*');};window.addEventListener('message',e=>{if(e.source!==parent||e.data?.type!=='reversium-review-file'||!['handover','baseline'].includes(e.data.kind)||!(e.data.file instanceof File))return;$('#'+e.data.kind+'-import').onchange({target:{files:[e.data.file],value:''}});});}
@@ -40,7 +44,8 @@ $('#baseline-clear').onclick=()=>{compareSerial++;$('#baseline-save').disabled=t
 $('#baseline-import').onchange=async e=>{const serial=++compareSerial,file=e.target.files[0];$('#baseline-results').replaceChildren();$('#baseline-save').disabled=true;if(!file)return;$('#baseline-status').textContent='Reading the earlier report locally…';
 try{if(file.size>33554432)throw Error('Report exceeds 32 MiB.');const previous=JSON.parse(await file.text());if(serial!==compareSerial)return;const result=compareLocal(report,previous),area=$('#baseline-results');$('#baseline-save').disabled=false;
 $('#baseline-status').textContent='Compared current '+(report.archive_name||'package')+' with '+(previous.archive_name||file.name)+'. Structural evidence only; analyzer changes can affect findings. Each list shows at most 200 entries. Comparison is temporary; save these results as readable notes.';
+drawMapComparison(report,previous,area);
 for(const [key,items] of Object.entries(result)){const h=document.createElement('h3');h.textContent=key.replaceAll('_',' ')+': '+items.length;area.append(h);const list=document.createElement('ul');for(const item of items.slice(0,200)){const li=document.createElement('li');li.textContent=typeof item==='string'?item:item.kind+': '+item.value+' — '+item.evidence.file;list.append(li);}area.append(list);if(items.length>200){const p=document.createElement('p');p.textContent=(items.length-200)+' further entries omitted from this view.';area.append(p);}}
-}catch(error){if(serial===compareSerial)$('#baseline-status').textContent='Comparison not loaded: '+error.message;}finally{e.target.value='';}};
+}catch(error){if(serial===compareSerial){$('#baseline-results').replaceChildren();$('#baseline-save').disabled=true;}if(serial===compareSerial)$('#baseline-status').textContent='Comparison not loaded: '+error.message;}finally{e.target.value='';}};
 })();
 """

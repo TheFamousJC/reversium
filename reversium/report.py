@@ -108,7 +108,7 @@ def render(report):
     }.get(report.get('user_goal', 'understand'), 'Start with supported findings, then check their evidence and gaps.')
     page = f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Reversium report</title><style>{STYLE}{AI_STYLE}{MODERN_STYLE}</style><main>
-<p class="brand">REVERSIUM 0.15.0 / LOCAL ANALYSIS</p>
+<p class="brand">REVERSIUM 0.16.0 / LOCAL ANALYSIS</p>
 <nav><a href="/">Start a new analysis</a><span>Step 3 · Review findings → Step 4 · Save &amp; next steps</span></nav>
 {'<p class="sample-notice">SAMPLE ANALYSIS · Fictional demonstration data. Start a new analysis to inspect your ZIP.</p>' if report.get("example") else ''}
 <p><b>Package:</b> {esc(report.get("archive_name", "Uploaded software package"))} · <b>Your goal:</b> {esc(goal_label)}</p>
@@ -137,7 +137,7 @@ def render(report):
 <section role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant" tabindex="0">{AI_PANEL}</section>
 <section role="tabpanel" id="panel-help" aria-labelledby="tab-help" tabindex="0">{GUIDE}</section>
 <section role="tabpanel" id="panel-faq" aria-labelledby="tab-faq" tabindex="0">{FAQ_GENERAL}{EXPORT_HELP}{FAQ_AI}</section>
-<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><p><b>Recommended for you:</b> save the readable report and send it to the developer. Technical data is optional and mainly useful for scripts or comparing packages.</p><nav><button id="html-export">Save readable report (HTML)</button><button id="json-export">Save technical data (JSON)</button></nav>{EXPORT_HELP}{NEXT_STEPS}<nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.15.0. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
+<section role="tabpanel" id="panel-finish" aria-labelledby="tab-finish" tabindex="0"><h2>Step 4 · Save and decide what comes next</h2><p>Keep a record of this analysis, then choose a practical check. A saved report is not proof that the software runs.</p><h3>Save your analysis</h3><p><b>Recommended for you:</b> save the readable report and send it to the developer. Technical data is optional and mainly useful for scripts or comparing packages.</p><nav><button id="html-export">Save readable report (HTML)</button><button id="json-export">Save technical data (JSON)</button></nav>{EXPORT_HELP}{NEXT_STEPS}<nav><button data-guide="tab-coverage">Review remaining gaps</button><button data-guide="tab-assistant">Optional: ask AI about selected evidence</button><a href="/">Start another analysis</a></nav><p>AI is optional. Connecting an account is not needed to read or save this report.</p></section><p>Open Source · 3Sci.com · 2026</p><p>Generated locally by Reversium 0.16.0. Local analysis needs no paid services. Optional AI shares only approved requests.</p></main>
 <script type="application/json" id="report-data">{payload}</script><script>{SCRIPT}{AI_SCRIPT}{HELP_SCRIPT}{GUIDE_SCRIPT}{MAINTENANCE_SCRIPT}{REVIEW_SCRIPT}</script></html>'''
     return layout(page)
 
@@ -215,3 +215,5 @@ STYLE += '.report-brand{display:flex;align-items:center;gap:12px;font-weight:700
 STYLE += '.subsection table{table-layout:fixed}.subsection th,.subsection td{overflow-wrap:anywhere;vertical-align:top}.report-brand{margin-bottom:14px}.subsection th{white-space:normal}'
 
 STYLE += '.handover-task{max-width:900px;min-width:0;margin:18px 0}.handover-task label{display:block;margin:12px 0}.handover-task input,.handover-task textarea{display:block;width:100%;box-sizing:border-box;max-width:100%;padding:12px}.handover-task select{min-width:230px}.handover-task p{margin:8px 0}'
+
+STYLE += '.relationship-change{background:#fff!important;color:#17253c!important;border:1px solid #cbd5e1;border-left:5px solid #4058da;border-radius:12px;padding:22px;margin:20px 0}.relationship-change h3{color:#17253c}.relationship-change a{color:#304bb8}.relationship-change svg{background:#fff;border-radius:10px}.relationship-change p{line-height:1.6}'

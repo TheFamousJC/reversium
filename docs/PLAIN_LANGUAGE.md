@@ -253,3 +253,14 @@ You can now save a handover checklist, return to the same ZIP later, and restore
 Open Compare reports and choose an earlier report JSON to see which files or recorded clues differ. Files that were not hashed are clearly marked unverified. Save comparison notes to keep the displayed results; long lists disclose omitted entries. Comparing does not erase your handover work. Neither your ZIP, report nor checklist is uploaded or sent to AI.
 
 We tested this with Tudela. A matching checklist restored and a wrong fingerprint was rejected. Its older report showed 115 extra clues under the newer reader, without changed shared file hashes. That does not mean Tudela gained 115 features: improved analysis can find more in the same files. Comparing the current report with itself found no changes. Some files still lack content hashes, and this browser view does not compare graph connections or prove what works at runtime. ChatGPT account access remains disabled until approved.
+
+
+## See which software connections changed — build 0.16.0
+
+Compare reports now includes feature-map changes. After analyzing your current ZIP, choose an earlier report in Compare reports. You can see which recorded features, code blocks and relationships were added, removed or changed. Each relationship card shows what was recorded earlier, what is recorded now, a small diagram and the source references. Current references open the current evidence; earlier locations belong to the earlier saved report.
+
+The useful question is: “What should my developer check after this change?” Directly recorded feature names appear first. Broader candidate connections can be expanded separately: shared code or table names can connect otherwise unrelated features. These are leads for investigation, not a list of things that definitely broke. Missing maps, uninspected behavior and truncated searches stay clearly marked. Save comparison notes if you want to keep the displayed review.
+
+We tested with Tudela. Comparing identical reports found no map changes. In a disposable test copy we renamed one table reference, without touching the original or live platform. The comparison identified a changed data-read connection and pointed directly to the chat API and AskHerzlChat screen for investigation. We also tested a clearly labelled confidence-only change. Neither result proves that a user-facing feature failed or that the database changed: a developer still needs to inspect the source and test the workflow separately.
+
+This remains free and local. Your ZIP and reports are not uploaded, and no AI connection is needed. The guide explains the limits and how to read the comparison. ChatGPT access is still disabled pending approval.
