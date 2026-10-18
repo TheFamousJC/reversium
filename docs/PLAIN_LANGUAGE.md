@@ -244,3 +244,12 @@ Use the new Handover tab to see setup clues with evidence: configuration variabl
 Use Change impact to choose a file and inspect nearby upstream/downstream references. It can help decide what to read or test before changing code. It does not predict every broken feature. Source links, candidate labels and limits remain visible. The first Tudela test used an overly broad evidence-based starting point; explicit file metadata now gives a tighter view, including 13 nearby candidates for its chat screen.
 
 The same Tudela archive still has 266 files. It now produces 4,004 findings because 122 setup clues have been added, grouped into 88 setup entries. Both handover downloads and impact evidence navigation were checked in the browser. The updated user guide has nine chapters. All core features remain free and local with no added service subscription or model requirement. Hosted ChatGPT access stays disabled while approval is pending.
+
+
+## Resume a review and compare deliveries — build 0.15.0
+
+You can now save a handover checklist, return to the same ZIP later, and restore your owners, statuses and notes. Open Handover, choose the saved checklist, review its preview and press Replace. New saves check the exact ZIP fingerprint first. A different or repacked ZIP will not match. Older checklists only carry a package name: the warning asks you to confirm the delivery yourself before replacing notes. Save before closing; nothing is stored automatically. A reviewer marking something verified is still a human annotation, not an automated test result.
+
+Open Compare reports and choose an earlier report JSON to see which files or recorded clues differ. Files that were not hashed are clearly marked unverified. Save comparison notes to keep the displayed results; long lists disclose omitted entries. Comparing does not erase your handover work. Neither your ZIP, report nor checklist is uploaded or sent to AI.
+
+We tested this with Tudela. A matching checklist restored and a wrong fingerprint was rejected. Its older report showed 115 extra clues under the newer reader, without changed shared file hashes. That does not mean Tudela gained 115 features: improved analysis can find more in the same files. Comparing the current report with itself found no changes. Some files still lack content hashes, and this browser view does not compare graph connections or prove what works at runtime. ChatGPT account access remains disabled until approved.

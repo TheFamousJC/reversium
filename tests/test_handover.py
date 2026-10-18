@@ -40,3 +40,10 @@ class HandoverTests(unittest.TestCase):
         report=scan({'src/app.ts':"import express from 'express'; const app=express(); app.get('/hello', (req,res)=>{res.json({ok:true});});"})
         nodes=[n for n in report['feature_map']['nodes'] if n['kind'] in {'module','helper','handler','feature'}]
         self.assertTrue(nodes);self.assertTrue(all(n.get('file')=='src/app.ts' for n in nodes))
+
+    def test_exact_archive_identity_includes_unread_content(self):
+        a=scan({'.env':'private-one'});b=scan({'.env':'private-two'})
+        self.assertEqual(len(a['archive_sha256']),64)
+        self.assertNotEqual(a['archive_sha256'],b['archive_sha256'])
+        self.assertIn('id="baseline-import"',render(a))
+        self.assertIn('id="handover-import"',render(a))

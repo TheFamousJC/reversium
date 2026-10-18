@@ -36,6 +36,16 @@ def inspect_zip(path):
     def finding(kind, value, file, line, confidence='observed'):
         report['findings'].append({'kind': kind, 'value': str(value)[:300], 'confidence': confidence, 'evidence': {'file': file, 'line': line}})
     with zipfile.ZipFile(path) as archive:
+        # Exact delivery identity, including inventory-only members. Bounded extra read.
+        position = archive.fp.tell()
+        archive.fp.seek(0, 2)
+        if archive.fp.tell() <= 64 * 1024 * 1024:
+            archive.fp.seek(0)
+            digest = hashlib.sha256()
+            while chunk := archive.fp.read(1024 * 1024):
+                digest.update(chunk)
+            report['archive_sha256'] = digest.hexdigest()
+        archive.fp.seek(position)
         members = archive.infolist()
         if len(members) > MAX_FILES:
             raise ValueError('Archive exceeds 10,000 entries.')

@@ -121,3 +121,5 @@ Build 0.11.1 improves the owner walkthrough: brief evidence-linked technology cl
 ## Rebuild the public demo
 
 Run `python scripts/build_demo.py`. It generates index.html and demo/report.html from fictional in-code fixtures only, using the real analyzer and renderer. Existing GitHub Pages publishes the root of codex/initial-workbench. Do not replace these fixtures with private customer code.
+
+Browser review (0.15.0): restore handover JSON with a preview and delivery fingerprint, or open Compare reports to compare a previous report locally. Legacy checklists require independent delivery confirmation. Browser comparison covers files and findings, not graph relationships or runtime behavior. Save comparison notes records the displayed bounded results.

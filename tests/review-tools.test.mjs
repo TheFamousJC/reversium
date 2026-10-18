@@ -1,0 +1,12 @@
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+const source=readFileSync(new URL('../reversium/review_tools.py',import.meta.url),'utf8').split('FUNCTIONS = r"""')[1].split('"""')[0];
+const api=vm.runInNewContext(source+';({validateChecklist,compareLocal})');
+const hash='a'.repeat(64), report={archive_name:'Tudela.zip',archive_sha256:hash,schema_version:3,files:[{path:'a.ts',sha256:hash},{path:'asset'}],findings:[]};
+const saved={format:'reversium-handover',version:2,archive_sha256:hash,tasks:['workflow','runtime','configuration','services','run'].map(id=>({id,status:'Not checked',owner:'Developer',notes:'<script>plain text</script>'}))};
+test('exact delivery restore and legacy warning',()=>{assert.equal(api.validateChecklist(saved,report).legacy,false);assert.equal(api.validateChecklist({...saved,version:1,archive_name:'Tudela.zip'},report).legacy,true);});
+test('wrong delivery, duplicate tasks, invalid status and oversized notes rejected',()=>{assert.throws(()=>api.validateChecklist({...saved,archive_sha256:'b'.repeat(64)},report));for(const field of [{id:'runtime'},{status:'fake'},{notes:'a'.repeat(2001)}]){const tasks=structuredClone(saved.tasks);Object.assign(tasks[0],field);assert.throws(()=>api.validateChecklist({...saved,tasks},report));}});
+test('comparison hashes only shared inspected files, flags unavailable hashes',()=>{const previous=structuredClone(report);previous.files[0].sha256='b'.repeat(64);previous.files.push({path:'removed'});const result=api.compareLocal(report,previous);assert.deepEqual(Array.from(result.changed_files),['a.ts']);assert.deepEqual(Array.from(result.removed_files),['removed']);assert.deepEqual(Array.from(result.unverified_files),['asset']);});
+test('finding identity ignores line movement and rejects malformed baselines',()=>{const f={kind:'route',value:'/hello',evidence:{file:'a.ts',line:1}};assert.equal(api.compareLocal({...report,findings:[f]},{...report,findings:[{...f,evidence:{file:'a.ts',line:9}}]}).added_findings.length,0);for(const bad of [{}, {...report,files:[{path:'a'},{path:'a'}]}, {...report,findings:[{}]}])assert.throws(()=>api.compareLocal(report,bad));});

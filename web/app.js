@@ -16,13 +16,13 @@ $('#browser-cancel').onclick=clear;$('#browser-clear').onclick=clear;
 window.addEventListener('message',event=>{
  if(event.source!==frame.contentWindow)return;
  if(event.data?.type==='reversium-clear')clear();
- const d=event.data,formats={'Reversium-User-Guide.pdf':'application/pdf','reversium-ai-request.txt':'text/plain','reversium-handover.txt':'text/plain','reversium-handover.json':'application/json','reversium-report.json':'application/json','reversium-report.html':'text/html','reversium-feature-map.svg':'image/svg+xml'};
+ const d=event.data,formats={'reversium-comparison.txt':'text/plain','Reversium-User-Guide.pdf':'application/pdf','reversium-ai-request.txt':'text/plain','reversium-handover.txt':'text/plain','reversium-handover.json':'application/json','reversium-report.json':'application/json','reversium-report.html':'text/html','reversium-feature-map.svg':'image/svg+xml'};
  if(d?.type==='reversium-download'&&formats[d.name]===d.mime&&typeof d.text==='string'&&d.text.length<100000000){const url=URL.createObjectURL(new Blob([d.mime==='application/pdf'?Uint8Array.from(atob(d.text),c=>c.charCodeAt(0)):d.text],{type:d.mime}));const a=document.createElement('a');a.href=url;a.download=d.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 });
 $('#upload-form').onsubmit=async event=>{
  event.preventDefault();const file=$('#zip-input').files[0];if(!file||file.size>33554432||file.size===0||worker)return;
  upload.hidden=true;progress.hidden=false;$('#browser-message').textContent='Preparing the local analysis…';
- worker=new Worker('./worker.mjs',{type:'module'});
+ worker=new Worker('./worker.mjs?v=0.15.0',{type:'module'});
  timer=setTimeout(()=>{stop();$('#browser-message').textContent='Analysis stopped after five minutes. Try a smaller archive or a more capable device. Nothing was uploaded.'},300000);
  worker.onerror=()=>{stop();$('#browser-message').textContent='Browser runtime could not start. Check your connection and browser support, then cancel and retry. Nothing was uploaded.'};
  worker.onmessage=({data})=>{if(data.stage)$('#browser-message').textContent=data.stage;if(data.error){stop();$('#browser-message').textContent=data.error}if(data.html){stop();document.querySelector('#app-content').hidden=true;progress.hidden=true;results.hidden=false;$('#start-step').hidden=true;frame.srcdoc=data.html;results.scrollIntoView({block:'start'})}};
@@ -41,3 +41,8 @@ window.addEventListener('message',async event=>{
  const reply=(result,error)=>frame.contentWindow.postMessage({type:'reversium-account-ai-result',requestId:d.requestId,...result,error},'*');
  try{let result;if(d.action==='status')result=onlineAI.snapshot();else if(d.action==='connect')result=await onlineAI.connect();else if(d.action==='disconnect')result=await onlineAI.disconnect();else if(d.action==='cancel')result=onlineAI.cancel();else if(d.action==='ask')result=await onlineAI.ask(d.packet,d.approved);else return;reply(result);}catch(error){reply(onlineAI.snapshot(),error.message)}
 });
+
+// The host owns file pickers for the sandboxed report, just as it owns downloads.
+const reviewPicker=document.createElement('input');reviewPicker.type='file';reviewPicker.accept='.json,application/json';reviewPicker.hidden=true;document.body.append(reviewPicker);let reviewKind=null;
+window.addEventListener('message',event=>{if(event.source!==frame.contentWindow||event.data?.type!=='reversium-review-pick'||!['handover','baseline'].includes(event.data.kind))return;reviewKind=event.data.kind;reviewPicker.value='';reviewPicker.click();});
+reviewPicker.onchange=()=>{const file=reviewPicker.files[0];if(file&&reviewKind)frame.contentWindow.postMessage({type:'reversium-review-file',kind:reviewKind,file},'*');reviewPicker.value='';reviewKind=null;};
