@@ -6,6 +6,7 @@ import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from .sandbox import capabilities, prepare as prepare_sandbox
 from .analyze import inspect_zip
 from .report import render, STYLE
 from .presentation import STYLE as MODERN_STYLE, SCRIPT as HELP_SCRIPT
@@ -79,6 +80,8 @@ class Handler(BaseHTTPRequestHandler):
             result = inspect_zip(javascript_sample_archive())
             result['example'] = True
             return self.send(200, render(result))
+        if self.path == '/sandbox/status':
+            return self.send(200, json.dumps(capabilities()), 'application/json')
         if self.path == '/version':
             return self.send(200, json.dumps({'version': __version__}), 'application/json')
         self.send(200, HOME) if self.path == '/' else self.send(404, 'Not found.')
@@ -196,7 +199,18 @@ def main():
     parser.add_argument('--port', type=int, default=8765)
     parser.add_argument('--no-browser', action='store_true')
     parser.add_argument('--compare', help='Prior report.json to compare with CLI analysis')
+    parser.add_argument('--sandbox-check', action='store_true', help='Read local backend availability; no execution')
+    parser.add_argument('--sandbox-plan', metavar='NEW_DIRECTORY', help='Write offline preparation profiles; never boot or run ZIPs')
     args = parser.parse_args()
+    if args.sandbox_check or args.sandbox_plan:
+        if args.archive or (args.sandbox_check and args.sandbox_plan):
+            parser.error('Sandbox preparation/check is separate from ZIP analysis; choose one action.')
+        try:
+            status = prepare_sandbox(args.sandbox_plan) if args.sandbox_plan else capabilities()
+        except OSError as error:
+            parser.error('Cannot write sandbox plan: ' + str(error))
+        print(json.dumps(status, indent=2))
+        return
     if args.archive:
         result = inspect_zip(args.archive)
         if args.compare:

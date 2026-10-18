@@ -1,6 +1,6 @@
 # Isolated execution proposal
 
-Status: design only, build 0.17.0. Reversium does not run software from uploaded ZIPs. The browser worker isolates the analyzer, not an application execution environment. Traffic-light review never authorizes execution.
+Status: preparation stage implemented in 0.18.0; VM execution remains unimplemented. Reversium does not run software from uploaded ZIPs. The browser worker isolates the analyzer, not an application execution environment. Traffic-light review never authorizes execution.
 
 ## What is possible
 
@@ -33,3 +33,12 @@ No VM provides a guarantee of zero risk. A compromised host or hypervisor, unsaf
 - [Windows Sandbox overview and supported editions](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/)
 - [Windows Sandbox configuration: networking, sharing and redirection](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file)
 - [Docker Engine security and isolation considerations](https://docs.docker.com/engine/security/)
+
+
+## Implemented preparation stage (0.18.0)
+
+`python -m reversium --sandbox-check` reads OS edition and executable availability without starting processes. `python -m reversium --sandbox-plan reports/new-sandbox-plan` creates a new directory (refuses overwrite) with a host check, a blank offline Windows Sandbox configuration, an explicitly untested QEMU argv draft and instructions. No ZIP is copied, no files are mapped, and no guest or archive command is run. The local server exposes read-only prerequisite status; the online UI cannot inspect host capabilities.
+
+On the development machine: Windows Core/Home, Windows Sandbox executable not found, QEMU not found. Docker CLI exists but its engine was unavailable; QEMU was also not found inside WSL. WSL Ubuntu exists but is not treated as a disposable unknown-code boundary. No optional Windows features were enabled and no backend or guest image installed. The first usable no-upgrade path to investigate is QEMU plus a trusted Linux guest, with network devices absent and no host shares. Software-emulated TCG is a possible draft profile, with performance and compatibility unverified.
+
+Prepared profiles are not a working Tudela sandbox. Next: obtain and verify a trusted backend/image, boot a blank guest, verify network/share isolation and termination, then design a narrow ZIP input channel and reviewed offline runtime provisioning. A timeout supervisor, reproducible guest image, tested teardown and guarded preview are still missing. Do not execute the draft as proof of isolation.
