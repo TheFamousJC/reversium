@@ -312,3 +312,18 @@ There may be a business here, especially when an agency inherits a project or an
 Our pitch is: taking over software should not start with guesswork. Reversium turns an unfamiliar package into an evidence-backed handover and a practical plan for the next developer, while keeping the ZIP on your device. AI can help explain code and use tools too; Reversium's proposed value is a repeatable process with evidence, comparisons and visible gaps.
 
 Next we plan to connect a developer-reviewed test outcome to the exact ZIP it tested, then work toward a complete isolated user journey with disposable supporting services. These are next steps, not completed features. The current sandbox still proves only the narrow Tudela build/start experiment; hosted ChatGPT remains disabled pending approval.
+
+
+## Connect a real test to the right delivery — build 0.21.0
+
+You can now attach a sandbox result to the exact ZIP you analyzed. Open Setup & readiness, choose the local run-evidence.json (or latest-run-evidence.json), review its preview and choose Attach this reviewed test record. A fingerprint mismatch refuses the attachment, even if the filenames are identical. Renaming the same ZIP is fine; changing or repacking it gives a different identity. A bad replacement does not erase the record already attached.
+
+The screen keeps three things distinct: recorded test outcomes, static setup clues found in the files, and what remains unknown. Each outcome says pass, failure or not recorded. It shows both the original ZIP fingerprint and the filtered copy that actually ran, including how many members were omitted. The Tudela test used synthetic settings; it was not connected to live accounts or databases. Passing a build or internal page request does not prove that login, storage or publishing a tour works.
+
+We repeated the isolated Tudela test and generated a real record. All 14 selected isolation checks and 11 application/cleanup checks passed. We then analyzed the real ZIP in the browser, attached that record, refused a deliberately wrong fingerprint and checked save/remove/restore. A separate controlled failed-build preview clearly showed failure and unrecorded later checks; it was only a test fixture, not a Tudela failure. The exported report kept the real attached record and excluded that pending preview.
+
+Save linked test record (JSON) keeps the record for later use; Save readable test summary gives you text notes. Readable report HTML retains an explicitly attached record, while technical report JSON remains the original static analysis. Closing the page does not automatically save your attachment. Existing handover statuses and AI requests are unchanged. The records contain limited metadata and outcomes, not source code, passwords or raw logs.
+
+There is a trust limit: someone can edit a JSON record. Matching the ZIP identifies the delivery it claims to describe, not who made the record or whether every claim is true. Review the original private logs when needed. We inspected the exported HTML and validated its saved record, but the testing browser blocked opening downloaded local HTML files, so that particular reopening action was not browser-tested. The live browser attachment and saved-JSON restoration were tested.
+
+Help now includes a fourteenth chapter explaining the workflow, its limits and saving choices. Everything remains free and local; no new account or paid service is needed. The browser still does not run the uploaded program. Private sandbox files and live Tudela remain separate.

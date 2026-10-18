@@ -79,3 +79,8 @@ Primary runtime references: [QEMU invocation options](https://www.qemu.org/docs/
 
 
 Final WHPX outcome: Node v24.18.1/npm 11.11.0, frontend build and backend compilation succeeded. The compiled production server returned guest-local HTTP 200 for GET /, with a nonempty body. No external route remained afterward, the input image hash matched and QEMU stopped. This is only build/start acceptance; no database, authentication, storage or published-tour workflow was verified. Private result/log: ignored lab run tudela-a460bf0f19d4.
+
+
+## Portable exact-delivery evidence (0.21.0)
+
+Application probes now emit run-evidence.json and a latest-run-evidence.json alias in the private lab. A fixed allowlisted contract records original ZIP and filtered-copy SHA-256, omitted count, profile/run/version/time metadata and explicit true/false/null outcomes. No raw logs, source paths, credentials or arbitrary exception strings enter this portable file. Input copying hashes and repacks the same bounded immutable snapshot. Setup & readiness can preview and explicitly attach the record only to matching archive_sha256, separately from static findings. This is not signature verification or an authenticated runtime attestation. Manual JSON editing remains possible and is disclosed. HTML exports preserve applied evidence separately; static JSON and AI packets do not include it. The unchanged offline guest boundary and synthetic configuration still apply. The fresh Tudela result passed 14 isolation and 11 application/teardown checks; no wider service/workflow acceptance is established.

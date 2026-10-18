@@ -17,6 +17,7 @@ import time
 import base64
 import zipfile
 from pathlib import Path
+from .runtime_evidence import portable_result, utc_now
 
 ASSETS = {
     'qemu-w64-setup-20260811.exe': ('https://qemu.weilnetz.de/w64/', 'sha512', '5bcf9eed634e8575a37b74f445af41a2fe4106da512d0c30c368301d4c105037fdfab40a5287367a28a957624cddebbc8c07e16c88ab6634f554cdf3d16bf543'),
@@ -257,13 +258,19 @@ def self_test(lab, accelerator="tcg"):
 def sanitize_delivery(archive):
     """Copy reviewed members into another ZIP in memory, never onto the host."""
     from .analyze import inspect_zip
-    report=inspect_zip(archive)
+    # Fingerprint and filtered copy must derive from the same bounded snapshot.
+    if hasattr(archive,'read'):
+        archive.seek(0);snapshot=archive.read(64*1024*1024+1)
+    else:
+        with Path(archive).open('rb') as stream:snapshot=stream.read(64*1024*1024+1)
+    if len(snapshot)>64*1024*1024:raise ValueError('Sandbox source ZIP exceeds the 64 MiB fingerprint bound.')
+    report=inspect_zip(io.BytesIO(snapshot))
     if report['file_review']['counts']['red']:
         raise ValueError('Red file-review signals require review before this experimental run.')
     if any(f['file_review']['integrity']!='crc_checked' for f in report['files']):
         raise ValueError('All members must pass bounded CRC inspection before guest input is prepared.')
     output=io.BytesIO();omitted=[]
-    with zipfile.ZipFile(archive) as source, zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED) as target:
+    with zipfile.ZipFile(io.BytesIO(snapshot)) as source, zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED) as target:
         for member in source.infolist():
             parts=member.filename.replace('\\','/').split('/')
             name=parts[-1].lower()
@@ -324,6 +331,7 @@ console.log('Offline locked libraries unpacked; lifecycle install scripts were n
 
 def probe_tudela(lab,archive, accelerator="tcg"):
     """A fixed, reviewed build/start experiment; always retest isolation first."""
+    started_at=utc_now()
     lab=verify_lab(lab)
     print('Running fresh blank-guest isolation tests before loading application input…',flush=True)
     isolation=self_test(lab,accelerator=accelerator)
@@ -347,6 +355,7 @@ def probe_tudela(lab,archive, accelerator="tcg"):
         if rc:raise RuntimeError('Offline signed runtime installation failed; no application code ran.')
         rc,versions=guest.command('node --version; npm --version')
         checks['node_available']=rc==0
+        if rc:raise RuntimeError('Guest Node/npm availability check failed.')
         result['runtime_versions']=re.findall(r'(?<![A-Za-z0-9])(v?\d+\.\d+\.\d+)(?=\r?\n)',versions)
         root=metadata['project_root']
         if not re.fullmatch(r'[A-Za-z0-9_./-]*',root):raise ValueError('Project root unsupported by reviewed guest profile.')
@@ -384,4 +393,7 @@ def probe_tudela(lab,archive, accelerator="tcg"):
         if not result['passed'] and not result.get('blocker'):result['blocker']='Application or teardown checks did not all pass.'
         (run/'result.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         (lab/'latest-tudela-probe.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+        evidence=portable_result(result,isolation,run.name.removeprefix('tudela-'),started_at)
+        (run/'run-evidence.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
+        (lab/'latest-run-evidence.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
     return result
