@@ -59,9 +59,22 @@ class QemuLabTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):probe_tudela('unused','unused.zip')
         bundle.assert_not_called()
 
+    def test_killed_windows_pipe_does_not_prevent_teardown_recording(self):
+        from unittest.mock import Mock
+        import queue
+        guest=Guest.__new__(Guest)
+        guest.timer=Mock();guest.process=Mock();guest.reader=Mock();guest.job=Mock()
+        guest.process.poll.return_value=0
+        guest.process.stdin.close.side_effect=OSError('invalid killed-process pipe')
+        guest.q=queue.Queue();guest.buffer=bytearray();guest.max_log=100
+        guest.close()
+        guest.job.close.assert_called_once()
+        guest.process.stdout.close.assert_called_once()
+
     def test_guest_deadlines_are_bounded_before_start(self):
         for seconds in (0,601):
             with self.assertRaises(ValueError):Guest('unused',seconds=seconds)
+        with self.assertRaises(ValueError):Guest('unused',seconds=1801,cms_preview=True)
 
     def test_unreviewed_project_profile_is_refused_before_cache_loading(self):
         stream=io.BytesIO()

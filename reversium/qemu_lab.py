@@ -106,9 +106,10 @@ class WindowsJob:
 
 
 class Guest:
-    def __init__(self, lab, media=None, seconds=180, accelerator="tcg", ram_mib=1024):
-        if not 1 <= seconds <= 600:
-            raise ValueError('Guest timeout must be 1–600 seconds.')
+    def __init__(self, lab, media=None, seconds=180, accelerator="tcg", ram_mib=1024, cms_preview=False):
+        if not 1 <= seconds <= (1800 if cms_preview else 600):
+            raise ValueError('Guest timeout exceeds bounded profile.')
+        self.max_log = 32 * 1024 * 1024 if cms_preview else MAX_LOG
         self.lab, self.buffer, self.q = Path(lab), bytearray(), queue.Queue(maxsize=1024)
         self.nonce, self.expired = secrets.token_hex(16), False
         self.process = subprocess.Popen(argv(lab, media, accelerator, ram_mib), cwd=Path(lab)/'qemu', stdin=subprocess.PIPE,
@@ -146,7 +147,7 @@ class Guest:
                 raise RuntimeError('Guest exited before the expected result; see private serial log.')
             try: self.buffer.extend(self.q.get(timeout=.2))
             except queue.Empty: continue
-            if len(self.buffer) > MAX_LOG:
+            if len(self.buffer) > self.max_log:
                 self.stop()
                 raise RuntimeError('Guest serial log limit reached.')
         self.stop()
@@ -179,13 +180,14 @@ class Guest:
         self.stop()
         self.process.wait(timeout=10)
         self.reader.join(timeout=2)
-        while not self.q.empty() and len(self.buffer) < MAX_LOG:
+        while not self.q.empty() and len(self.buffer) < self.max_log:
             self.buffer.extend(self.q.get_nowait())
         self.job.close()
         if log:
-            Path(log).write_bytes(bytes(self.buffer[:MAX_LOG]))
+            Path(log).write_bytes(bytes(self.buffer[:self.max_log]))
         for pipe in (self.process.stdin,self.process.stdout):
-            pipe.close()
+            try:pipe.close()
+            except OSError:pass  # Windows can invalidate a killed process's pipe.
 
 
 def input_iso(lab, output, files):
@@ -330,7 +332,7 @@ console.log('Offline locked libraries unpacked; lifecycle install scripts were n
     return files,{'source_archive_sha256':source_hash,'sanitized_archive_sha256':hashlib.sha256(delivery).hexdigest(),'omitted_sensitive_or_generated_members':omitted,'project_root':root,'npm_entries':len(npm_manifest),'apk_entries':len(apks)}
 
 
-def probe_tudela(lab,archive, accelerator="tcg", tour=False):
+def probe_tudela(lab,archive, accelerator="tcg", tour=False, preview=None):
     """A fixed, reviewed build/start experiment; always retest isolation first."""
     started_at=utc_now()
     lab=verify_lab(lab)
@@ -343,6 +345,11 @@ def probe_tudela(lab,archive, accelerator="tcg", tour=False):
         from .service_inputs import add_services
         add_services(lab,files)
         metadata['apk_entries']=sum(name.endswith('.apk') for name in files)
+    if preview:
+        if not tour:raise ValueError('CMS preview requires disposable services.')
+        from .cms_preview import FETCH, SEED
+        files['cms-fetch.cjs']=FETCH.encode()
+        files['cms-seed.cjs']=SEED.encode()
     run=lab/'runs'/('tudela-'+secrets.token_hex(6));run.mkdir(parents=True)
     media=run/'application-input.iso';input_iso(lab,media,files);before=digest(media)
     result={'stage':'experimental offline Tudela build/start','accelerator':accelerator,'isolation_passed':True,'checks':{},'delivery':metadata,
@@ -351,10 +358,14 @@ def probe_tudela(lab,archive, accelerator="tcg", tour=False):
         result['profile']='tudela-offline-tour-v1'
         result['stage']='experimental offline Tudela API tour journey'
         result['scope']='Real disposable PostgreSQL/Auth/REST/Storage with synthetic users; guest-only API acceptance, not CMS browser clicks or production certification.'
+    if preview:
+        result['profile']='tudela-cms-manual-v1'
+        result['stage']='disposable CMS browser preview'
+        result['scope']='Manual browser test via bounded loopback serial relay; no guest NIC. Separate from automated API acceptance.'
     guest=None
     try:
         print('Booting separate application guest; networking remains absent…',flush=True)
-        guest=Guest(lab,media,seconds=600,accelerator=accelerator,ram_mib=ram_mib);guest.login()
+        guest=Guest(lab,media,seconds=1800 if preview else 600,accelerator=accelerator,ram_mib=ram_mib,cms_preview=bool(preview));guest.login()
         checks=result['checks']
         checks['loopback_only']=guest.command('test "$(ls /sys/class/net)" = lo && test -z "$(ip route)"')[0]==0
         checks['input_mounted']=mount_input(guest)
@@ -396,6 +407,7 @@ def probe_tudela(lab,archive, accelerator="tcg", tour=False):
         print('Building Tudela inside the offline guest…',flush=True)
         env='NODE_OPTIONS=--max-old-space-size=384 VITE_SUPABASE_URL=https://reversium-sandbox.invalid VITE_SUPABASE_PUBLISHABLE_KEY=synthetic-publishable-no-live-key'
         if tour:env='set -a; . /work/runtime.env; set +a; NODE_OPTIONS=--max-old-space-size=384'
+        if preview:env='set -a; . /work/runtime.env; set +a; NODE_OPTIONS=--max-old-space-size=384 VITE_SUPABASE_URL='+preview.origin
         rc,_=guest.command('cd /work/'+(root or '.')+' && '+env+' node node_modules/vite/bin/vite.js build --configLoader runner > /tmp/build.log 2>&1',seconds=240)
         checks['frontend_build']=rc==0
         if rc:
@@ -415,7 +427,13 @@ def probe_tudela(lab,archive, accelerator="tcg", tour=False):
         checks['guest_local_home_responded']=rc==0
         guest.command('tail -n 20 /tmp/server.log')
         if not checks['guest_local_home_responded']:raise RuntimeError('Guest-local home page did not respond; see private server log.')
-        if tour:
+        if preview:
+            rc,fixture=guest.command('cd /work/'+(root or '.')+' && (set -a; . /work/runtime.env; set +a; node /mnt/input/cms-seed.cjs '+('/work/'+(root or '.'))+')',seconds=60)
+            if rc:raise RuntimeError('CMS disposable account preparation failed.')
+            fixture_data=json.JSONDecoder().raw_decode(fixture.split('REVERSIUM_FIXTURE:',1)[1])[0]
+            (run/'cms-fixture-private.json').write_text(json.dumps(fixture_data,indent=2),encoding='utf-8')
+            result['browser_preview']=preview.run(guest,run)
+        elif tour:
             print('Running reviewed editor/reviewer publication and media journey…',flush=True)
             rc,_=guest.command('cd /work/'+(root or '.')+' && set -a; . /work/runtime.env; set +a; node /mnt/input/prepare-tour-test.cjs && node node_modules/tsx/dist/cli.mjs scripts/reversium-tour-acceptance.ts > /tmp/tour-test.log 2>&1',seconds=150)
             checks['tour_acceptance']=False if rc else None
@@ -438,9 +456,19 @@ def probe_tudela(lab,archive, accelerator="tcg", tour=False):
         result['guest_process_stopped']=guest is None or guest.process.poll() is not None
         result['passed']=not result.get('blocker') and all(result['checks'].values()) and result['input_media_unchanged'] and result['guest_process_stopped']
         if not result['passed'] and not result.get('blocker'):result['blocker']='Application or teardown checks did not all pass.'
-        (run/'result.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
-        (lab/'latest-tudela-probe.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
-        evidence=portable_result(result,isolation,run.name.removeprefix('tudela-'),started_at)
-        (run/'run-evidence.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
-        (lab/'latest-run-evidence.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
+        if preview:
+            preview.close()
+            result['setup_and_teardown_passed']=result.pop('passed')
+            result['browser_publishing_verified']=None
+            result['started_at']=started_at
+            result['finished_at']=utc_now()
+            result['run_id']=run.name.removeprefix('tudela-')
+            (run/'cms-result.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+            (lab/'latest-cms-preview.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+        else:
+            (run/'result.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+            (lab/'latest-tudela-probe.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+            evidence=portable_result(result,isolation,run.name.removeprefix('tudela-'),started_at)
+            (run/'run-evidence.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
+            (lab/'latest-run-evidence.json').write_text(json.dumps(evidence,indent=2),encoding='utf-8')
     return result

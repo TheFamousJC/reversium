@@ -163,3 +163,16 @@ python -m reversium --sandbox-tudela-tour "path/to/Tudela.zip" --sandbox-acceler
 Use WHPX only where already available; omission uses bounded, potentially slower TCG emulation. This separate profile requires 3 GiB guest RAM and repeats isolation checks at that size. Real PostgreSQL 17.11, Auth 2.197.0, PostgREST 16.4 and Storage 1.83.5 run on guest loopback with disposable credentials and RAM-backed data. No host services, live credentials, guest NIC or forwarded ports are introduced. Public artifacts are pinned and cached; no source is uploaded. Original application migrations and access policies remain in force.
 
 The real Tudela test passed 14 isolation and 26 application checks, including editor/reviewer login, rejected password, role/tenant boundaries, validated media upload, approval/publication of a two-stop tour, public HTTP JSON/image readback and cleanup. This is API end-to-end acceptance, not an interactive CMS browser journey or production certification. The v2 result attaches to the exact original ZIP in Setup & readiness; v1 records remain supported. Private input images/logs/caches stay ignored on the host. See [Help](docs/user-guide.html) and [sandbox design](docs/SANDBOX_DESIGN.md) for preparation, retention and remaining gaps.
+
+
+### Explicit disposable CMS browser preview (0.23.0)
+
+After preparing the lab, dependencies and services, run:
+
+```powershell
+python scripts/test_tudela_cms.py "path/to/Tudela.zip" --accelerator whpx
+```
+
+Use WHPX only where already available. This opt-in profile repeats the 3 GiB isolation gate, builds the frontend for a random host-loopback HTTP origin, and relays bounded requests over serial to the guest HTTPS gateway. It adds no guest NIC, shared folder or forwarded network port. A private entry cookie, exact Host/Origin checks and a restrictive browser policy limit access; this remains experimental, not security certification. No live service credentials or paid hosting are needed.
+
+Open the URL in the private run's preview-entry.json; disposable editor/reviewer details are in cms-fixture-private.json. These files and logs must not be shared. Open /cms to use the documented administration route. Stop through /__reversium on the same origin, or let the twenty-minute preview/thirty-minute total deadline expire. Guest data is temporary; host artifacts and browser session data can remain. The CLI records setup and teardown separately and never automatically calls browser publishing verified. See [Help](docs/user-guide.html) for limitations and [CMS test notes](docs/SANDBOX_CMS_TEST.md) for observed outcomes.

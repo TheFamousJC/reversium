@@ -340,3 +340,21 @@ This was an end-to-end API test: the test script performed the requests behind t
 After the existing local sandbox preparation, run python scripts/prepare_tudela_services.py, then python -m reversium --sandbox-tudela-tour "path/to/Tudela.zip" --sandbox-accelerator whpx if WHPX is already available. Help explains the prerequisites and slower default emulation option. This profile needs 3 GiB guest memory, local disk space and public dependency downloads, but no paid hosting or API account. It is a reviewed Tudela profile, not a general run-any-program feature.
 
 In Setup & readiness, select reports/qemu-lab/latest-run-evidence.json and review it before attaching. Reversium matches the exact original ZIP fingerprint, shows what passed and what remains unknown, and keeps runtime checks separate from file analysis. The result is an editable local record, not an independently signed certificate. Source-bearing input images, caches and logs remain privately on the host after the guest stops; do not distribute them. Help and its downloadable PDF now cover this workflow.
+
+
+## Build 0.23.0 — testing the actual CMS screens
+
+We can now open a temporary local Tudela preview and test its buttons, rather than treating a successful test script as proof that the screens work. A separate editor and reviewer use invented accounts in a new temporary organization. Services and accounts are prepared before the browser journey; that setup is not itself a browser test.
+
+The virtual computer still has no internet/network adapter and no access to host folders. A small private local relay carries browser requests through its supervised serial connection. It opens only on this computer, requires the private entry link, and blocks external browser connections. Maps and other outside services may therefore be unavailable intentionally. This experimental preview is slower than a normal deployment and is not a production or security guarantee.
+
+The first attempt exposed problems with preview setup and response speed. We corrected the transport and repeated the journey in a fresh guest, without editing Tudela's application logic or connecting to live. The detailed CMS test report records the visible successes and any remaining blockers, separately from the previous API results. A machine-created setup record never labels manual publishing as automatically verified.
+
+The command and stopping instructions are in Help: python scripts/test_tudela_cms.py "path/to/Tudela.zip" --accelerator whpx where supported. The preview has a twenty-minute window within a thirty-minute total guest limit. Open /__reversium on its own local address to stop it. The guest's database and files are temporary; private files, screenshots and browser session data can remain on the host. Keep the account file and entry link private. No paid service or live credentials are needed.
+
+
+The actual browser publishing test passed. The editor created a city and two stops, then submitted them. A different reviewer approved and published the city, tour and both stops. The CMS showed one published tour with two stops and nothing left waiting for review. After signing out, we opened the visitor page for that temporary organization and saw the exact tour and both stops in order. This is stronger evidence than seeing preloaded demonstration content.
+
+Two preview limitations were recorded: the serial connection needed performance fixes, and the original Stop form was rejected by its own security check. A direct shutdown call was blocked by automatic approval review, so that route was not used; the test guest was left to its preset deadline. We fixed and browser-tested the form on a separate mock server, with no guest attached. External thumbnails did not load under isolation. We did not test image uploading through the CMS, narration, real maps/GPS, outside sign-in or production reliability. The earlier API image test remains separate evidence.
+
+The original preview stopped automatically at its deadline. We confirmed that the guest and local listener had stopped and that its input image was unchanged. The completed publishing test, remaining gaps and cleanup outcome are now recorded together.
