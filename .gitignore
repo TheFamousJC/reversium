@@ -1,8 +1,0 @@
-__pycache__/
-*.py[cod]
-.venv/
-reports/
-*.zip
-
-!web/engine.zip
-!web/vendor/pyodide/python_stdlib.zip

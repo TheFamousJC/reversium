@@ -1,4 +1,0 @@
-Flask>=3.0
-SQLAlchemy==2.0.0
-# ignored comment
--r private.txt
