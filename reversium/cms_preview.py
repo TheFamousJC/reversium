@@ -1,6 +1,7 @@
 """Opt-in, bounded browser relay over serial. Never adds a guest NIC or shares."""
 import base64
 import gzip
+import hashlib
 import io
 import json
 import secrets
@@ -14,7 +15,13 @@ CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; 
 
 FETCH = r"""
 const fs=require('fs'),zlib=require('zlib');
-(async()=>{const r=JSON.parse(Buffer.from(process.argv[2],'base64').toString());
+(async()=>{let encoded=process.argv[2];
+if(encoded==='--file'){
+ const path='/tmp/cms-request.b64';if(fs.statSync(path).size>4194304)throw Error('Packet too large');
+ encoded=fs.readFileSync(path,'ascii');fs.unlinkSync(path);
+ if(!/^[a-f0-9]{64}$/.test(process.argv[3])||require('crypto').createHash('sha256').update(encoded).digest('hex')!==process.argv[3])throw Error('Packet checksum mismatch');
+}
+const r=JSON.parse(Buffer.from(encoded,'base64').toString());
 if(!r.path.startsWith('/')||r.path.startsWith('//')||/[\r\n\\]/.test(r.path))throw Error('Invalid relative target');
 if(!/^[a-f0-9]{64}$/.test(r.headers_key))throw Error('Invalid header cache key');
 const headerFile='/tmp/cms-headers-'+r.headers_key+'.json';
@@ -25,7 +32,7 @@ const reader=response.body?.getReader();let chunks=[],size=0;
 if(reader)while(true){const {value,done}=await reader.read();if(done)break;size+=value.length;if(size>2097152)throw Error('Response too large');chunks.push(value)}
 const headers={};for(const k of ['content-type','location','content-range','accept-ranges'])if(response.headers.has(k))headers[k]=response.headers.get(k);
 process.stdout.write('REVERSIUM_HTTP:'+JSON.stringify({status:response.status,headers,body:zlib.gzipSync(Buffer.concat(chunks)).toString('base64')})+'\n',()=>process.exit(0));
-})().catch(()=>{console.log('REVERSIUM_HTTP:'+JSON.stringify({status:502,headers:{'content-type':'text/plain'},body:require('zlib').gzipSync('Guest relay failed').toString('base64')}))});
+})().catch(error=>{console.error('REVERSIUM_HTTP_DIAGNOSTIC:'+JSON.stringify({name:error.name,code:error.code||error.cause?.code||null,message:String(error.message).slice(0,200)}));console.log('REVERSIUM_HTTP:'+JSON.stringify({status:502,headers:{'content-type':'text/plain'},body:require('zlib').gzipSync('Guest relay failed').toString('base64')}))});
 """
 
 SEED = r"""
@@ -44,6 +51,21 @@ console.log('REVERSIUM_FIXTURE:'+JSON.stringify({organization:org,slug:'cms-'+su
 def valid_target(path):
     return (isinstance(path, str) and path.startswith('/') and not path.startswith('//')
             and len(path) <= 8192 and not any(c in path for c in '\r\n\\'))
+
+
+def serial_request_command(encoded):
+    """Keep individual serial shell lines small, even for binary upload bodies."""
+    if len(encoded) > 4 * 1024 * 1024:
+        raise ValueError('Encoded request exceeds bound')
+    if not encoded or any(c not in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=' for c in encoded):
+        raise ValueError('Invalid encoded request')
+    prefix='NODE_EXTRA_CA_CERTS=/work/certs/cert.pem node /mnt/input/cms-fetch.cjs '
+    if len(encoded)<=1024:
+        return prefix+encoded
+    lines=['umask 077; : > /tmp/cms-request.b64']
+    lines += ['printf %s '+encoded[i:i+768]+' >> /tmp/cms-request.b64' for i in range(0,len(encoded),768)]
+    lines.append(prefix+'--file '+hashlib.sha256(encoded.encode('ascii')).hexdigest())
+    return '\n'.join(lines)
 
 
 class Preview:
@@ -135,19 +157,18 @@ class Preview:
 
     def forward(self, method, path, headers, body):
         allowed = {'authorization','apikey','content-type','range','prefer','accept','accept-profile','content-profile','x-client-info','x-supabase-api-version','x-organization-id','x-file-name','x-media-rights-status','x-media-creator','x-media-attribution','x-media-rights-notes','x-media-source-url','x-media-license-name','x-media-license-url'}
-        import hashlib
         selected = {k.lower():v for k,v in headers.items() if k.lower() in allowed}
         key = hashlib.sha256(json.dumps(selected,sort_keys=True).encode()).hexdigest()
         packet = {'method':method,'path':path,'headers_key':key,'body':base64.b64encode(body).decode()}
         with self.lock:
             if key not in self.header_cache:packet['headers']=selected
             encoded = base64.b64encode(json.dumps(packet).encode()).decode()
-            rc, output = self.guest.command('NODE_EXTRA_CA_CERTS=/work/certs/cert.pem node /mnt/input/cms-fetch.cjs '+encoded, seconds=25)
+            rc, output = self.guest.command(serial_request_command(encoded), seconds=25)
             self.count += 1
-            if not rc:self.header_cache.add(key)
-        if rc:
-            raise ValueError('Guest fetch failed')
-        result = json.JSONDecoder().raw_decode(output.split('REVERSIUM_HTTP:',1)[1])[0]
+            if rc:
+                raise ValueError('Guest fetch failed')
+            result = json.JSONDecoder().raw_decode(output.split('REVERSIUM_HTTP:',1)[1])[0]
+            if result['status'] != 502:self.header_cache.add(key)
         self.events.append({'method':method,'route':path.split('?')[0],'status':result['status']})
         self.events=self.events[-2000:]
         if hasattr(self,'run_path'):
@@ -161,6 +182,10 @@ class Preview:
     def run(self, guest, run):
         self.guest = guest
         self.run_path = run
+        for headers in ({},{'x-client-info':'reversium-transfer-check-'+'a'*2048}):
+            response=self.forward('GET','/auth/v1/health',headers,b'')
+            if response['status']!=200:
+                raise RuntimeError('Serial HTTP preflight failed; inspect private guest diagnostic.')
         (run/'preview-entry.json').write_text(json.dumps({'url':self.origin+'/__preview/'+self.token,'scope':'temporary local serial relay; no guest NIC'}),encoding='utf-8')
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         print('CMS preview ready; private entry URL saved in '+str(run/'preview-entry.json'),flush=True)

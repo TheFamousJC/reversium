@@ -53,3 +53,6 @@ Follow the CMS preview chapter in Help. Run python scripts/test_tudela_cms.py "p
 Run 7eead40febda started at 2026-10-18T19:16:07Z and finished at 19:38:19Z. Its twenty-minute preview deadline stopped the listener and QEMU. Post-test guest loopback/no-route, unchanged input image and stopped guest checks passed. Setup/teardown recorded success; browser_publishing_verified remains null in the generated record, because the browser observations belong to this separate reviewed report.
 
 Filtered-copy SHA-256: `f7cebd79b5a6fbe5c35bd5dbbdbc8a42ea4c45fc767e55a14c3e9c477319acef`; this differs from the original delivery identity above. The preview relayed 291 requests. The earlier v2 API result for run 1eb69ba4c21f was preserved unchanged. Private artifacts remain local and ignored; source-bearing media and logs were not published. No guest, preview listener or live-platform connection remains running.
+
+
+[Photograph follow-up](TUDELA_PHOTO_TEST.md): upload passed; reviewer queue empty. The earlier publishing result does not establish photograph publication.

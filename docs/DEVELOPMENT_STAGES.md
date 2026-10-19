@@ -444,3 +444,12 @@ Cleanup exposed a separate form-origin rejection. Automatic approval review refu
 
 
 Confirmed teardown at 19:38:19 UTC by the original twenty-minute preview deadline: listener closed, QEMU stopped, post-test loopback/no external route passed and input image unchanged. Run 7eead40febda started 19:16:07 UTC; filtered-copy SHA-256 f7cebd79b5a6fbe5c35bd5dbbdbc8a42ea4c45fc767e55a14c3e9c477319acef, original SHA-256 unchanged as recorded above. 291 requests relayed. Private setup result remains explicit about manual browser unknowns; separate reviewed observations and screenshots establish the limited journey. Previous v2 API evidence remains unchanged. No private source, credentials, entry URL or VM artifact was staged.
+
+
+## Build 0.23.1 — photograph workflow: upload passed, review blocked (19 October 2026)
+
+A synthetic 192×128 PNG and rights manifest now support repeatable local testing. Larger relay requests use bounded shell-safe chunks and guest-side SHA-256 checks. Ordinary and chunked real-guest preflights must pass before browser entry opens. Regression tests cover exact binary bytes, tampering, packet bounds and failed preflight.
+
+Tudela run 157411ce697d accepted the image (HTTP 201 and CMS confirmation) and the editor submitted its one-stop tour package. Missing-rights and missing-credit validation were observed in an earlier attempt against the same ZIP. The separate reviewer in the same organization saw zero content and media items. Approval, publication and anonymous image/credit display remain unverified. Investigate session state, query scope and policies without bypassing the review queue. Previous API acceptance and text-only CMS publication remain separate evidence.
+
+The protected browser Stop control worked. Post-test isolation, unchanged input and stopped guest checks passed. Everything stayed local, free and separate from live. Intermittent startup, serial transfer and slow browser file selection are documented in TUDELA_PHOTO_TEST.md. Private source, credentials, screenshots and logs remain excluded from publication. Help/PDF now includes the image workflow and its current blocker. Validation: 149 Python tests, with one optional-dependency skip, and 30 JavaScript tests passed. Next: diagnose the empty reviewer queue and repeat approval/public-image verification.

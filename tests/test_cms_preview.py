@@ -1,6 +1,29 @@
 import unittest,threading,urllib.request,urllib.error,json,base64,gzip
-from reversium.cms_preview import Preview,valid_target,CSP
+from reversium.cms_preview import Preview,valid_target,CSP,serial_request_command
 class PreviewTests(unittest.TestCase):
+ def test_binary_request_uses_bounded_checksummed_serial_lines(self):
+  import hashlib
+  raw=json.dumps({'body':base64.b64encode(bytes(range(256))*40).decode(),'path':'/api/admin/media'}).encode()
+  encoded=base64.b64encode(raw).decode()
+  command=serial_request_command(encoded);lines=command.splitlines()
+  self.assertTrue(all(len(line)<1024 for line in lines))
+  rebuilt=''.join(line.split()[2] for line in lines if line.startswith('printf %s '))
+  self.assertEqual(rebuilt,encoded)
+  self.assertTrue(lines[-1].endswith('--file '+hashlib.sha256(encoded.encode()).hexdigest()))
+  self.assertEqual(json.loads(base64.b64decode(rebuilt))['path'],'/api/admin/media')
+  for invalid in ('bad;command','x\ncommand','A'*(4*1024*1024+1)):
+   with self.assertRaises(ValueError):serial_request_command(invalid)
+ def test_failed_transfer_preflight_never_publishes_browser_entry(self):
+  import tempfile
+  from pathlib import Path
+  from unittest.mock import Mock
+  p=Preview()
+  try:
+   with tempfile.TemporaryDirectory() as d:
+    p.forward=Mock(return_value={'status':502})
+    with self.assertRaisesRegex(RuntimeError,'preflight failed'):p.run(Mock(),Path(d))
+    self.assertFalse((Path(d)/'preview-entry.json').exists())
+  finally:p.close()
  def test_targets_cannot_select_external_upstreams(self):
   for path in ('http://evil.test/','//evil.test/','/\\evil.test','/x\r\ny'):
    self.assertFalse(valid_target(path))

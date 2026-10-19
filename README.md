@@ -176,3 +176,8 @@ python scripts/test_tudela_cms.py "path/to/Tudela.zip" --accelerator whpx
 Use WHPX only where already available. This opt-in profile repeats the 3 GiB isolation gate, builds the frontend for a random host-loopback HTTP origin, and relays bounded requests over serial to the guest HTTPS gateway. It adds no guest NIC, shared folder or forwarded network port. A private entry cookie, exact Host/Origin checks and a restrictive browser policy limit access; this remains experimental, not security certification. No live service credentials or paid hosting are needed.
 
 Open the URL in the private run's preview-entry.json; disposable editor/reviewer details are in cms-fixture-private.json. These files and logs must not be shared. Open /cms to use the documented administration route. Stop through /__reversium on the same origin, or let the twenty-minute preview/thirty-minute total deadline expire. Guest data is temporary; host artifacts and browser session data can remain. The CLI records setup and teardown separately and never automatically calls browser publishing verified. See [Help](docs/user-guide.html) for limitations and [CMS test notes](docs/SANDBOX_CMS_TEST.md) for observed outcomes.
+
+
+### CMS photograph test (0.23.1)
+
+The local browser accepted a synthetic image and submitted its tour package. The separate reviewer saw an empty queue, so approval and public image/credit display remain unverified. See [photograph evidence and blockers](docs/TUDELA_PHOTO_TEST.md). Help includes the repeatable image test.

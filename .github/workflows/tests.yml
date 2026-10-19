@@ -21,4 +21,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/review-tools.test.mjs tests/online-ai.test.mjs tests/runtime-evidence.test.mjs tests/service-guest.test.mjs
+      - run: node --test tests/review-tools.test.mjs tests/online-ai.test.mjs tests/runtime-evidence.test.mjs tests/service-guest.test.mjs tests/cms-transport.test.mjs

@@ -358,3 +358,14 @@ The actual browser publishing test passed. The editor created a city and two sto
 Two preview limitations were recorded: the serial connection needed performance fixes, and the original Stop form was rejected by its own security check. A direct shutdown call was blocked by automatic approval review, so that route was not used; the test guest was left to its preset deadline. We fixed and browser-tested the form on a separate mock server, with no guest attached. External thumbnails did not load under isolation. We did not test image uploading through the CMS, narration, real maps/GPS, outside sign-in or production reliability. The earlier API image test remains separate evidence.
 
 The original preview stopped automatically at its deadline. We confirmed that the guest and local listener had stopped and that its input image was unchanged. The completed publishing test, remaining gaps and cleanup outcome are now recorded together.
+
+
+## Build 0.23.1 — what happened when we tested pictures
+
+We used a small invented image, temporary accounts and a separate local copy of Tudela. The editor screens required image rights and a public credit. They accepted the picture and confirmed that the tour containing it had been submitted for review.
+
+The reviewer then saw an empty queue in the same organization. That is a real blocker: we could not approve or publish the picture through the screens. We have not yet proved that a visitor can see this picture or its credit. Earlier tests that sent requests directly do not replace this missing screen test.
+
+We improved the local connection so image bytes arrive in checked pieces. Selecting the file through browser automation was still intermittently very slow. These problems and the successful steps are recorded in the photograph test report. Help and its PDF explain how to repeat the test and distinguish upload from publication.
+
+The protected Stop button shut down the temporary guest. Its input stayed unchanged and the isolation checks passed afterward. No live accounts, paid service or outside connection were used. Private test files and screenshots stay out of the published site. Next we need to find why the reviewer cannot see the submitted work, then repeat approval and visitor checks using normal authorized accounts.

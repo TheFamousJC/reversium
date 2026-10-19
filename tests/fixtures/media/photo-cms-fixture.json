@@ -1,0 +1,11 @@
+{
+  "description": "Synthetic geometric PNG for local CMS photograph workflow QA; not a camera photograph",
+  "width": 192,
+  "height": 128,
+  "byte_size": 2064,
+  "sha256": "f8456805dd5e401c572eefebb378a3076995b4774ed9991a92c6d29100024fea",
+  "creator": "Reversium QA",
+  "rights_status": "own_work",
+  "public_credit": "Reversium QA - synthetic test image",
+  "notes": "Created solely for disposable local testing; no third-party photograph or personal data."
+}
