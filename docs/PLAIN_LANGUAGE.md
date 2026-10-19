@@ -424,3 +424,5 @@ The saved report now starts with receiving guidance and a checklist shortcut. Ch
 The real-package browser test confirmed that selected notes can be restored, a checklist for a different delivery is refused without erasing your notes, and an updated checklist can be sent back. Notes remain excluded by default; selecting them also adds a readable copy to the brief. We checked the reported script names against the original files. The runtime version still needs confirmation from the sender. These tests cover the handover process, not a new run of the software. Analysis and downloads remain free and local.
 
 One local release-file check had a temporary response timeout; its repeat passed. We recorded this rather than treating the checks as a guarantee that every computer or browser will behave identically.
+
+A publishing-path mistake briefly recorded file removals in the repository; the local project files were intact. We restored the complete project in a corrective commit, checked the intended changes against the previous release and kept the recovery history. The public build still needs its separate deployment verification.
