@@ -1,0 +1,353 @@
+{
+  "reviewed_on": "2026-10-19",
+  "feature_groups": [
+    {
+      "title": "Understand your delivery",
+      "features": [
+        {
+          "name": "Guided Start flow",
+          "availability": "Browser + local",
+          "does": "Choose an outcome, select your ZIP and follow findings to next steps.",
+          "limit": "No installation is needed for browser analysis."
+        },
+        {
+          "name": "ZIP inventory and platform clues",
+          "availability": "Browser + local",
+          "does": "See inspected languages, files, manifests, runtimes and referenced services.",
+          "limit": "Clues do not prove the whole deployed platform is present."
+        },
+        {
+          "name": "Plain-language findings",
+          "availability": "Browser + local",
+          "does": "Read supported feature explanations with evidence and unknowns.",
+          "limit": "The analyzer cannot tell you exactly everything an application does."
+        },
+        {
+          "name": "Source tracing",
+          "availability": "Browser + local",
+          "does": "Follow selected Python and JavaScript/TypeScript routes, React props/callbacks, computed API targets and Supabase data references.",
+          "limit": "Bounded static readers; dynamic paths and unsupported patterns can remain unresolved."
+        },
+        {
+          "name": "Binary clues",
+          "availability": "Browser + local",
+          "does": "Inspect supported executable/container metadata, strings and target clues.",
+          "limit": "Not full decompilation or reconstruction."
+        },
+        {
+          "name": "File alerts",
+          "availability": "Browser + local",
+          "does": "Review green, yellow and red signals, selected ZIP integrity checks and suspicious patterns.",
+          "limit": "Green is not a safety certificate; not antivirus or a complete vulnerability audit."
+        }
+      ]
+    },
+    {
+      "title": "See relationships and changes",
+      "features": [
+        {
+          "name": "Workflow paths",
+          "availability": "Browser + local",
+          "does": "Follow supported screen-to-callback-to-API-to-data candidate paths.",
+          "limit": "Static connections do not establish permissions, runtime conditions or success."
+        },
+        {
+          "name": "Graphical feature map",
+          "availability": "Browser + local",
+          "does": "Focus a feature, inspect nodes and edges and save the visible SVG.",
+          "limit": "View capped at 120 nodes and 240 edges; omissions are disclosed."
+        },
+        {
+          "name": "Imports and dependencies",
+          "availability": "Browser + local",
+          "does": "Explore candidate file/module and referenced-package relationships.",
+          "limit": "Not a full runtime call graph; drawn import view shows first 100 unique edges."
+        },
+        {
+          "name": "Evidence and coverage",
+          "availability": "Browser + local",
+          "does": "Search source locations and see inspected, unresolved and omitted material.",
+          "limit": "Coverage describes this inspection; it is not test coverage."
+        },
+        {
+          "name": "Compare deliveries",
+          "availability": "Browser + local",
+          "does": "Compare saved reports for file, finding and feature-map relationship changes.",
+          "limit": "Analyzer-version changes can affect output; differences do not prove behavior changed."
+        },
+        {
+          "name": "Candidate change impact",
+          "availability": "Browser + local",
+          "does": "Explore bounded upstream/downstream neighbors before maintenance.",
+          "limit": "Potentially affected components need developer confirmation."
+        }
+      ]
+    },
+    {
+      "title": "Prepare and share a handover",
+      "features": [
+        {
+          "name": "Setup and supporting-service clues",
+          "availability": "Browser + local",
+          "does": "Collect runtime names, configuration names, migrations, scripts and operation questions.",
+          "limit": "No live service connection, production permissions or cost verification."
+        },
+        {
+          "name": "Saved handover checklist",
+          "availability": "Browser + local",
+          "does": "Assign owners, statuses and notes; restore a matching saved checklist.",
+          "limit": "Reviewer status is a human claim; notes need a separate save."
+        },
+        {
+          "name": "Report exports",
+          "availability": "Browser + local",
+          "does": "Save readable HTML, structured JSON and map SVG.",
+          "limit": "Exports can contain private code-derived details; not an application backup."
+        },
+        {
+          "name": "AI-to-AI handover",
+          "availability": "Manual workflow",
+          "does": "Give a developer using another coding tool a report, evidence, gaps and the original authorized code package.",
+          "limit": "Does not transfer chat history, hidden prompts, credentials or provider sessions."
+        },
+        {
+          "name": "Online AI request preparation",
+          "availability": "Manual handoff",
+          "does": "Select up to 20 findings, edit the exact request and choose whether to share it with an AI provider.",
+          "limit": "Embedded online ChatGPT account access remains disabled pending approval."
+        },
+        {
+          "name": "Local optional AI",
+          "availability": "Local + account eligibility",
+          "does": "Use the existing optional account connection and review evidence before each request.",
+          "limit": "Separate setup, network and provider limits apply; sign-in is not proof of inference access."
+        }
+      ]
+    },
+    {
+      "title": "Verify carefully and keep control",
+      "features": [
+        {
+          "name": "Browser-local analysis",
+          "availability": "Browser",
+          "does": "Read your ZIP in device memory without uploading or executing its contents.",
+          "limit": "Hosting sees normal app requests; optional AI sharing is a separate deliberate action. 32 MiB compressed input."
+        },
+        {
+          "name": "Local application and CLI",
+          "availability": "Local",
+          "does": "Analyze locally and export/compare reports with Python.",
+          "limit": "Local web input limit is 64 MiB; archive inspection bounds still apply."
+        },
+        {
+          "name": "Sandbox preparation",
+          "availability": "Local developer workflow",
+          "does": "Check host prerequisites and prepare offline VM profiles without launching input code.",
+          "limit": "Preparation is not proof of isolation or application compatibility."
+        },
+        {
+          "name": "Experimental sandbox execution",
+          "availability": "Fixed reviewed profile",
+          "does": "Run real builds and selected tests in a disposable offline QEMU Linux guest with synthetic settings.",
+          "limit": "Windows pilot only; not general Run ZIP. A developer must review and adapt any other project."
+        },
+        {
+          "name": "Disposable service and CMS pilot",
+          "availability": "Fixed reviewed profile",
+          "does": "Use guest-local database, login and storage, plus a guarded serial browser preview for the example profile.",
+          "limit": "Image upload passed; reviewer queue was empty, so photo approval/publication remains unverified."
+        },
+        {
+          "name": "Exact-package runtime records",
+          "availability": "Browser + local review",
+          "does": "Attach a matching ZIP fingerprint record and keep runtime outcomes separate from static clues.",
+          "limit": "Editable unsigned reviewer evidence; no automatic certification or checklist verification."
+        }
+      ]
+    }
+  ],
+  "journeys": [
+    {
+      "id": "understand",
+      "title": "Understand a package you received",
+      "who": "Owner or project manager",
+      "goal": "Know what was delivered and what to ask next.",
+      "steps": [
+        [
+          "Choose your goal",
+          "Start > Understand the software"
+        ],
+        [
+          "Select your package",
+          "ZIP > Analyze ZIP locally"
+        ],
+        [
+          "Read and inspect",
+          "Review findings > Architecture > Evidence"
+        ],
+        [
+          "Agree next steps",
+          "Coverage > Save & next steps"
+        ]
+      ],
+      "output": "Readable HTML report plus questions for the developer.",
+      "limit": "A feature explanation is supported code evidence, not proof that the feature works."
+    },
+    {
+      "id": "ai-handover",
+      "title": "Move a project between AI coding tools",
+      "who": "Builder changing tools or developers",
+      "goal": "Continue from an evidence-backed handover, for example Claude to Codex.",
+      "steps": [
+        [
+          "Save the source",
+          "Export your authorized code package from the original tool"
+        ],
+        [
+          "Map the delivery",
+          "Analyze > Architecture > Evidence"
+        ],
+        [
+          "Prepare the handover",
+          "Handover: setup clues, owners, gaps and next checks"
+        ],
+        [
+          "Continue elsewhere",
+          "Give the next developer the code, reports and selected context"
+        ]
+      ],
+      "output": "Original code package, HTML/JSON report and separately saved checklist.",
+      "limit": "Manual handover. Reversium does not migrate conversations, agent memory, prompts, secrets or accounts."
+    },
+    {
+      "id": "developer",
+      "title": "Take over maintenance",
+      "who": "Incoming developer or agency",
+      "goal": "Identify first files, required services and unresolved setup tasks.",
+      "steps": [
+        [
+          "Analyze the delivery",
+          "Start > Prepare a developer handover"
+        ],
+        [
+          "Follow one feature",
+          "Architecture > Workflow > Evidence"
+        ],
+        [
+          "Review setup needs",
+          "Handover > Setup clues; Coverage > Setup & readiness"
+        ],
+        [
+          "Assign verification",
+          "Set checklist owners; save handover notes"
+        ]
+      ],
+      "output": "A scoped investigation and setup checklist for the exact delivery.",
+      "limit": "Service references are clues. The developer still verifies versions, permissions, migrations and credentials."
+    },
+    {
+      "id": "change",
+      "title": "Plan a change without guessing",
+      "who": "Developer or maintainer",
+      "goal": "Find candidate components to inspect before editing.",
+      "steps": [
+        [
+          "Pick the starting file",
+          "Analyze > Change impact"
+        ],
+        [
+          "Explore connections",
+          "Upstream and downstream candidate neighbors"
+        ],
+        [
+          "Check each claim",
+          "Architecture map > Evidence > Coverage"
+        ],
+        [
+          "Make and verify the change",
+          "Use your editor and normal tests; save a new baseline"
+        ]
+      ],
+      "output": "Candidate impact notes and a source-backed test plan.",
+      "limit": "Graph reachability is not proof that a component will be affected. Reversium does not edit or deploy code."
+    },
+    {
+      "id": "compare",
+      "title": "Check what changed in a new delivery",
+      "who": "Owner, reviewer or developer",
+      "goal": "Compare a new package with a saved earlier analysis.",
+      "steps": [
+        [
+          "Keep a baseline",
+          "Save technical data (JSON) from the earlier analysis"
+        ],
+        [
+          "Analyze the new ZIP",
+          "Create a separate current report"
+        ],
+        [
+          "Compare reports",
+          "Select earlier JSON; inspect files, findings and map changes"
+        ],
+        [
+          "Record the review",
+          "Check evidence; save comparison notes and next tests"
+        ]
+      ],
+      "output": "Changed relationships and candidate effects, with disclosed omissions.",
+      "limit": "Analyzer versions and packaging can change results. A difference is not automatically a defect."
+    },
+    {
+      "id": "ai-review",
+      "title": "Ask AI a focused question privately",
+      "who": "Owner or developer needing an explanation",
+      "goal": "Share only selected evidence and check the answer.",
+      "steps": [
+        [
+          "Choose the evidence",
+          "AI: select provider, question and up to 20 findings"
+        ],
+        [
+          "Review the exact text",
+          "Prepare request; remove private details"
+        ],
+        [
+          "Choose how to submit",
+          "Online: manual handoff; local: eligible optional connection"
+        ],
+        [
+          "Check the answer",
+          "Match cited IDs/locations; record unsupported claims"
+        ]
+      ],
+      "output": "A reviewed request and a human-checked explanation.",
+      "limit": "Nothing is shared automatically. Online account-connected chat is disabled; provider terms/limits apply."
+    },
+    {
+      "id": "sandbox",
+      "title": "Verify behavior in a disposable local environment",
+      "who": "Developer with an explicitly reviewed execution profile",
+      "goal": "Separate observed behavior from setup assumptions without touching live.",
+      "steps": [
+        [
+          "Review support first",
+          "Analyze package; review alerts and compatibility"
+        ],
+        [
+          "Prepare isolation",
+          "Local prerequisites, trusted assets and fresh isolation checks"
+        ],
+        [
+          "Run a bounded test",
+          "Fixed reviewed profile: real code, disposable data and accounts"
+        ],
+        [
+          "Record and stop",
+          "Capture passes/blockers, stop guest and review matching evidence"
+        ]
+      ],
+      "output": "Exact-package test record and separately recorded manual observations.",
+      "limit": "Experimental local profile only, not any ZIP or a simulation. No production/live credentials. VM isolation cannot guarantee zero risk."
+    }
+  ]
+}

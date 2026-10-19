@@ -1,5 +1,7 @@
 # Isolated execution proposal
 
+Project names in historical notes have been anonymized. Recorded counts, fingerprints, outcomes and limitations describe a specific reviewed example, not arbitrary code packages.
+
 Status: preparation stage implemented in 0.18.0; VM execution remains unimplemented. Reversium does not run software from uploaded ZIPs. The browser worker isolates the analyzer, not an application execution environment. Traffic-light review never authorizes execution.
 
 ## What is possible
@@ -23,7 +25,7 @@ Windows Sandbox is a candidate on an existing supported Windows Pro, Enterprise 
 - Stage 1: capability detection and user-visible setup plan; no execution. Test unsupported hosts and missing prerequisites.
 - Stage 2: boot and destroy a blank offline guest, verify network/clipboard/mount policies and timeout/cancel handling. No user software.
 - Stage 3: run a tiny known fixture with synthetic inputs. Confirm it cannot reach a test host service or write outside its intended guest storage.
-- Stage 4: manually approved application setup on a copy of Tudela with synthetic services, then a bounded workflow test. Missing dependencies, offline setup and operating-system differences must remain visible.
+- Stage 4: manually approved application setup on a copy of reviewed example application with synthetic services, then a bounded workflow test. Missing dependencies, offline setup and operating-system differences must remain visible.
 - Stage 5: optional reviewed network/provisioning profiles and guarded preview routing, with isolation regression tests before enabling public use.
 
 No VM provides a guarantee of zero risk. A compromised host or hypervisor, unsafe sharing configuration, secret exposure and unreviewed network access remain possible. Secure execution is a separate development milestone, not part of the static traffic-light feature.
@@ -41,7 +43,7 @@ No VM provides a guarantee of zero risk. A compromised host or hypervisor, unsaf
 
 On the development machine: Windows Core/Home, Windows Sandbox executable not found, QEMU not found. Docker CLI exists but its engine was unavailable; QEMU was also not found inside WSL. WSL Ubuntu exists but is not treated as a disposable unknown-code boundary. No optional Windows features were enabled and no backend or guest image installed. The first usable no-upgrade path to investigate is QEMU plus a trusted Linux guest, with network devices absent and no host shares. Software-emulated TCG is a possible draft profile, with performance and compatibility unverified.
 
-Prepared profiles are not a working Tudela sandbox. Next: obtain and verify a trusted backend/image, boot a blank guest, verify network/share isolation and termination, then design a narrow ZIP input channel and reviewed offline runtime provisioning. A timeout supervisor, reproducible guest image, tested teardown and guarded preview are still missing. Do not execute the draft as proof of isolation.
+Prepared profiles are not a working reviewed example application sandbox. Next: obtain and verify a trusted backend/image, boot a blank guest, verify network/share isolation and termination, then design a narrow ZIP input channel and reviewed offline runtime provisioning. A timeout supervisor, reproducible guest image, tested teardown and guarded preview are still missing. Do not execute the draft as proof of isolation.
 
 
 ## Implemented experimental QEMU pilot (0.19.0, 18 October 2026)
@@ -67,9 +69,9 @@ All 14 selected checks passed with TCG and with WHPX: expected Alpine version; l
 
 These checks test this configuration and selected behaviors. They are not a hypervisor penetration test, raw-block-device attack test or proof against emulator/kernel vulnerabilities, compromised host tools or all secret leakage. Read-only media and discarded guest memory do not erase retained host artifacts.
 
-### Narrow Tudela profile and private artifacts
+### Narrow reviewed example application profile and private artifacts
 
-The pilot refuses red file-review signals or members without completed bounded CRC checks. Repacking stays in memory on the host. Common `.env*`, key, credential and generated dependency/Git paths are omitted; this is not a complete embedded-secret detector. Only the reviewed Tudela build/start script profile is supported. The original ZIP is unchanged. Application input and logs stay under ignored `reports/qemu-lab/runs/`; they can contain private code and must not be published. Public reports contain test summaries only.
+The pilot refuses red file-review signals or members without completed bounded CRC checks. Repacking stays in memory on the host. Common `.env*`, key, credential and generated dependency/Git paths are omitted; this is not a complete embedded-secret detector. Only the reviewed reviewed example application build/start script profile is supported. The original ZIP is unchanged. Application input and logs stay under ignored `reports/qemu-lab/runs/`; they can contain private code and must not be published. Public reports contain test summaries only.
 
 The exact delivery tested has SHA-256 `6271cf0f60c7da652bb0ee36bcbbff02a4693a0310f97dd70a11db1ec5af466b`. Its guest input uses 235 compatible locked npm entries and 22 runtime APKs. Early setup attempts exposed a live-Alpine nonrepository-package rule and an OpenSSL package version mismatch; both were resolved without disabling package signatures. TCG compiled the frontend and backend, but its startup check failed while guest loopback was down. Enabling guest-only loopback fixed that setup defect. A subsequent attempt correctly refused incomplete production configuration; production checks were preserved, with later experiments using reserved `.invalid` HTTPS addresses, distinct synthetic keys and simulator mode. No real Supabase, OpenAI or other live credentials were supplied.
 
@@ -78,19 +80,19 @@ Remaining scope: disposable database/auth/storage fixtures, migration tests, aut
 Primary runtime references: [QEMU invocation options](https://www.qemu.org/docs/master/system/qemu-manpage.html), [WHPX requirements](https://www.qemu.org/docs/master/system/whpx.html), [Windows binary provider](https://qemu.weilnetz.de/w64/).
 
 
-Final WHPX outcome: Node v24.18.1/npm 11.11.0, frontend build and backend compilation succeeded. The compiled production server returned guest-local HTTP 200 for GET /, with a nonempty body. No external route remained afterward, the input image hash matched and QEMU stopped. This is only build/start acceptance; no database, authentication, storage or published-tour workflow was verified. Private result/log: ignored lab run tudela-a460bf0f19d4.
+Final WHPX outcome: Node v24.18.1/npm 11.11.0, frontend build and backend compilation succeeded. The compiled production server returned guest-local HTTP 200 for GET /, with a nonempty body. No external route remained afterward, the input image hash matched and QEMU stopped. This is only build/start acceptance; no database, authentication, storage or published-tour workflow was verified. Private result/log: ignored lab run reviewed example application-a460bf0f19d4.
 
 
 ## Portable exact-delivery evidence (0.21.0)
 
-Application probes now emit run-evidence.json and a latest-run-evidence.json alias in the private lab. A fixed allowlisted contract records original ZIP and filtered-copy SHA-256, omitted count, profile/run/version/time metadata and explicit true/false/null outcomes. No raw logs, source paths, credentials or arbitrary exception strings enter this portable file. Input copying hashes and repacks the same bounded immutable snapshot. Setup & readiness can preview and explicitly attach the record only to matching archive_sha256, separately from static findings. This is not signature verification or an authenticated runtime attestation. Manual JSON editing remains possible and is disclosed. HTML exports preserve applied evidence separately; static JSON and AI packets do not include it. The unchanged offline guest boundary and synthetic configuration still apply. The fresh Tudela result passed 14 isolation and 11 application/teardown checks; no wider service/workflow acceptance is established.
+Application probes now emit run-evidence.json and a latest-run-evidence.json alias in the private lab. A fixed allowlisted contract records original ZIP and filtered-copy SHA-256, omitted count, profile/run/version/time metadata and explicit true/false/null outcomes. No raw logs, source paths, credentials or arbitrary exception strings enter this portable file. Input copying hashes and repacks the same bounded immutable snapshot. Setup & readiness can preview and explicitly attach the record only to matching archive_sha256, separately from static findings. This is not signature verification or an authenticated runtime attestation. Manual JSON editing remains possible and is disclosed. HTML exports preserve applied evidence separately; static JSON and AI packets do not include it. The unchanged offline guest boundary and synthetic configuration still apply. The fresh reviewed example application result passed 14 isolation and 11 application/teardown checks; no wider service/workflow acceptance is established.
 
 
 ## Disposable service profile (0.22.0)
 
-The separate tudela-offline-tour-v1 profile now supplies actual PostgreSQL 17.11, Auth 2.197.0, PostgREST 16.4 and Storage 1.83.5. Provisioning caches pinned official release assets and selected Storage runtime image layers, plus 39 signed Alpine packages; it executes no application source on the host. Only the Storage application layers are unpacked in the guest, using Node v24.18.1, rather than recreating the full vendor Docker deployment. Artifact hashes over HTTPS are publisher/image checksums, not independent attestation.
+The separate reviewed example application-offline-tour-v1 profile now supplies actual PostgreSQL 17.11, Auth 2.197.0, PostgREST 16.4 and Storage 1.83.5. Provisioning caches pinned official release assets and selected Storage runtime image layers, plus 39 signed Alpine packages; it executes no application source on the host. Only the Storage application layers are unpacked in the guest, using Node v24.18.1, rather than recreating the full vendor Docker deployment. Artifact hashes over HTTPS are publisher/image checksums, not independent attestation.
 
-This profile explicitly selects 3072 MiB guest memory, a bounded 2048 MiB /work tmpfs, two CPUs and a 600-second deadline. The same 14 blank-guest isolation checks run first at this memory size. No NIC, shared folder, forwarding, remote display or host preview is enabled. Standard Auth/Storage roles and grants precede the original Tudela migrations; modern JWT claim helpers preserve application RLS assertions. Guest-generated credentials and a guest certificate support a fixed loopback HTTPS gateway, with TLS validation enabled. No host environment or live service keys are reused.
+This profile explicitly selects 3072 MiB guest memory, a bounded 2048 MiB /work tmpfs, two CPUs and a 600-second deadline. The same 14 blank-guest isolation checks run first at this memory size. No NIC, shared folder, forwarding, remote display or host preview is enabled. Standard Auth/Storage roles and grants precede the original reviewed example application migrations; modern JWT claim helpers preserve application RLS assertions. Guest-generated credentials and a guest certificate support a fixed loopback HTTPS gateway, with TLS validation enabled. No host environment or live service keys are reused.
 
 Run 1eb69ba4c21f on the previously identified exact delivery passed all 14 isolation and 26 application checks. A reviewed derivative of the supplied acceptance script preserves its security assertions and adds wrong-password rejection and actual public HTTP JSON/image byte readback. It created separate disposable editor/reviewer users, tested tenant/role boundaries and denied direct storage writes, uploaded via the application media gateway, approved/published one tour with two stops and completed the supplied tenant/user cleanup. Original application business logic was not modified. Post-run route/interface and image checks passed and QEMU stopped.
 
@@ -108,4 +110,4 @@ The manual profile is capped at thirty minutes total, twenty minutes after readi
 
 ### CMS transfer update (0.23.1)
 
-Large base64 packets use fixed-path shell-safe chunks with guest SHA-256 verification before parsing. Encoded packets remain bounded at 4 MiB; HTTP bodies/responses at 2 MiB. Ordinary and chunked guest HTTP preflights must pass before browser entry opens. Header-cache success is recorded only after a non-502 response. Bounded private diagnostics never enter portable evidence. Photograph upload passed but reviewer approval remains blocked; see TUDELA_PHOTO_TEST.md.
+Large base64 packets use fixed-path shell-safe chunks with guest SHA-256 verification before parsing. Encoded packets remain bounded at 4 MiB; HTTP bodies/responses at 2 MiB. Ordinary and chunked guest HTTP preflights must pass before browser entry opens. Header-cache success is recorded only after a non-502 response. Bounded private diagnostics never enter portable evidence. Photograph upload passed but reviewer approval remains blocked; see CMS_PHOTO_TEST.md.

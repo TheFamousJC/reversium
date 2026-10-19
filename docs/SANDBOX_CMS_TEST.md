@@ -1,4 +1,6 @@
-# Tudela CMS browser test — 18 October 2026
+# reviewed example application CMS browser test — 18 October 2026
+
+Project names in historical notes have been anonymized. Recorded counts, fingerprints, outcomes and limitations describe a specific reviewed example, not arbitrary code packages.
 
 Build 0.23.0. This report distinguishes browser actions from sandbox setup and earlier API acceptance. It is a bounded test of one delivery, not production or security certification.
 
@@ -35,7 +37,7 @@ The browser journey passed for this minimal two-stop tour. The CMS displayed one
 
 ## Blockers and limits
 
-The first launch could not parse the account fixture after a serial shell prompt; parsing was corrected and that guest stopped. The first browser attempt reached the editor wizard and submission but the serial preview became unresponsive to queued requests. It was stopped without claiming publishing success. Repeated headers and idle Node connections were removed from the transport path, and private bounded route/status diagnostics were added. These are preview issues, not established Tudela defects.
+The first launch could not parse the account fixture after a serial shell prompt; parsing was corrected and that guest stopped. The first browser attempt reached the editor wizard and submission but the serial preview became unresponsive to queued requests. It was stopped without claiming publishing success. Repeated headers and idle Node connections were removed from the transport path, and private bounded route/status diagnostics were added. These are preview issues, not established reviewed example application defects.
 
 The documented CMS address is /cms; the visitor screen's account menu did not provide an obvious CMS entry in this test. Before this disposable organization has published content, the visitor app can show bundled demonstration cities. Those cities must not be mistaken for successful database publication.
 
@@ -45,7 +47,7 @@ External geocoding/maps, fonts and live AI/email/OAuth remain intentionally unav
 
 ## Reproduce and stop
 
-Follow the CMS preview chapter in Help. Run python scripts/test_tudela_cms.py "path/to/Tudela.zip" --accelerator whpx where supported; open the private entry URL and use only its disposable accounts. Open /__reversium on that same origin to stop the preview. Host input images, private credential files, browser session data, screenshots and logs can remain after guest RAM is discarded. Do not distribute them.
+Follow the CMS preview chapter in Help. Run python scripts/test_project_cms.py "path/to/your-package.zip" --accelerator whpx where supported; open the private entry URL and use only its disposable accounts. Open /__reversium on that same origin to stop the preview. Host input images, private credential files, browser session data, screenshots and logs can remain after guest RAM is discarded. Do not distribute them.
 
 
 ## Final teardown and retained evidence
@@ -55,4 +57,4 @@ Run 7eead40febda started at 2026-10-18T19:16:07Z and finished at 19:38:19Z. Its 
 Filtered-copy SHA-256: `f7cebd79b5a6fbe5c35bd5dbbdbc8a42ea4c45fc767e55a14c3e9c477319acef`; this differs from the original delivery identity above. The preview relayed 291 requests. The earlier v2 API result for run 1eb69ba4c21f was preserved unchanged. Private artifacts remain local and ignored; source-bearing media and logs were not published. No guest, preview listener or live-platform connection remains running.
 
 
-[Photograph follow-up](TUDELA_PHOTO_TEST.md): upload passed; reviewer queue empty. The earlier publishing result does not establish photograph publication.
+[Photograph follow-up](CMS_PHOTO_TEST.md): upload passed; reviewer queue empty. The earlier publishing result does not establish photograph publication.

@@ -1,183 +1,70 @@
-# Reversium
+# Reversium by 3Sci Labs
 
-[Use Reversium in your browser](web/) — analyze your own ZIP without installation or an account. Files stay on your device; no uploads or AI calls. Browser limit: 32 MiB. First use downloads the self-hosted Python runtime (about 14 MB). [Sample report](demo/report.html) uses fictional data.
+Understand. Prepare. Develop.
 
+[Use Reversium in your browser](web/) to analyze your own ZIP locally, free and without installation or an account. The app does not upload or execute the package. The first visit downloads about 14 MB of application/runtime assets. Browser compressed ZIP limit: 32 MiB. [Explore fictional sample data](demo/report.html).
 
-[Try the free interactive sample demo](index.html) — no installation or sign-up. Explore fictional findings, feature paths and report downloads. The sample uses fictional data; the browser version above accepts your own ZIP locally.
+## What it is for
 
-A local and free-to-run handover and maintenance-discovery workbench. [Market comparison and roadmap](docs/market-position.html).
+Understand a delivery, prepare a developer handover or investigate maintenance. A prototype developed with Claude can be handed to someone working in Codex with its original code, a readable evidence-backed report and a practical checklist. This is a manual handover, not chat, account or agent-memory migration.
 
-New in 0.14.0: **Handover** provides names-only configuration/script/runtime clues and reviewer-owned tasks with local checklist export. **Change impact** explores bounded upstream/downstream graph candidates associated with a selected file. Neither claims working setup or complete change coverage.
+Reversium inventories a package, extracts supported source/binary clues, draws feature and file relationships, records evidence and unknowns, and compares deliveries. It helps you choose what to inspect and verify. It cannot tell you exactly everything a program does or certify it safe or production-ready.
 
-An archive analysis workbench. No external services, API keys, JavaScript packages or Python dependencies are required. Python 3.10+ is required.
+## Documentation
 
-## Run
+- [Complete Help](docs/user-guide.html), available on Start and report screens.
+- [Feature list PDF](output/pdf/Reversium-Feature-List.pdf): current functions, edition availability and limits.
+- [Seven graphical user journeys](docs/user-journeys.html) and [journey PDF](output/pdf/Reversium-User-Journeys.pdf).
+- [Purpose, sandbox, tool compatibility and lawful-use sources](docs/PRODUCT_GUIDANCE.md).
+- [Commercial assessment and competitors](docs/market-position.html).
+- [Running development stages](docs/DEVELOPMENT_STAGES.md) and [plain-language progress](docs/PLAIN_LANGUAGE.md).
+
+The feature list and journey assets are generated from docs/product-catalog.json whenever Help is rebuilt. Update that catalog when capabilities change. The release gate checks build identity and generated artifact hashes; it does not replace editorial verification.
+
+## Local application
+
+The base analyzer requires Python 3.10+ and no third-party Python packages:
 
 ```sh
 python -m reversium
 ```
 
-Choose a ZIP in the browser at http://127.0.0.1:8765. Analysis stays on your computer. Stop the server with Ctrl+C. For exportable reports:
-
-On Windows, `./Start-Reversium.ps1` also starts the application and can use the bundled Codex Python runtime when available.
-
-The Windows launcher now selects a free local port. Use the address it opens and check the displayed build number; an already-running server continues serving its older code until restarted. The CLI uses 8765 by default and selects a free port if that default is busy. `--port 0` explicitly requests a free port.
+Open the printed local address. The default is port 8765 with a free-port fallback; --port 0 requests a free port explicitly. Stop with Ctrl+C. On Windows, Start-Reversium.ps1 is an alternative launcher. Restart an existing server to load a new build. Local web ZIP limit: 64 MiB; normal archive/inspection bounds still apply.
 
 ```sh
-python -m reversium project.zip --output reports/project
+python -m reversium your-package.zip --output reports/your-package
+python -m reversium your-package.zip --output reports/review --compare reports/earlier/report.json
+```
+
+CLI output includes report.html, report.json and feature-map.svg, overwriting those names in the selected directory. Save checklist notes separately; ordinary report JSON is static analysis only. Exports can contain private code-derived details.
+
+## Useful capabilities and boundaries
+
+Selected Python, JavaScript/TypeScript, React and Supabase references support feature candidates, workflows and graphical maps. Solid traced references and dashed inferences stay distinct. Coverage discloses unresolved and omitted material. Views and readers are bounded; dynamic code and unsupported patterns can be missed.
+
+File alerts flag selected integrity, disguise and suspicious-pattern signals. Green is not guaranteed safe. These checks are not antivirus or a complete vulnerability audit. Binary inspection is metadata/reference analysis, not full decompilation.
+
+Use the report alongside Visual Studio, VS Code, repository hosting including GitHub, Supabase, Docker, Railway and other development tools. These are manual file/report workflows; no native account, editor, deployment or synchronization connectors are provided.
+
+Online AI is an explicit reviewed text handoff to a selected provider. Embedded online ChatGPT account access remains disabled pending approval. The local optional connection has separate setup and account eligibility; successful sign-in does not guarantee inference availability. AI sharing is never required for local analysis.
+
+## Experimental local sandbox
+
+The browser edition never executes uploaded code. The Windows QEMU pilot runs real code in an offline disposable Linux guest, not a simulation. It supports one fixed developer-reviewed example profile, not arbitrary ZIPs. Another project needs separate reviewed preparation and acceptance checks.
+
+After reviewing compatibility, prerequisites and [Help](docs/user-guide.html), the profile's neutral entry points are scripts/prepare_project_offline.py, scripts/prepare_project_services.py, --sandbox-project, --sandbox-project-services and scripts/test_project_cms.py. They preserve existing profile compatibility; renaming an entry point does not broaden support. Fresh isolation gates, synthetic data, deadlines and no guest NIC/host shares remain in force. Private lab files can remain after shutdown.
+
+[Historical CMS observations](docs/SANDBOX_CMS_TEST.md) and [image test evidence/blockers](docs/CMS_PHOTO_TEST.md) describe a specific anonymized delivery. Image upload passed; the separate reviewer saw an empty queue. Image approval/publication remains unverified. [Sandbox design](docs/SANDBOX_DESIGN.md) describes the execution boundary and limits.
+
+## Release checks
+
+```sh
 python -m unittest discover -s tests -v
+node --test tests/review-tools.test.mjs tests/online-ai.test.mjs tests/runtime-evidence.test.mjs tests/service-guest.test.mjs tests/cms-transport.test.mjs
+python scripts/build_help.py
+python scripts/build_browser.py
+python scripts/build_demo.py
+python scripts/check_release_docs.py
 ```
 
-The CLI writes standalone `report.html`, structured `report.json`, and `feature-map.svg`. It overwrites those names in the selected output directory. Browser reports offer Download JSON, Download HTML and map SVG, plus live evidence/feature filters. Exports always contain the full generated report/map view, even when the screen is filtered.
-
-Reports open on **Review findings**, a plain-language overview with evidence links and explicit unknowns. **Architecture** holds the platform profile, supporting services and diagram; **Evidence** holds filterable findings and baseline comparison; **Coverage** holds binary inspection, inventory, readiness and limitations. Tabs support arrow/Home/End keyboard navigation. Saved HTML retains all sections; printing or disabling JavaScript exposes all sections. Analysis does not establish an exact behavioral specification of arbitrary uploaded programs.
-
-In **Architecture**, the feature interaction map connects supported routes, handlers, helpers and data-name candidates. Select a node/line to inspect evidence or filter by feature. Solid edges are traced references; dashed data edges are inferred name matches, not proof of the same database or a business workflow. A catalogue supplies supported-operation titles and unknowns. Browser SVG export and CLI `feature-map.svg` retain the complete drawn view; JSON includes the full generated graph. The view discloses omissions beyond 120 nodes/240 edges.
-
-`--compare previous-report.json` now compares stable feature/node/edge identities as well as files/findings. Added items are green, changed items amber; removals are listed. Baselines without a map are reported as unavailable. Structural differences do not establish behavioral changes.
-
-Explanations use local rules only, with no AI or added dependencies. Each explanation links to matching findings and includes what remains unverified. Links clear any evidence filter and focus the referenced row. Up to 16 explanation groups appear in the overview, with an explicit omitted count; full findings stay available. Packages without supported clues get an insufficient-evidence result. Structured explanations are included in the report JSON's additive `behavior` field (schema version 3).
-
-Python feature tracing follows module-level decorated route handlers into uniquely resolved local/imported helpers and recognizes supported SQLite reads/writes/commits, response shapes and selected literal requests/httpx host references. JavaScript/TypeScript tracing recognizes selected ES-module Express registrations, block-bodied callbacks and helpers, pg Pool/Client and mysql2 literal SQL calls, plus response field names. It uses a bounded local tokenizer, not a full parser, and requires no Node installation. Version 0.7.0 additionally maps nested TS route registrations, React JSX/value references, Supabase table/RPC/Auth/storage operations and SQL migration RPC/table candidates. Regex bodies and JSX text are opaque. Literal router mounts are candidates; CommonJS, dynamic SQL/query objects, complex middleware, class handlers, re-exports and React prop/callback data flow remain unsupported or unknown. Trace evidence and limits are recorded in `route_traces`, coverage and findings. No input is evaluated.
-
-Tabs are visible before scripting initializes and remain near the top while scrolling; without JavaScript, their anchors navigate the visible sections. The home page links to a built-in local sample report showing the four sections. Sample source is analyzed, never executed.
-
-## React workflows and computed targets in v0.8.0
-
-Selected JSX callback bindings, destructured/object props, forwarding, immutable aliases, literal React.lazy components, useCallback and returned hook callbacks now connect UI actions to supported helpers. API target candidates follow local constants/concatenation/templates and per-caller wrapper arguments, with HTTP-method-aware route matching. Binding links are inferred across possible source usages, not verified component instances. Computed origins, complex forwarding/state flow, mutable targets and unknown methods remain explicit gaps.
-
-Verified against the same Tudela ZIP: 172 prop-binding occurrences, 52 resolved API-target contexts and 46 unambiguous caller-to-route connections; 96 tests pass. The chat callback reaches POST /api/chat and the CMS save callback reaches its database helper. Source evidence includes prop-binding locations and API caller/helper locations. Request targets are not contacted. Expression size (2,000 characters), helper depth (4), context/output (5,000/400), feature traversal (10/360) and SVG display (120/240 nodes/edges) are bounded. No Node, AI model, external service or new dependency is required.
-
-## Tudela tracing in v0.7.0
-
-The real Tudela ZIP now yields 25 structural route references and 32 React/JSX module starting points across all 115 JS/TS files, plus Supabase table, RPC, authentication, storage and SQL migration references. These counts do not establish complete behavior. Select a feature to rebuild a focused map; the 120-node/240-edge view limit is disclosed, and JSON retains generated workspace references. Computed targets, React prop/callback flow, applied migrations, permissions and runtime behavior remain unknown. No Node runtime, parser package, model or paid service is required.
-
-## Practical use
-
-Reversium helps with initial software due diligence, legacy-system handover and maintenance/migration discovery. Use it to locate likely features, follow supported routes to data operations, and inventory dependencies before deeper review. It provides evidence and open questions rather than a certified functional specification, runtime validation or automatic rebuild.
-
-Compare against a previously saved JSON report:
-
-```sh
-python -m reversium project.zip --compare reports/previous/report.json --output reports/current
-```
-
-Comparison lists added/removed files and findings, and changed inspected files with hashes in both reports (including binaries). Moving a finding to a different line or byte offset alone does not count as a new finding. Comparison is currently CLI-only; reports and exports display the results.
-
-## Current coverage
-
-- ZIP member inventory, source language counts and hashes for inspected content.
-- Python AST imports, classes, functions and main guards.
-- JavaScript/TypeScript import and require heuristics, package.json dependency inventory.
-- requirements.txt and go.mod dependency names (common declarations only).
-- Python AST decorator route candidates (including multiline decorators) and Django/SQLAlchemy base-name model candidates.
-- Heuristic non-Python route and endpoint-host candidates, with file and line references.
-- Conservative Python and JavaScript/TypeScript local module links, including relative imports, index files and emitted .js to TypeScript path candidates. Ambiguous matches are retained without selecting a target.
-- Internal/external/unresolved/ambiguous labels and per-file analysis coverage.
-- Static binary identification and metadata: PE/ELF library references, Java class references, DEX/Mach-O header identification and APK/JAR-like container directories. Binary evidence uses byte offsets; partial/unsupported readers remain explicit.
-- Evidence-backed platform/framework/runtime candidates and supporting service references from known libraries and simple Docker/Compose image declarations.
-- Setup/readiness assessment with unconfirmed requirements; no automatic installation or execution.
-- Embedded SVG diagram of file-to-import/package mentions, evidence table and explicit limitations.
-
-The import diagram shows package references; the interaction map distinguishes structural calls, JSX references and inferred shared data/API candidates. Neither is a complete runtime call graph. An external import label requires a matching declared package name; unknown references remain unresolved (including Python standard-library imports). Aliases, custom module paths and dynamic imports are not resolved. JavaScript/TypeScript uses bounded local token/reference readers; Python uses AST parsing. SQL receives limited migration-function/table reference inspection. Other source languages receive language inventory only. No claim of complete architecture recovery, vulnerability detection, cost estimation or binary decompilation is made in this release. Files are not extracted, built, imported or executed. Nested ZIP containers receive bounded directory-only inspection, without recursive content analysis. See [binary coverage and limits](docs/BINARY_ANALYSIS.md).
-
-The platform profile identifies likely components and supporting services, not an exact business specification or a verified deployment. Client references can be optional or development-only. The application does not install, start or health-check submitted software; stable operation, resource sizing and required service versions remain unverified. Reversium is free to run, while the analyzed software may require paid or private external services.
-
-Browser uploads are capped at 64 MiB. Both entry points reject archives over 10,000 entries or 256 MiB declared uncompressed size, unsafe paths, symlinks and duplicate member names. Individual content reads are capped at 4 MiB; compression ratios above 200:1 are skipped. Encrypted members are skipped. Reports can contain private paths and symbol names; review them before sharing. Run locally on trusted hardware; static parsing still consumes resources.
-
-## Project
-
-- User guide: docs/user-guide.html
-- [Development stages](docs/DEVELOPMENT_STAGES.md)
-- [Plain-language explanation](docs/PLAIN_LANGUAGE.md)
-- [Contributing](CONTRIBUTING.md)
-
-Licensed under MIT. The built-in static binary reader has no third-party dependencies. External decompiler adapters remain planned and will have their own license notices. The core continues to work without AI or paid services.
-
-## Optional AI assistant
-
-The report's **AI assistant · optional** tab includes a setup wizard and FAQ. Local analysis remains free, offline and dependency-free. To enable signature verification for the optional ChatGPT account flow, install `python -m pip install -r requirements-ai.txt`. Restart Reversium, choose Continue with ChatGPT, open the provider sign-in link, then return and Check connection. Eligible account models load after consent; availability and plan limits are controlled by OpenAI. No API-key billing fallback is used.
-
-Select findings, enter a question, prepare/edit the sharing preview, then approve and send each request. Only that question/evidence plus the visible instructions are shared. No full ZIP upload or execution tools. Answers cite selected findings and disclose unknowns; citations are not proof of correctness. Cloud sign-in/inference still require live user acceptance testing.
-
-Tokens remain in memory and expire without automatic refresh; reconnect as needed. Ignored `reports/assistant-host.json` and `reports/assistant-registration.json` retain non-token host/account identifiers. To switch accounts, disconnect and remove only the registration file before reconnecting. Local disconnect does not revoke provider-side consent. HTML exports exclude assistant state; analysis JSON never includes it.
-
-Official contract: [registration](https://developers.openai.com/), [models and inference](https://developers.openai.com/).
-
-
-## About and FAQ (build 0.10.1)
-
-About explains Reversium in plain language and displays its build and 3Sci.com / 2026 attribution. Software findings keeps the uploaded-code explanations. FAQ has its own report button and home help button. Expand “What are the downloads for?” beside the exports: HTML is a readable report for offline review or handover; JSON is structured findings for scripts, integrations and CLI baseline comparisons. Neither export is a runnable software backup or includes the original ZIP.
-
-
-## Guided workflow (0.11.0)
-
-Start by choosing a goal, continue to Choose ZIP, then Review findings. Follow the guided actions to inspect connections and gaps. Save & next steps contains HTML/JSON exports and a practical verification checklist; no download controls or AI setup appear before analysis. Samples are labelled fictional demonstrations.
-
-
-Build 0.11.1 improves the owner walkthrough: brief evidence-linked technology clues first, technical details collapsed, selected package identity, and a concrete owner/developer handover checklist with completion criteria. Save readable report (HTML) is the recommended handover action; technical JSON is optional. The overview does not claim the software runs.
-
-
-## Rebuild the public demo
-
-Run `python scripts/build_demo.py`. It generates index.html and demo/report.html from fictional in-code fixtures only, using the real analyzer and renderer. Existing Static web hosting publishes the root of codex/initial-workbench. Do not replace these fixtures with private customer code.
-
-Browser review (0.15.0): restore handover JSON with a preview and delivery fingerprint, or open Compare reports to compare a previous report locally. Legacy checklists require independent delivery confirmation. Browser comparison covers files, findings and (since 0.16.0) feature-map relationships, not runtime behavior. Save comparison notes records the displayed bounded results.
-
-Feature-map review (0.16.0): Compare reports now shows changed relationships, earlier/current evidence, focused diagrams and directly recorded features separately from broader candidate effects. Traversal/display bounds and omissions are explicit. Nothing is uploaded or executed.
-
-File alerts (0.17.0): local traffic-light triage for bounded ZIP member integrity, selected filename/header disguises and suspicious script patterns. Green is not a safety certificate; yellow includes inspection gaps and potentially damaged files, and red is a review signal rather than a malware verdict. Nothing is executed or sent to a scanning service. See [isolated execution proposal](docs/SANDBOX_DESIGN.md) for the separate experimental VM-based run milestone.
-
-Setup/readiness (0.18.0): eight inventory-backed preparation checks, with explicit unknowns and a local text export. Handover cards now use an explicit light theme. Read-only sandbox prerequisites: `python -m reversium --sandbox-check`. Offline profile preparation: `python -m reversium --sandbox-plan reports/new-sandbox-plan` (new directory only). Preparation does not boot a VM or execute ZIPs; QEMU and Windows Sandbox profiles remain unvalidated runtime drafts. See the updated [market comparison](docs/market-position.html) for missing features and local/free priorities.
-
-
-Experimental local QEMU pilot (0.19.0, Windows only):
-
-```powershell
-python scripts/bootstrap_qemu_lab.py
-python scripts/prepare_tudela_offline.py "path/to/Tudela.zip"
-python -m reversium --sandbox-self-test
-python -m reversium --sandbox-tudela "path/to/Tudela.zip"
-```
-
-Requires existing 7-Zip. Downloads pinned QEMU/Alpine assets and the optional pycdlib ISO library into `reports/qemu-lab`; no QEMU installer or global PATH change is used. Public runtime/dependency packages are cached on the host, not installed there. Uploaded ZIP/source contents are not sent to providers. Publisher checksums are verified over HTTPS; this is not independent signature attestation or a malware clearance. Alpine APK trust remains enforced in the offline guest. Every application probe reruns blank-guest isolation checks first. Only the reviewed Tudela build/start profile is supported, with reserved .invalid service addresses and synthetic keys. No guest network adapter, host-folder sharing, clipboard integration or host port forwarding is enabled. Windows job supervision and deadlines stop the guest. This is not a guarantee against VM/emulator vulnerabilities.
-
-The lab retains private source-bearing input images and logs; do not commit or share them. Browser analysis remains separate and never executes ZIP contents. A successful build/start is not database/auth/tour acceptance. See [sandbox design and test record](docs/SANDBOX_DESIGN.md) for tested boundaries and remaining gaps.
-
-The default accelerator is TCG software emulation. If WHPX is already enabled, append `--sandbox-accelerator whpx` to either execution command; the same backend is tested before application use. No Windows feature is enabled automatically.
-
-Build 0.20.0: [Searchable user guide](docs/user-guide.html), [PDF guide](output/pdf/Reversium-User-Guide.pdf), [commercial assessment and development priorities](docs/market-position.html), and [elevator pitch](docs/Elevator-pitch.txt). The guide is rebuilt with every release; run `python scripts/check_release_docs.py` before publication. Core analysis remains free and local.
-
-Build 0.21.0: Setup & readiness can preview and attach a portable sandbox `run-evidence.json` to the exact analysed ZIP SHA-256. New local Tudela attempts also save `reports/qemu-lab/latest-run-evidence.json`. Applied records survive readable HTML export or separate JSON save; technical report JSON remains static. The tested filtered-copy identity, individual outcomes and unknowns stay separate from source findings. Imports are bounded, local and unauthenticated reviewer evidence, not a signed certificate. No runtime record enters AI requests or marks checklist tasks verified.
-
-
-### Disposable Tudela services and API acceptance (0.22.0)
-
-After the existing lab and dependency preparation:
-
-```powershell
-python scripts/prepare_tudela_services.py
-python -m reversium --sandbox-tudela-tour "path/to/Tudela.zip" --sandbox-accelerator whpx
-```
-
-Use WHPX only where already available; omission uses bounded, potentially slower TCG emulation. This separate profile requires 3 GiB guest RAM and repeats isolation checks at that size. Real PostgreSQL 17.11, Auth 2.197.0, PostgREST 16.4 and Storage 1.83.5 run on guest loopback with disposable credentials and RAM-backed data. No host services, live credentials, guest NIC or forwarded ports are introduced. Public artifacts are pinned and cached; no source is uploaded. Original application migrations and access policies remain in force.
-
-The real Tudela test passed 14 isolation and 26 application checks, including editor/reviewer login, rejected password, role/tenant boundaries, validated media upload, approval/publication of a two-stop tour, public HTTP JSON/image readback and cleanup. This is API end-to-end acceptance, not an interactive CMS browser journey or production certification. The v2 result attaches to the exact original ZIP in Setup & readiness; v1 records remain supported. Private input images/logs/caches stay ignored on the host. See [Help](docs/user-guide.html) and [sandbox design](docs/SANDBOX_DESIGN.md) for preparation, retention and remaining gaps.
-
-
-### Explicit disposable CMS browser preview (0.23.0)
-
-After preparing the lab, dependencies and services, run:
-
-```powershell
-python scripts/test_tudela_cms.py "path/to/Tudela.zip" --accelerator whpx
-```
-
-Use WHPX only where already available. This opt-in profile repeats the 3 GiB isolation gate, builds the frontend for a random host-loopback HTTP origin, and relays bounded requests over serial to the guest HTTPS gateway. It adds no guest NIC, shared folder or forwarded network port. A private entry cookie, exact Host/Origin checks and a restrictive browser policy limit access; this remains experimental, not security certification. No live service credentials or paid hosting are needed.
-
-Open the URL in the private run's preview-entry.json; disposable editor/reviewer details are in cms-fixture-private.json. These files and logs must not be shared. Open /cms to use the documented administration route. Stop through /__reversium on the same origin, or let the twenty-minute preview/thirty-minute total deadline expire. Guest data is temporary; host artifacts and browser session data can remain. The CLI records setup and teardown separately and never automatically calls browser publishing verified. See [Help](docs/user-guide.html) for limitations and [CMS test notes](docs/SANDBOX_CMS_TEST.md) for observed outcomes.
-
-
-### CMS photograph test (0.23.1)
-
-The local browser accepted a synthetic image and submitted its tour package. The separate reviewer saw an empty queue, so approval and public image/credit display remain unverified. See [photograph evidence and blockers](docs/TUDELA_PHOTO_TEST.md). Help includes the repeatable image test.
+ReportLab is needed to build documentation PDFs, not for ordinary analysis. Authorized code understanding and reverse-engineering analysis are valid product purposes; rights, licences and jurisdiction still govern each use. Reversium does not grant permission to bypass access controls or publish someone else's code.

@@ -1,9 +1,16 @@
-Reversium by 3Sci Labs — elevator pitch
+Reversium by 3Sci Labs - elevator pitch
 
-Taking over software should not start with guesswork. Reversium by 3Sci Labs turns an unfamiliar software package into a clear handover: what the code appears to do, how supported features connect, and what a developer still needs to verify. It links explanations to evidence, helps compare deliveries and keeps your ZIP on your device. Start free in your browser, with no installation, then give the next developer a practical plan to investigate, run and maintain the software.
+You have the code. Now someone else needs to understand it.
+
+Perhaps you built a first version with Claude and the next developer works in Codex. Perhaps an agency is handing over a project, or you are taking over software with very little documentation. Reversium turns your code package into an evidence-backed starting point: what it appears to do, how supported features connect, which services are referenced and what still needs checking.
+
+Start free in your browser, with no installation. Your ZIP stays on your device. Give the next person the original code, a readable report, relationship diagrams and a practical checklist - so the handover begins with shared context and clear questions.
 
 Short version
-Understand the software you inherit. Give its next developer an evidence-backed handover, with your ZIP kept on your device.
+Your code. A clearer handover. Understand, prepare and continue in the tools you choose.
+
+What this means
+The Claude-to-Codex example is a manual code-and-document handover. Reversium does not migrate chats, hidden prompts, agent memory, credentials or accounts. AI can perform code analysis and use tools; Reversium packages a repeatable evidence, comparison and review workflow rather than claiming an ability AI cannot reproduce.
 
 Claim limits
-Supported static tracing is incomplete. Browser analysis does not execute the software. The local sandbox supports one reviewed experimental profile. This is not a security or production-readiness certificate.
+Supported static tracing is incomplete. Browser analysis never executes the package. The experimental local sandbox runs real code only in a fixed reviewed example profile; it is not a general runner, a simulator or a security/production certificate. Optional AI sharing is a separate user decision.

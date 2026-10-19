@@ -32,3 +32,6 @@ There is now a full Help guide and downloadable PDF. Browser ZIP limit: 32 MiB.
 If you have ever inherited a project with a brave README and a mysterious .env.example, I would love to hear what you would want to find first.
 
 #OpenSource #SoftwareDevelopment #DeveloperTools #SoftwareHandover #3SciLabs
+
+
+A common handover: you built a prototype with Claude, and the next developer works in Codex. Reversium helps you pass the original code package, a source-backed map, known gaps and a practical checklist. It does not migrate chats or accounts.

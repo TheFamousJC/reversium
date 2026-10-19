@@ -63,7 +63,7 @@ class Handler(BaseHTTPRequestHandler):
         return self.headers.get('Host') == f'127.0.0.1:{self.server.server_port}'
 
     def do_GET(self):
-        documents={'/docs/user-guide.html':('docs/user-guide.html','text/html; charset=utf-8'),'/docs/market-position.html':('docs/market-position.html','text/html; charset=utf-8'),'/output/pdf/Reversium-User-Guide.pdf':('output/pdf/Reversium-User-Guide.pdf','application/pdf')}
+        documents={'/docs/PRODUCT_GUIDANCE.md':('docs/PRODUCT_GUIDANCE.md','text/plain; charset=utf-8'),'/docs/user-guide.html':('docs/user-guide.html','text/html; charset=utf-8'),'/docs/market-position.html':('docs/market-position.html','text/html; charset=utf-8'),'/docs/user-journeys.html':('docs/user-journeys.html','text/html; charset=utf-8'),'/output/pdf/Reversium-Feature-List.pdf':('output/pdf/Reversium-Feature-List.pdf','application/pdf'),'/output/pdf/Reversium-User-Journeys.pdf':('output/pdf/Reversium-User-Journeys.pdf','application/pdf'),'/output/pdf/Reversium-User-Guide.pdf':('output/pdf/Reversium-User-Guide.pdf','application/pdf')}
         if self.path in documents:
             path,kind=documents[self.path]
             source=Path(__file__).resolve().parents[1]/path
@@ -209,8 +209,10 @@ def main():
     parser.add_argument('--sandbox-lab', default='reports/qemu-lab', help='Private QEMU lab directory (not uploaded or published)')
     parser.add_argument('--sandbox-accelerator', choices=['tcg','whpx'], default='tcg', help='Explicit local CPU backend; WHPX requires already enabled Windows hypervisor support')
     parser.add_argument('--sandbox-self-test', action='store_true', help='Explicitly boot benign offline guests and test isolation/teardown')
-    parser.add_argument('--sandbox-tudela', metavar='ZIP', help='Experimental fixed Tudela build/start profile; retests isolation first')
-    parser.add_argument('--sandbox-tudela-tour',metavar='ZIP',help='Experimental offline disposable-service API tour journey; fresh isolation first')
+    parser.add_argument('--sandbox-project', dest='sandbox_tudela', metavar='ZIP', help='Experimental fixed reviewed example build/start profile; retests isolation first')
+    parser.add_argument('--sandbox-project-services', dest='sandbox_tudela_tour',metavar='ZIP',help='Experimental offline disposable-service API tour journey; fresh isolation first')
+    parser.add_argument('--sandbox-tudela', dest='sandbox_tudela', help=argparse.SUPPRESS)
+    parser.add_argument('--sandbox-tudela-tour', dest='sandbox_tudela_tour', help=argparse.SUPPRESS)
     args = parser.parse_args()
     actions=sum(bool(x) for x in (args.sandbox_check,args.sandbox_plan,args.sandbox_self_test,args.sandbox_tudela,args.sandbox_tudela_tour))
     if actions>1 or (actions and args.archive):
