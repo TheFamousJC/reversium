@@ -19,7 +19,7 @@ def render_start(style, help_script):
 <label class="goal-choice"><input type="radio" name="goal" value="handover"> <b>Prepare a developer handover</b><br>Find the code and questions another developer needs to investigate.</label>
 <label class="goal-choice"><input type="radio" name="goal" value="change"> <b>Plan maintenance or modernization</b><br>Explore feature connections and areas that need further checks.</label>
 </fieldset><button id="start-continue">Continue to ZIP</button></form>
-<details><summary>Just exploring? Try a clearly labelled sample</summary><p><a href="/example-js">View sample analysis</a> — a small fictional contact application, not your software.</p></details>
+<details><summary>Just exploring? Try a clearly labelled sample</summary><p><a href="/example-js">View sample analysis</a> — a sample contact application, not your software.</p></details>
 <p>You will get a file-based overview, questions for a developer and a report you can save. This does not test whether the software works. No sign-in is required; AI is optional.</p></section>
 <section id="upload-screen" hidden><h1>Choose your software ZIP.</h1><p id="chosen-goal"></p><p>Choose the project’s source-code package for the clearest results. An installer alone provides fewer clues.</p><p>Choose the package you want to understand. You will review its findings next, then decide what to save or investigate. Nothing is sent to an AI provider during analysis.</p>
 <form id="upload-form"><label for="zip-input">Software ZIP (maximum 64 MiB)</label><input id="zip-input" aria-label="Choose ZIP archive" type="file" accept=".zip" required><button id="analyze-zip" disabled>Analyze ZIP locally</button></form>

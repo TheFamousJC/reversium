@@ -395,3 +395,10 @@ One real problem appeared: an evidence link inside the feature map sent the repo
 The online site still showed the older 0.23.1 build during these checks. Its two new PDF links returned not found because publication had not finished. A free publication retry was requested, but the jobs remained queued. A successful local test is not a successful online release; do not announce the new build as live until its version and PDF files are checked there.
 
 Final local follow-up verification: the actual dynamically rendered map link opened Evidence and finding-19 without navigating the iframe. All three 0.24.1 report PDF downloads matched the generated files byte-for-byte. HTML/JSON/SVG export and reviewed AI request download worked; no AI provider was contacted, and account connection remained intentionally disabled. The report Clear control returned to Start. Python: 152 tests with one optional-dependency skip. JavaScript: 34 tests passed. Documentation release checks passed. Publication remains separately subject to the hosting queue.
+
+
+## A clearer link description and realistic launch scope
+
+The link description now explains that Reversium helps analyze your software ZIP, map features and prepare a handover. Sample screens still say they use sample data, but the link no longer describes the whole product as fictional. Product wording contains no retired licensing-status references; dependency notices remain in place.
+
+The useful first release is a limited beta for understanding and handing over code. It is not yet a promise that any package can run, that every feature is mapped, or that the software is secure or production-ready. Test it with independent owners and developers before making stronger claims or charging for a hosted service. Keep the experimental sandbox and unavailable online account connection clearly separate from the core analyzer.

@@ -5,6 +5,7 @@ import json
 import re
 import sys
 import zipfile
+from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -21,6 +22,16 @@ def asset_hash(path):
 
 def check():
     problems=[]
+    class LinkMetadata(HTMLParser):
+        def __init__(self):super().__init__();self.descriptions=[]
+        def handle_starttag(self,tag,attrs):
+            data=dict(attrs)
+            if tag=='meta' and (data.get('name') or data.get('property')) in ('description','og:description','twitter:description'):
+                self.descriptions.append(data.get('content',''))
+    for entry in ('index.html','web/index.html'):
+        metadata=LinkMetadata();metadata.feed((ROOT/entry).read_text(encoding='utf-8'))
+        if len(metadata.descriptions)!=3 or any(not d.strip() or re.search(r'fictional|open[\s_-]*source',d,re.I) for d in metadata.descriptions):
+            problems.append('Missing or retired link-preview wording: '+entry)
     if GUIDE_VERSION!=__version__:problems.append('Rebuild Help: guide version differs from application.')
     page=(ROOT/'docs/user-guide.html').read_text(encoding='utf-8')
     if GUIDE not in page or SCRIPT not in page:problems.append('Standalone Help differs from embedded Help.')
@@ -58,7 +69,7 @@ def check():
     # Product copy only: dependency licence notices and vendor assets are preserved.
     targets=[ROOT/'README.md',ROOT/'CONTRIBUTING.md',ROOT/'index.html',ROOT/'demo/report.html',ROOT/'web/index.html',ROOT/'web/README.md']
     targets+=list((ROOT/'docs').glob('*'))+list((ROOT/'reversium').glob('*.py'))
-    forbidden=re.compile(r'open[ -]source|github\.(?:com|io)',re.I)
+    forbidden=re.compile(r'open[\s_-]*source|github\.(?:com|io)',re.I)
     for target in targets:
         if target.is_file() and target.suffix in ('.md','.txt','.html','.py') and forbidden.search(target.read_text(encoding='utf-8')):
             problems.append('Retired product wording or source-hosting link: '+target.relative_to(ROOT).as_posix())

@@ -2,7 +2,7 @@
 
 Understand. Prepare. Develop.
 
-[Use Reversium in your browser](web/) to analyze your own ZIP locally, free and without installation or an account. The app does not upload or execute the package. The first visit downloads about 14 MB of application/runtime assets. Browser compressed ZIP limit: 32 MiB. [Explore fictional sample data](demo/report.html).
+[Use Reversium in your browser](web/) to analyze your own ZIP locally, free and without installation or an account. The app does not upload or execute the package. The first visit downloads about 14 MB of application/runtime assets. Browser compressed ZIP limit: 32 MiB. [Explore sample data](demo/report.html).
 
 ## What it is for
 

@@ -115,7 +115,7 @@ def render(report):
 <title>Reversium report</title><style>{STYLE}{AI_STYLE}{MODERN_STYLE}</style><main>
 <p class="brand">REVERSIUM 0.24.1 / LOCAL ANALYSIS</p>
 <nav><a href="/">Start a new analysis</a><span>Step 3 · Review findings → Step 4 · Save &amp; next steps</span></nav>
-{'<p class="sample-notice">SAMPLE ANALYSIS · Fictional demonstration data. Start a new analysis to inspect your ZIP.</p>' if report.get("example") else ''}
+{'<p class="sample-notice">SAMPLE ANALYSIS · Demonstration data. Start a new analysis to inspect your ZIP.</p>' if report.get("example") else ''}
 <p><b>Package:</b> {esc(report.get("archive_name", "Uploaded software package"))} · <b>Your goal:</b> {esc(goal_label)}</p>
 <div role="tablist" aria-label="Report sections">
 <a role="tab" href="#panel-behavior" id="tab-behavior" aria-controls="panel-behavior" aria-selected="false">About</a>
