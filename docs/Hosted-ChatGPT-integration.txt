@@ -1,0 +1,18 @@
+Hosted ChatGPT account integration: remaining dependency
+
+Checked 18 October 2026 against official OpenAI documentation:
+https://developers.openai.com/
+https://developers.openai.com/siwc/request-client-id
+https://openai.com/form/sign-in-with-chatgpt-interest/
+
+The public Static web hosting app has no hosted ChatGPT plan-use entitlement. Official documentation directs remotely hosted apps to the interest process. Identity sign-in alone does not establish permission to run inference using a subscription. Do not reuse another product's OAuth client or collect API secrets in the static app.
+
+Requested capability: Sign in and ChatGPT plan use for AI requests.
+Product description draft: Reversium by 3Sci Labs is a free software handover and source-analysis workbench. Analysis of ZIP files runs on the user's device. We want an optional in-UI assistant using the user's eligible ChatGPT plan, with explicit review of selected evidence and no ZIP upload. Responses should cite selected finding IDs, distinguish inferences and show unknowns. We need confirmation of supported hosted-web OAuth redirect, token exchange, browser/CORS and inference deployment requirements.
+
+Product URL: ../web/
+User guide: user-guide.html
+
+After access is confirmed: implement the provider-approved OAuth/session flow; review exact outgoing question/evidence before each request; validate returned citations; show replies inside Reversium; support disconnect/revocation; exclude credentials and chats from report exports. If a backend is required, select hosting and disclose its handling of selected evidence. Raw ZIPs remain device-local. Keep analysis independent from AI. Provider eligibility, usage limits and hosting costs must be confirmed; do not promise unlimited/free hosted inference.
+
+The user reports submitting the interest form on 18 October 2026. Approval has not been confirmed and hosted account inference is not enabled. The UI and provider-neutral lifecycle are prepared behind a disabled configuration; see docs/Online-AI-adapter.txt.

@@ -1,0 +1,16 @@
+Reversium by 3Sci Labs - elevator pitch
+
+You have the code. Now someone else needs to understand it.
+
+Perhaps you built a first version with Claude and the next developer works in Codex. Perhaps an agency is handing over a project, or you are taking over software with very little documentation. Reversium turns your code package into an evidence-backed starting point: what it appears to do, how supported features connect, which services are referenced and what still needs checking.
+
+Start free in your browser, with no installation. Your ZIP stays on your device. Give the next person the original code, a readable report, relationship diagrams and a practical checklist - so the handover begins with shared context and clear questions.
+
+Short version
+Your code. A clearer handover. Understand, prepare and continue in the tools you choose.
+
+What this means
+The Claude-to-Codex example is a manual code-and-document handover. Reversium does not migrate chats, hidden prompts, agent memory, credentials or accounts. AI can perform code analysis and use tools; Reversium packages a repeatable evidence, comparison and review workflow rather than claiming an ability AI cannot reproduce.
+
+Claim limits
+Supported static tracing is incomplete. Browser analysis never executes the package. The experimental local sandbox runs real code only in a fixed reviewed example profile; it is not a general runner, a simulator or a security/production certificate. Optional AI sharing is a separate user decision.

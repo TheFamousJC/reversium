@@ -1,0 +1,16 @@
+{
+  "version": "0.26.0",
+  "catalog_sha256": "bcaa5bc4ea543d1f33b4da0f29ea3f466e9416b151e22e9c330b29841069a8f0",
+  "artifacts": {
+    "output/pdf/Reversium-Feature-List.pdf": "803a65b96e71d61e81efcdf4a3cab0f0a7b7a7ed460a5b927d065ef738c515c1",
+    "output/pdf/Reversium-User-Journeys.pdf": "b1740d71faf179a8f8798129acc583a650b634f3567903810d23016d19b00242",
+    "docs/user-journeys.html": "ea46ca67ca7e118ea1c552832d014c64527158871ebeee6bc13d0e8f3e919209",
+    "docs/journeys/ai-handover.svg": "bfae3d3d21a62e618c09ac222afe67ec26c830d88d3646b00e6d395de2cca4ef",
+    "docs/journeys/ai-review.svg": "08b7842c2ec43953bb2b791ca25dc6c33a0657b4d07c599708261f9b6f8ff8b4",
+    "docs/journeys/change.svg": "b96b19a59679af9ca7dc3b76c0b806340db993fef11de12a283b330ec17826ec",
+    "docs/journeys/compare.svg": "59ab3e154f1495aa24c05a5df5b613b510465612bb88da017543b26eb4b79374",
+    "docs/journeys/developer.svg": "82bdd4fff8ad0c03be3d02d4a1837eb16b57319b420d34eaa14841e0977d3695",
+    "docs/journeys/sandbox.svg": "de9420410792f00cfc1a09bfbf75f3ac42a6bdd1a16d4ce72d35118e8b3c5f51",
+    "docs/journeys/understand.svg": "bd97a48f6711498033e474fee78eb06d34c55eb6296107d71483d1a27561db73"
+  }
+}
