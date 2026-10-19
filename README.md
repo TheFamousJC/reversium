@@ -60,7 +60,7 @@ After reviewing compatibility, prerequisites and [Help](docs/user-guide.html), t
 
 ```sh
 python -m unittest discover -s tests -v
-node --test tests/review-tools.test.mjs tests/online-ai.test.mjs tests/runtime-evidence.test.mjs tests/service-guest.test.mjs tests/cms-transport.test.mjs
+node --test tests/review-tools.test.mjs tests/online-ai.test.mjs tests/runtime-evidence.test.mjs tests/service-guest.test.mjs tests/cms-transport.test.mjs tests/evidence-links.test.mjs
 python scripts/build_help.py
 python scripts/build_browser.py
 python scripts/build_demo.py

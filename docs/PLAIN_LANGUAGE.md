@@ -384,3 +384,14 @@ A new feature-list PDF explains what each function does, where it is available a
 The market assessment identifies a possible business in helping agencies and developers take over unfamiliar projects. That is an opportunity to test with real paid handovers, not proven demand or revenue. The authorized reverse-engineering wording has legal sources and clearly leaves rights, restrictions and local law to each actual use.
 
 Final verification: 152 Python tests passed with one optional-dependency skip; 30 JavaScript tests passed. The documentation release gate passed. All four feature-list pages, seven journey pages and seventeen guide pages were rendered and visually checked. Both new PDF buttons downloaded files matching their generated build; Help showed seven journeys and 28 steps before analysis and after opening a sample report. A generic article-style contrast conflict was found and fixed. Browser download automation stalled for an extended period despite producing the files; that tool delay is not an application performance benchmark. No guest or live service was run for this documentation release.
+
+
+## Build 0.24.1 - checking the buttons properly
+
+We checked the main Start controls and used a fictional package to test the analysis flow. The updated Help, chapters, diagrams and three PDF downloads worked when served from the exact browser build on this computer. The PDF contents matched the release files. Report navigation, subsection buttons, filters and exports also worked in the tested sample.
+
+One real problem appeared: an evidence link inside the feature map sent the report back to Start. We fixed how newly created links are handled and added a regression check. Build 0.24.1 includes that correction.
+
+The online site still showed the older 0.23.1 build during these checks. Its two new PDF links returned not found because publication had not finished. A free publication retry was requested, but the jobs remained queued. A successful local test is not a successful online release; do not announce the new build as live until its version and PDF files are checked there.
+
+Final local follow-up verification: the actual dynamically rendered map link opened Evidence and finding-19 without navigating the iframe. All three 0.24.1 report PDF downloads matched the generated files byte-for-byte. HTML/JSON/SVG export and reviewed AI request download worked; no AI provider was contacted, and account connection remained intentionally disabled. The report Clear control returned to Start. Python: 152 tests with one optional-dependency skip. JavaScript: 34 tests passed. Documentation release checks passed. Publication remains separately subject to the hosting queue.
