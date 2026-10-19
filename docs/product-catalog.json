@@ -1,5 +1,5 @@
 {
-  "reviewed_on": "2026-10-19",
+  "reviewed_on": "2026-10-20",
   "feature_groups": [
     {
       "title": "Understand your delivery",
@@ -101,8 +101,8 @@
         {
           "name": "Report exports",
           "availability": "Browser + local",
-          "does": "Save readable HTML, structured JSON and map SVG.",
-          "limit": "Exports can contain private code-derived details; not an application backup."
+          "does": "Save readable HTML, structured JSON, map SVG or one local handover ZIP with checklist and remaining questions.",
+          "limit": "Pack limit 64 MiB. Notes and runtime evidence are opt-in. Original code ZIP and AI conversations are excluded."
         },
         {
           "name": "AI-to-AI handover",
@@ -136,8 +136,8 @@
         {
           "name": "Local application and CLI",
           "availability": "Local",
-          "does": "Analyze locally and export/compare reports with Python.",
-          "limit": "Local web input limit is 64 MiB; archive inspection bounds still apply."
+          "does": "Analyze locally with Python; release smoke checks verify public file/version consistency without sending user data.",
+          "limit": "File checks are not UI coverage. Local web input limit is 64 MiB; archive bounds still apply."
         },
         {
           "name": "Sandbox preparation",
@@ -216,7 +216,7 @@
           "Give the next developer the code, reports and selected context"
         ]
       ],
-      "output": "Original code package, HTML/JSON report and separately saved checklist.",
+      "output": "Original code package kept separately, plus one reviewed handover ZIP with reports and optional annotations.",
       "limit": "Manual handover. Reversium does not migrate conversations, agent memory, prompts, secrets or accounts."
     },
     {
@@ -238,8 +238,8 @@
           "Handover > Setup clues; Coverage > Setup & readiness"
         ],
         [
-          "Assign verification",
-          "Set checklist owners; save handover notes"
+          "Assign and save",
+          "Set checklist owners; optionally include annotations in the handover pack"
         ]
       ],
       "output": "A scoped investigation and setup checklist for the exact delivery.",

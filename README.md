@@ -60,7 +60,7 @@ After reviewing compatibility, prerequisites and [Help](docs/user-guide.html), t
 
 ```sh
 python -m unittest discover -s tests -v
-node --test tests/review-tools.test.mjs tests/online-ai.test.mjs tests/runtime-evidence.test.mjs tests/service-guest.test.mjs tests/cms-transport.test.mjs tests/evidence-links.test.mjs
+node --test tests/review-tools.test.mjs tests/online-ai.test.mjs tests/runtime-evidence.test.mjs tests/service-guest.test.mjs tests/cms-transport.test.mjs tests/evidence-links.test.mjs tests/handover-pack.test.mjs tests/browser-flow.test.mjs
 python scripts/build_help.py
 python scripts/build_browser.py
 python scripts/build_demo.py
@@ -68,3 +68,10 @@ python scripts/check_release_docs.py
 ```
 
 ReportLab is needed to build documentation PDFs, not for ordinary analysis. Authorized code understanding and reverse-engineering analysis are valid product purposes; rights, licences and jurisdiction still govern each use. Reversium does not grant permission to bypass access controls or publish someone else's code.
+
+
+## Build 0.25.0 - one-download handover and release checks
+
+Save & next steps now offers a device-local handover ZIP with HTML/JSON reports, current map SVG, full bounded map JSON, a checklist, remaining questions and a file manifest. Checklist annotations and attached runtime evidence are opt-in. The original code ZIP, AI conversations, pending imports and comparison previews are excluded. Inspect exports before sharing; code-derived details can be private. Maximum pack size is 64 MiB; CRC32 is corruption detection, not authentication.
+
+`python scripts/check_deployment.py --local` checks the release on a restricted loopback preview. `--base-url YOUR_PUBLIC_SITE` checks nine served assets against the current checkout; optional bounded retries allow for deployment/cache delays. Public asset verification also runs after successful Pages publication. Unit tests cover canceled-worker races, pack privacy defaults, bounds and independent ZIP/CRC readback. Actual browser checks remain separate.

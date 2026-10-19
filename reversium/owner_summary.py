@@ -28,6 +28,6 @@ def owner_summary(report):
 
 
 NEXT_STEPS = '''<h3>Your next three actions</h3><ol class="action-plan">
-<li><b>You: choose one feature that matters.</b><p>Write down what a user should be able to do, such as open a tour and see its stops. Avoid trying to verify the entire platform at once.</p><p><b>Done when:</b> you and the developer agree on the action and its expected result.</p></li>
+<li><b>You: choose one feature that matters.</b><p>Write down what a user should be able to do, such as save an item and see it listed. Avoid trying to verify the entire platform at once.</p><p><b>Done when:</b> you and the developer agree on the action and its expected result.</p></li>
 <li><b>Developer: explain the setup and prove that feature locally.</b><p>Use the evidence to locate the code. List the required services, configuration and sample data, then test in a separate disposable environment.</p><p><b>Done when:</b> another person can follow the setup notes and see the agreed feature succeed, with dated test results.</p></li>
 <li><b>You and the developer: record what is still missing.</b><p>Save the report and agree who owns each unanswered question, access requirement and failed test.</p><p><b>Done when:</b> you have a handover checklist with owners and evidence, not just a claim that the software works.</p></li></ol>'''

@@ -1,15 +1,15 @@
 {
-  "version": "0.24.1",
-  "catalog_sha256": "9cea8da4b5b0b227888781d9b1a76f8f3c3549ad25ad52f8972586f94391b676",
+  "version": "0.25.0",
+  "catalog_sha256": "6243f67ebc70720e43a13b78dfce5820672e2482452c2c19d0b20f671eb356a0",
   "artifacts": {
-    "output/pdf/Reversium-Feature-List.pdf": "d0b03a43dab86123508baad8c7e09cabf82a8f66dbf5a99fb975d9c1f4858a10",
-    "output/pdf/Reversium-User-Journeys.pdf": "45e082cae3eb972a758922afd52ed9f577241d5face9cc666141a9997c27d6eb",
-    "docs/user-journeys.html": "d497ca891e993b487aea7ec27834f304e6344fbb0f2bbb5a5dcf31ed9db93960",
+    "output/pdf/Reversium-Feature-List.pdf": "ce62aed4b6dcb8d2b38ec71f947e5a51f81236e04ea05fa949ced7fad1a5d45d",
+    "output/pdf/Reversium-User-Journeys.pdf": "6e15522bdaae926463ce582d7c864b9cd6363b4c2079571aaa0ca8e08e66db45",
+    "docs/user-journeys.html": "cc3a67c8c204259cb4f2f711a597b4c272b7b56eeb5c25039fa0fa3b0220ac8e",
     "docs/journeys/ai-handover.svg": "bfae3d3d21a62e618c09ac222afe67ec26c830d88d3646b00e6d395de2cca4ef",
     "docs/journeys/ai-review.svg": "08b7842c2ec43953bb2b791ca25dc6c33a0657b4d07c599708261f9b6f8ff8b4",
     "docs/journeys/change.svg": "b96b19a59679af9ca7dc3b76c0b806340db993fef11de12a283b330ec17826ec",
     "docs/journeys/compare.svg": "59ab3e154f1495aa24c05a5df5b613b510465612bb88da017543b26eb4b79374",
-    "docs/journeys/developer.svg": "01048be9740aac0b7fae2c110e01cfbfb7fa6dce45c4fd151b5a1baf1e201880",
+    "docs/journeys/developer.svg": "82bdd4fff8ad0c03be3d02d4a1837eb16b57319b420d34eaa14841e0977d3695",
     "docs/journeys/sandbox.svg": "de9420410792f00cfc1a09bfbf75f3ac42a6bdd1a16d4ce72d35118e8b3c5f51",
     "docs/journeys/understand.svg": "bd97a48f6711498033e474fee78eb06d34c55eb6296107d71483d1a27561db73"
   }

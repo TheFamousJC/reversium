@@ -16,17 +16,18 @@ $('#browser-cancel').onclick=clear;$('#browser-clear').onclick=clear;
 window.addEventListener('message',event=>{
  if(event.source!==frame.contentWindow)return;
  if(event.data?.type==='reversium-clear')clear();
+ if(event.data?.type==='reversium-pack-download'&&event.data.bytes instanceof ArrayBuffer&&event.data.bytes.byteLength>0&&event.data.bytes.byteLength<=67108864){const url=URL.createObjectURL(new Blob([event.data.bytes],{type:'application/zip'})),a=document.createElement('a');a.href=url;a.download='reversium-handover-pack.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);return;}
  const d=event.data,formats={'reversium-runtime-result.json':'application/json','reversium-runtime-result.txt':'text/plain','reversium-readiness.txt':'text/plain','reversium-comparison.txt':'text/plain','Reversium-User-Guide.pdf':'application/pdf','Reversium-Feature-List.pdf':'application/pdf','Reversium-User-Journeys.pdf':'application/pdf','reversium-ai-request.txt':'text/plain','reversium-handover.txt':'text/plain','reversium-handover.json':'application/json','reversium-report.json':'application/json','reversium-report.html':'text/html','reversium-feature-map.svg':'image/svg+xml'};
  if(d?.type==='reversium-download'&&formats[d.name]===d.mime&&typeof d.text==='string'&&d.text.length<100000000){const url=URL.createObjectURL(new Blob([d.mime==='application/pdf'?Uint8Array.from(atob(d.text),c=>c.charCodeAt(0)):d.text],{type:d.mime}));const a=document.createElement('a');a.href=url;a.download=d.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 });
 $('#upload-form').onsubmit=async event=>{
  event.preventDefault();const file=$('#zip-input').files[0];if(!file||file.size>33554432||file.size===0||worker)return;
  upload.hidden=true;progress.hidden=false;$('#browser-message').textContent='Preparing the local analysis…';
- worker=new Worker('./worker.mjs?v=0.24.1',{type:'module'});
- timer=setTimeout(()=>{stop();$('#browser-message').textContent='Analysis stopped after five minutes. Try a smaller archive or a more capable device. Nothing was uploaded.'},300000);
- worker.onerror=()=>{stop();$('#browser-message').textContent='Browser runtime could not start. Check your connection and browser support, then cancel and retry. Nothing was uploaded.'};
- worker.onmessage=({data})=>{if(data.stage)$('#browser-message').textContent=data.stage;if(data.error){stop();$('#browser-message').textContent=data.error}if(data.html){stop();document.querySelector('#app-content').hidden=true;progress.hidden=true;results.hidden=false;$('#start-step').hidden=true;frame.srcdoc=data.html;results.scrollIntoView({block:'start'})}};
- try{const bytes=await file.arrayBuffer();if(worker)worker.postMessage({bytes,name:file.name,goal},[bytes])}catch(error){stop();$('#browser-message').textContent='The selected file could not be read. Cancel and choose it again.'}
+ const activeWorker=worker=new Worker('./worker.mjs?v=0.25.0',{type:'module'});
+ timer=setTimeout(()=>{if(worker!==activeWorker)return;stop();$('#browser-message').textContent='Analysis stopped after five minutes. Try a smaller archive or a more capable device. Nothing was uploaded.'},300000);
+ worker.onerror=()=>{if(worker!==activeWorker)return;stop();$('#browser-message').textContent='Browser runtime could not start. Check your connection and browser support, then cancel and retry. Nothing was uploaded.'};
+ worker.onmessage=({data})=>{if(worker!==activeWorker||!data||typeof data!=='object')return;if(data.stage)$('#browser-message').textContent=data.stage;if(data.error){stop();$('#browser-message').textContent=data.error}if(data.html){stop();document.querySelector('#app-content').hidden=true;progress.hidden=true;results.hidden=false;$('#start-step').hidden=true;frame.srcdoc=data.html;results.scrollIntoView({block:'start'})}};
+ try{const bytes=await file.arrayBuffer();if(worker===activeWorker)activeWorker.postMessage({bytes,name:file.name,goal},[bytes])}catch(error){if(worker!==activeWorker)return;stop();$('#browser-message').textContent='The selected file could not be read. Cancel and choose it again.'}
 };
 window.addEventListener('pagehide',()=>{stop();onlineAI.disconnect()});
 

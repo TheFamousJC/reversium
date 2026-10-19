@@ -402,3 +402,14 @@ Final local follow-up verification: the actual dynamically rendered map link ope
 The link description now explains that Reversium helps analyze your software ZIP, map features and prepare a handover. Sample screens still say they use sample data, but the link no longer describes the whole product as fictional. Product wording contains no retired licensing-status references; dependency notices remain in place.
 
 The useful first release is a limited beta for understanding and handing over code. It is not yet a promise that any package can run, that every feature is mapped, or that the software is secure or production-ready. Test it with independent owners and developers before making stronger claims or charging for a hosted service. Keep the experimental sandbox and unavailable online account connection clearly separate from the core analyzer.
+
+
+## Build 0.25.0 - one download for a practical handover
+
+You can now save a handover ZIP after analysis. It keeps the readable report, technical findings, diagrams, review checklist and unanswered questions together, with a short guide explaining what to open first. Your original code package stays separate.
+
+The two inclusion choices start off: your checklist annotations, and any attached local test record. Turn them on only if you want those details in the pack. Pending imports and AI conversations are excluded. Reports can still reveal private code-derived information, so open and review the files before sharing. A file manifest helps detect accidental damage; it is not an authenticity certificate. Larger packs are refused at 64 MiB.
+
+Reliability tests found that canceling one analysis and quickly starting another could allow an old result or file read to interfere. We fixed that and added checks that reproduce both cases. Release checks now compare the public site files with the intended release, including PDFs. They help catch stale deployments but do not replace clicking through the interface or testing your own application. No account or paid service is needed for these functions.
+
+We tested both privacy choices in the browser, opened a saved report again and downloaded a fresh pack from it. This caught and fixed a button that could incorrectly stay disabled in the saved copy. A real 266-file package also produced a complete pack with its original-package fingerprint preserved. The automated checks passed: 155 Python checks with one optional check skipped, and 41 browser-logic checks. These are analysis and export checks, not a new test run of the software inside your ZIP.
